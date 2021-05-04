@@ -1,4 +1,4 @@
-package com.ai.st.microservice.quality.infrastructure.v1.controllers;
+package com.ai.st.microservice.quality.entrypoints.controllers;
 
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 import org.springframework.http.HttpStatus;

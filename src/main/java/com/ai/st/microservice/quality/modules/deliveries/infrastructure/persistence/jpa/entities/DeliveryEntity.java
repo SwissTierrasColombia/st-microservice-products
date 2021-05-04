@@ -1,4 +1,4 @@
-package com.ai.st.microservice.quality.infrastructure.persistence.entities;
+package com.ai.st.microservice.quality.modules.deliveries.infrastructure.persistence.jpa.entities;
 
 import javax.persistence.*;
 import java.util.Date;

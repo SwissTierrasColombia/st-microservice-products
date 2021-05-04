@@ -1,6 +1,6 @@
-package com.ai.st.microservice.quality.modules.products.infrastructure.persistence.jpa;
+package com.ai.st.microservice.quality.modules.products.infrastructure.persistence.jpa.repositories;
 
-import com.ai.st.microservice.quality.infrastructure.persistence.entities.ProductEntity;
+import com.ai.st.microservice.quality.modules.products.infrastructure.persistence.jpa.entities.ProductEntity;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.ai.st.microservice.quality.modules.deliveries.application.CreateDelivery;
 
-import com.ai.st.microservice.quality.infrastructure.persistence.entities.DeliveryMethodEnum;
+import com.ai.st.microservice.quality.modules.deliveries.infrastructure.persistence.jpa.entities.DeliveryMethodEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.web.multipart.MultipartFile;

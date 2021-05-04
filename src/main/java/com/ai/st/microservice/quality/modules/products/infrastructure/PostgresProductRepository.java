@@ -1,9 +1,9 @@
 package com.ai.st.microservice.quality.modules.products.infrastructure;
 
-import com.ai.st.microservice.quality.infrastructure.persistence.entities.ProductEntity;
+import com.ai.st.microservice.quality.modules.products.infrastructure.persistence.jpa.entities.ProductEntity;
 import com.ai.st.microservice.quality.modules.products.domain.Product;
 import com.ai.st.microservice.quality.modules.products.domain.contracts.ProductRepository;
-import com.ai.st.microservice.quality.modules.products.infrastructure.persistence.jpa.ProductJPARepository;
+import com.ai.st.microservice.quality.modules.products.infrastructure.persistence.jpa.repositories.ProductJPARepository;
 import com.ai.st.microservice.quality.modules.shared.domain.ManagerCode;
 import org.springframework.stereotype.Service;
 

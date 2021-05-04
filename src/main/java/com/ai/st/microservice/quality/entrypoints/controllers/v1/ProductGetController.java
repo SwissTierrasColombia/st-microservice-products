@@ -1,4 +1,4 @@
-package com.ai.st.microservice.quality.infrastructure.v1.controllers;
+package com.ai.st.microservice.quality.entrypoints.controllers.v1;
 
 import com.ai.st.microservice.common.business.AdministrationBusiness;
 import com.ai.st.microservice.common.business.ManagerBusiness;
@@ -7,6 +7,7 @@ import com.ai.st.microservice.common.dto.general.BasicResponseDto;
 import com.ai.st.microservice.common.dto.managers.MicroserviceManagerDto;
 import com.ai.st.microservice.common.exceptions.DisconnectedMicroserviceException;
 import com.ai.st.microservice.common.exceptions.InputValidationException;
+import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
 import com.ai.st.microservice.quality.modules.products.application.ProductResponse;
 import com.ai.st.microservice.quality.modules.products.application.SearchProductsFromManager.ProductsFinder;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
@@ -55,7 +56,6 @@ public final class ProductGetController extends ApiController {
 
         try {
 
-            // user session
             MicroserviceUserDto userDtoSession = administrationBusiness.getUserByToken(headerAuthorization);
             if (userDtoSession == null) {
                 throw new DisconnectedMicroserviceException("Ha ocurrido un error consultando el usuario");
