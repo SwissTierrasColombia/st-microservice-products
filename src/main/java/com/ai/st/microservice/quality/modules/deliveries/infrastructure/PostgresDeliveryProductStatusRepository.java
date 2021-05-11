@@ -1,9 +1,9 @@
 package com.ai.st.microservice.quality.modules.deliveries.infrastructure;
 
-import com.ai.st.microservice.quality.modules.deliveries.infrastructure.persistence.jpa.entities.DeliveryProductStatusEntity;
-import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryProductStatus;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.jpa.entities.DeliveryProductStatusEntity;
+import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductStatus;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductStatusRepository;
-import com.ai.st.microservice.quality.modules.deliveries.infrastructure.persistence.jpa.repositories.DeliveryProductStatusJPARepository;
+import com.ai.st.microservice.quality.modules.deliveries.infrastructure.persistence.jpa.DeliveryProductStatusJPARepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

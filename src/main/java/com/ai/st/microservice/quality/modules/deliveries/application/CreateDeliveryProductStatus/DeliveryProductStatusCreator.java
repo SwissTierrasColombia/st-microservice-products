@@ -1,8 +1,8 @@
 package com.ai.st.microservice.quality.modules.deliveries.application.CreateDeliveryProductStatus;
 
-import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryProductStatus;
-import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryProductStatusId;
-import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryProductStatusName;
+import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductStatus;
+import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductStatusId;
+import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductStatusName;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductStatusRepository;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 

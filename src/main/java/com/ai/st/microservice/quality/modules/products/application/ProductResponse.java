@@ -10,15 +10,15 @@ public final class ProductResponse {
     private final String name;
     private final String description;
     private final Long managerCode;
-    private final String method;
+    private final boolean isXTF;
     private final Date createdAt;
 
-    public ProductResponse(Long id, String name, String description, Long managerCode, String method, Date createdAt) {
+    public ProductResponse(Long id, String name, String description, Long managerCode, boolean method, Date createdAt) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.managerCode = managerCode;
-        this.method = method;
+        this.isXTF = method;
         this.createdAt = createdAt;
     }
 
@@ -28,7 +28,7 @@ public final class ProductResponse {
                 product.name().value(),
                 product.description().value(),
                 product.managerCode().value(),
-                product.method().value(),
+                product.productXTF().value(),
                 product.createdAt());
     }
 
@@ -48,8 +48,8 @@ public final class ProductResponse {
         return managerCode;
     }
 
-    public String method() {
-        return method;
+    public boolean xtf() {
+        return isXTF;
     }
 
     public Date createdAt() {

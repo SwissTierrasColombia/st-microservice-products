@@ -4,7 +4,7 @@ import com.ai.st.microservice.quality.modules.deliveries.application.CreateDeliv
 import com.ai.st.microservice.quality.modules.deliveries.application.CreateDeliveryStatus.DeliveryStatusCreator;
 import com.ai.st.microservice.quality.modules.deliveries.application.SearchAllDeliveryProductStatuses.DeliveryProductStatusesFinder;
 import com.ai.st.microservice.quality.modules.deliveries.application.SearchAllDeliveryStatuses.DeliveryStatusesFinder;
-import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryProductStatusId;
+import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductStatusId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryStatusId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +45,11 @@ public class StMicroserviceProductsApplicationStartup implements ApplicationList
 
         int count = deliveryStatusesFinder.finder().size();
         if (count == 0) {
-            deliveryStatusCreator.create(DeliveryStatusId.IN_VALIDATION, "EN VALIDACIÓN");
+            deliveryStatusCreator.create(DeliveryStatusId.DRAFT, "BORRADOR");
             deliveryStatusCreator.create(DeliveryStatusId.DELIVERED, "ENTREGADO");
-            deliveryStatusCreator.create(DeliveryStatusId.REJECT, "RECHAZADO");
+            deliveryStatusCreator.create(DeliveryStatusId.IN_VALIDATION, "EN VALIDACIÓN");
+            deliveryStatusCreator.create(DeliveryStatusId.ACCEPTED, "ACEPTADO");
+            deliveryStatusCreator.create(DeliveryStatusId.REJECTED, "RECHAZADO");
             log.info("The domains 'delivery statuses' have been loaded!");
         }
 
@@ -57,13 +59,13 @@ public class StMicroserviceProductsApplicationStartup implements ApplicationList
 
         int count = deliveryProductStatusesFinder.finder().size();
         if (count == 0) {
+            deliveryProductStatusCreator.create(DeliveryProductStatusId.PENDING, "PENDIENTE");
             deliveryProductStatusCreator.create(DeliveryProductStatusId.IN_VALIDATION, "EN VALIDACIÓN");
-            deliveryProductStatusCreator.create(DeliveryProductStatusId.ACCEPT, "ACEPTADO");
-            deliveryProductStatusCreator.create(DeliveryProductStatusId.REJECT, "RECHAZADO");
+            deliveryProductStatusCreator.create(DeliveryProductStatusId.ACCEPTED, "ACEPTADO");
+            deliveryProductStatusCreator.create(DeliveryProductStatusId.REJECTED, "RECHAZADO");
             log.info("The domains 'delivery product statuses' have been loaded!");
         }
 
     }
-
 
 }

@@ -11,25 +11,25 @@ public final class Product {
     private final ProductName name;
     private final ProductDescription description;
     private final ManagerCode managerCode;
-    private final ProductDeliveryMethod method;
+    private final ProductXTF productXTF;
     private final Date createdAt;
 
-    public Product(ProductId id, ProductName name, ProductDescription description, ManagerCode managerCode, ProductDeliveryMethod method, Date createdAt) {
+    public Product(ProductId id, ProductName name, ProductDescription description, ManagerCode managerCode, ProductXTF productXTF, Date createdAt) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.managerCode = managerCode;
-        this.method = method;
+        this.productXTF = productXTF;
         this.createdAt = createdAt;
     }
 
-    public static Product fromPrimitives(Long id, String name, String description, Long managerCode, String method, Date createdAt) {
+    public static Product fromPrimitives(Long id, String name, String description, Long managerCode, boolean productXTF, Date createdAt) {
         return new Product(
                 new ProductId(id),
                 new ProductName(name),
                 new ProductDescription(description),
                 new ManagerCode(managerCode),
-                new ProductDeliveryMethod(method),
+                new ProductXTF(productXTF),
                 createdAt);
     }
 
@@ -49,8 +49,8 @@ public final class Product {
         return managerCode;
     }
 
-    public ProductDeliveryMethod method() {
-        return method;
+    public ProductXTF productXTF() {
+        return productXTF;
     }
 
     public Date createdAt() {
@@ -65,11 +65,11 @@ public final class Product {
         return id.equals(product.id) && name.equals(product.name)
                 && description.equals(product.description)
                 && managerCode.equals(product.managerCode)
-                && method.equals(product.method) && createdAt.equals(product.createdAt);
+                && productXTF.equals(product.productXTF) && createdAt.equals(product.createdAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, managerCode, method, createdAt);
+        return Objects.hash(id, name, description, managerCode, productXTF, createdAt);
     }
 }

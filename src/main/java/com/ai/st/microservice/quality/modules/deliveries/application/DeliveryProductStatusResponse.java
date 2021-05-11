@@ -1,6 +1,6 @@
 package com.ai.st.microservice.quality.modules.deliveries.application;
 
-import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryProductStatus;
+import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductStatus;
 
 public final class DeliveryProductStatusResponse {
 

@@ -1,6 +1,6 @@
 package com.ai.st.microservice.quality.modules.deliveries.domain.contracts;
 
-import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryProductStatus;
+import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductStatus;
 
 import java.util.List;
 
