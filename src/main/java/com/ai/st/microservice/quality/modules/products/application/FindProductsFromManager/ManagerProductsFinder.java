@@ -1,4 +1,4 @@
-package com.ai.st.microservice.quality.modules.products.application.SearchProductsFromManager;
+package com.ai.st.microservice.quality.modules.products.application.FindProductsFromManager;
 
 import com.ai.st.microservice.quality.modules.products.application.ProductResponse;
 import com.ai.st.microservice.quality.modules.products.domain.Product;
@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public final class ProductsFinderByManager {
+public final class ManagerProductsFinder {
 
     private final ProductRepository repository;
 
-    public ProductsFinderByManager(ProductRepository repository) {
+    public ManagerProductsFinder(ProductRepository repository) {
         this.repository = repository;
     }
 

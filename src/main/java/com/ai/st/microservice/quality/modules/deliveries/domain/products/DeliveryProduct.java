@@ -3,6 +3,8 @@ package com.ai.st.microservice.quality.modules.deliveries.domain.products;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.DeliveryProductAttachment;
 import com.ai.st.microservice.quality.modules.products.domain.ProductId;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public final class DeliveryProduct {
@@ -16,13 +18,33 @@ public final class DeliveryProduct {
 
     public DeliveryProduct(DeliveryProductId deliveryProductId, DeliveryProductDate deliveryProductDate,
                            DeliveryProductObservations deliveryProductObservations,
-                           ProductId productId, DeliveryProductStatusId deliveryProductStatusId, List<DeliveryProductAttachment> attachments) {
+                           ProductId productId, DeliveryProductStatusId deliveryProductStatusId,
+                           List<DeliveryProductAttachment> attachments) {
         this.deliveryProductId = deliveryProductId;
         this.deliveryProductDate = deliveryProductDate;
         this.deliveryProductObservations = deliveryProductObservations;
         this.productId = productId;
         this.deliveryProductStatusId = deliveryProductStatusId;
         this.attachments = attachments;
+    }
+
+    public static DeliveryProduct fromPrimitives(Long deliveryProductId, Date deliveryProductDate, String observations, Long productId,
+                                                 Long deliveryProductStatusId) {
+        return new DeliveryProduct(
+                new DeliveryProductId(deliveryProductId),
+                new DeliveryProductDate(deliveryProductDate),
+                new DeliveryProductObservations(observations),
+                new ProductId(productId),
+                new DeliveryProductStatusId(deliveryProductStatusId),
+                new ArrayList<>()
+        );
+    }
+
+    public static DeliveryProduct create(DeliveryProductDate deliveryProductDate,
+                                         DeliveryProductObservations deliveryProductObservations,
+                                         ProductId productId, DeliveryProductStatusId deliveryProductStatusId) {
+        return new DeliveryProduct(null, deliveryProductDate, deliveryProductObservations,
+                productId, deliveryProductStatusId, new ArrayList<>());
     }
 
     public DeliveryProductId deliveryProductId() {

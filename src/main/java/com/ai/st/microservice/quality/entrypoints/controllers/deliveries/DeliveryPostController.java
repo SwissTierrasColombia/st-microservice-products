@@ -74,7 +74,7 @@ public final class DeliveryPostController extends ApiController {
             List<Long> products = request.getDeliveredProducts();
             validateProducts(request.getDeliveredProducts());
 
-            this.deliveryCreator.create(
+            deliveryCreator.create(
                     new CreateDeliveryCommand(
                             municipalityCode,
                             managerCode,
@@ -86,15 +86,15 @@ public final class DeliveryPostController extends ApiController {
             httpStatus = HttpStatus.CREATED;
 
         } catch (InputValidationException e) {
-            log.error("Error DeliveryV1Controller@createDelivery#Validation ---> " + e.getMessage());
+            log.error("Error DeliveryPostController@createDelivery#Validation ---> " + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
             responseDto = new BasicResponseDto(e.getMessage(), 1);
         } catch (DomainError e) {
-            log.error("Error DeliveryV1Controller@createDelivery#Domain ---> " + e.errorMessage());
+            log.error("Error DeliveryPostController@createDelivery#Domain ---> " + e.errorMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
             responseDto = new BasicResponseDto(e.errorMessage(), 2);
         } catch (Exception e) {
-            log.error("Error DeliveryV1Controller@createDelivery#General ---> " + e.getMessage());
+            log.error("Error DeliveryPostController@createDelivery#General ---> " + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
             responseDto = new BasicResponseDto(e.getMessage(), 3);
         }

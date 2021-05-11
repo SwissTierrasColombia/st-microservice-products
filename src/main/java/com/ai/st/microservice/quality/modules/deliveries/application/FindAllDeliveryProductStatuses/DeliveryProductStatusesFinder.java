@@ -1,4 +1,4 @@
-package com.ai.st.microservice.quality.modules.deliveries.application.SearchAllDeliveryProductStatuses;
+package com.ai.st.microservice.quality.modules.deliveries.application.FindAllDeliveryProductStatuses;
 
 import com.ai.st.microservice.quality.modules.deliveries.application.DeliveryProductStatusResponse;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductStatusRepository;

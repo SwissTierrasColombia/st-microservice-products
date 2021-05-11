@@ -1,16 +1,13 @@
 package com.ai.st.microservice.quality.modules.deliveries.application.CreateDelivery;
 
-import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
-import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryDate;
-import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryObservations;
-import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryStatusId;
+import com.ai.st.microservice.quality.modules.deliveries.domain.*;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryRepository;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductDate;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductObservations;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductStatusId;
 
 import com.ai.st.microservice.quality.modules.products.application.ProductResponse;
-import com.ai.st.microservice.quality.modules.products.application.SearchProductsFromManager.ProductsFinderByManager;
+import com.ai.st.microservice.quality.modules.products.application.FindProductsFromManager.ManagerProductsFinder;
 import com.ai.st.microservice.quality.modules.products.domain.ProductId;
 import com.ai.st.microservice.quality.modules.products.domain.contracts.ProductRepository;
 import com.ai.st.microservice.quality.modules.products.domain.exceptions.ProductDoesNotBelongToManager;
@@ -19,6 +16,7 @@ import com.ai.st.microservice.quality.modules.shared.domain.*;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.DateTime;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.WorkspaceMicroservice;
 import com.ai.st.microservice.quality.modules.shared.domain.exceptions.OperatorDoesNotBelongToManager;
+import org.apache.commons.lang.RandomStringUtils;
 
 import java.util.List;
 
@@ -28,14 +26,14 @@ public final class DeliveryCreator {
     private final DeliveryRepository deliveryRepository;
     private final WorkspaceMicroservice workspaceMicroservice;
     private final DateTime dateTime;
-    private final ProductsFinderByManager productsFinderByManager;
+    private final ManagerProductsFinder productsFinderByManager;
 
     public DeliveryCreator(DeliveryRepository deliveryRepository, ProductRepository productRepository,
                            WorkspaceMicroservice workspaceMicroservice, DateTime dateTime) {
         this.deliveryRepository = deliveryRepository;
         this.workspaceMicroservice = workspaceMicroservice;
         this.dateTime = dateTime;
-        this.productsFinderByManager = new ProductsFinderByManager(productRepository);
+        this.productsFinderByManager = new ManagerProductsFinder(productRepository);
     }
 
     public void create(CreateDeliveryCommand command) {
@@ -48,6 +46,7 @@ public final class DeliveryCreator {
         verifyProductsBelongToManager(command.deliveryProducts(), managerCode);
 
         Delivery delivery = Delivery.create(
+                new DeliveryCode(generateDeliveryCode()),
                 municipalityCode,
                 managerCode,
                 operatorCode,
@@ -82,6 +81,10 @@ public final class DeliveryCreator {
         List<ProductResponse> productResponseList = this.productsFinderByManager.finder(managerCode.value());
         productResponseList.stream().filter(productResponse -> productResponse.id().equals(productId.value())).findAny()
                 .orElseThrow(ProductDoesNotBelongToManager::new);
+    }
+
+    private String generateDeliveryCode() {
+        return RandomStringUtils.random(6, false, true);
     }
 
 }

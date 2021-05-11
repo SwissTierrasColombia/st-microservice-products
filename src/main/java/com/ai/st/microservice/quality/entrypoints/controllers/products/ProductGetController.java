@@ -9,7 +9,7 @@ import com.ai.st.microservice.common.exceptions.DisconnectedMicroserviceExceptio
 import com.ai.st.microservice.common.exceptions.InputValidationException;
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
 import com.ai.st.microservice.quality.modules.products.application.ProductResponse;
-import com.ai.st.microservice.quality.modules.products.application.SearchProductsFromManager.ProductsFinderByManager;
+import com.ai.st.microservice.quality.modules.products.application.FindProductsFromManager.ManagerProductsFinder;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -30,9 +30,9 @@ public final class ProductGetController extends ApiController {
 
     private final AdministrationBusiness administrationBusiness;
     private final ManagerBusiness managerBusiness;
-    private final ProductsFinderByManager productsFinder;
+    private final ManagerProductsFinder productsFinder;
 
-    public ProductGetController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness, ProductsFinderByManager productsFinder) {
+    public ProductGetController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness, ManagerProductsFinder productsFinder) {
         this.administrationBusiness = administrationBusiness;
         this.managerBusiness = managerBusiness;
         this.productsFinder = productsFinder;

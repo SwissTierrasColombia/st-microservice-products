@@ -14,6 +14,9 @@ public class DeliveryEntity {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Column(name = "code", nullable = false, length = 20)
+    private String code;
+
     @Column(name = "municipality_code", nullable = false, length = 8)
     private String municipalityCode;
 
@@ -110,5 +113,13 @@ public class DeliveryEntity {
 
     public void setProducts(List<DeliveredProductEntity> products) {
         this.products = products;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }

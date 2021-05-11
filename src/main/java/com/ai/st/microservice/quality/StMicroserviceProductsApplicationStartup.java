@@ -2,8 +2,8 @@ package com.ai.st.microservice.quality;
 
 import com.ai.st.microservice.quality.modules.deliveries.application.CreateDeliveryProductStatus.DeliveryProductStatusCreator;
 import com.ai.st.microservice.quality.modules.deliveries.application.CreateDeliveryStatus.DeliveryStatusCreator;
-import com.ai.st.microservice.quality.modules.deliveries.application.SearchAllDeliveryProductStatuses.DeliveryProductStatusesFinder;
-import com.ai.st.microservice.quality.modules.deliveries.application.SearchAllDeliveryStatuses.DeliveryStatusesFinder;
+import com.ai.st.microservice.quality.modules.deliveries.application.FindAllDeliveryProductStatuses.DeliveryProductStatusesFinder;
+import com.ai.st.microservice.quality.modules.deliveries.application.FindAllDeliveryStatuses.DeliveryStatusesFinder;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductStatusId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryStatusId;
 import org.slf4j.Logger;
