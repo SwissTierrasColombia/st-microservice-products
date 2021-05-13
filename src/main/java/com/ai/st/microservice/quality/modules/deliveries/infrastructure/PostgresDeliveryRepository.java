@@ -7,8 +7,24 @@ import com.ai.st.microservice.quality.modules.deliveries.infrastructure.persiste
 import com.ai.st.microservice.quality.modules.deliveries.infrastructure.persistence.jpa.DeliveryProductStatusJPARepository;
 import com.ai.st.microservice.quality.modules.deliveries.infrastructure.persistence.jpa.DeliveryStatusJPARepository;
 import com.ai.st.microservice.quality.modules.products.infrastructure.persistence.jpa.ProductJPARepository;
+import com.ai.st.microservice.quality.modules.shared.domain.PageableDomain;
+import com.ai.st.microservice.quality.modules.shared.domain.criteria.*;
 import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.jpa.entities.*;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.springframework.data.jpa.domain.Specification.where;
 
 @Service
 public final class PostgresDeliveryRepository implements DeliveryRepository {
@@ -17,6 +33,14 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
     private final DeliveryProductStatusJPARepository deliveryProductStatusJPARepository;
     private final ProductJPARepository productJPARepository;
     private final DeliveryJPARepository deliveryJPARepository;
+
+    public static final Map<String, String> MAPPING_FIELDS = new HashMap<>(
+            Map.ofEntries(
+                    new AbstractMap.SimpleEntry<>("deliveryDate", "createdAt"),
+                    new AbstractMap.SimpleEntry<>("deliveryStatus", "deliveryStatus"),
+                    new AbstractMap.SimpleEntry<>("manager", "managerCode"),
+                    new AbstractMap.SimpleEntry<>("operator", "operatorCode")
+            ));
 
     public PostgresDeliveryRepository(DeliveryStatusJPARepository deliveryStatusJPARepository,
                                       DeliveryProductStatusJPARepository deliveryProductStatusJPARepository,
@@ -75,6 +99,115 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
                         deliveryEntity.getObservations(),
                         deliveryEntity.getCreatedAt(),
                         deliveryEntity.getDeliveryStatus().getId());
+    }
+
+    @Override
+    public PageableDomain<Delivery> matching(Criteria criteria) {
+
+        List<DeliveryEntity> deliveryEntities;
+        Page<DeliveryEntity> page = null;
+
+        if (criteria.hasFilters()) {
+
+            Specification<DeliveryEntity> specification = addFilters(criteria.filters());
+
+            if (criteria.hasPagination()) {
+                Pageable pageable = addPageable(criteria.page().get(), criteria.limit().get(), criteria.order());
+                page = deliveryJPARepository.findAll(specification, pageable);
+                deliveryEntities = page.getContent();
+            } else {
+                if (criteria.order().hasOrder()) {
+                    Sort sort = addSorting(criteria.order().orderBy(), criteria.order().orderType());
+                    deliveryEntities = deliveryJPARepository.findAll(specification, sort);
+                } else {
+                    deliveryEntities = deliveryJPARepository.findAll(specification);
+                }
+            }
+
+        } else {
+            if (criteria.hasPagination()) {
+                Pageable pageable = addPageable(criteria.page().get(), criteria.limit().get(), criteria.order());
+                page = deliveryJPARepository.findAll(pageable);
+                deliveryEntities = page.getContent();
+            } else {
+                if (criteria.order().hasOrder()) {
+                    Sort sort = addSorting(criteria.order().orderBy(), criteria.order().orderType());
+                    deliveryEntities = deliveryJPARepository.findAll(sort);
+                } else {
+                    deliveryEntities = deliveryJPARepository.findAll();
+                }
+            }
+        }
+
+        List<Delivery> deliveries = deliveryEntities.stream().map(deliveryEntity -> Delivery.fromPrimitives(
+                deliveryEntity.getId(), deliveryEntity.getCode(), deliveryEntity.getMunicipalityCode(),
+                deliveryEntity.getManagerCode(), deliveryEntity.getOperatorCode(), deliveryEntity.getUserCode(),
+                deliveryEntity.getObservations(), deliveryEntity.getCreatedAt(), deliveryEntity.getDeliveryStatus().getId()
+        )).collect(Collectors.toList());
+
+        return new PageableDomain<>(
+                deliveries,
+                page != null ? Optional.of(page.getNumber() + 1) : Optional.empty(),
+                page != null ? Optional.of(page.getNumberOfElements()) : Optional.empty(),
+                page != null ? Optional.of(page.getTotalElements()) : Optional.empty(),
+                page != null ? Optional.of(page.getTotalPages()) : Optional.empty(),
+                page != null ? Optional.of(page.getSize()) : Optional.empty()
+        );
+    }
+
+    private Specification<DeliveryEntity> addFilters(List<Filter> filters) {
+        Specification<DeliveryEntity> specification = where(createSpecification(filters.remove(0)));
+        for (Filter filter : filters) {
+            specification = specification != null ? specification.and(createSpecification(filter)) : null;
+        }
+        return specification;
+    }
+
+    private Sort addSorting(OrderBy orderBy, OrderType orderType) {
+        Sort sort = Sort.by(mappingField(orderBy.value()));
+        sort = (orderType.isAsc()) ? sort.ascending() : sort.descending();
+        return sort;
+    }
+
+    private Pageable addPageable(int page, int limit, Order order) {
+        Pageable pageable;
+        int numberPage = page - 1;
+        if (order.hasOrder()) {
+            Sort sort = addSorting(order.orderBy(), order.orderType());
+            pageable = PageRequest.of(numberPage, limit, sort);
+        } else {
+            pageable = PageRequest.of(numberPage, limit);
+        }
+        return pageable;
+    }
+
+    private Specification<DeliveryEntity> createSpecification(Filter filter) {
+        try {
+            switch (filter.operator()) {
+                case EQUAL:
+                    return (root, query, criteriaBuilder) ->
+                            criteriaBuilder.equal(buildPath(root, filter.field().value()), filter.value().value());
+                case NOT_EQUAL:
+                    return (root, query, criteriaBuilder) ->
+                            criteriaBuilder.notEqual(root.get(mappingField(filter.field().value())), filter.value().value());
+                default:
+                    throw new OperatorUnsupported();
+            }
+        } catch (Exception e) {
+            throw new FieldUnsupported();
+        }
+    }
+
+    private Path buildPath(Root<DeliveryEntity> root, String fieldDomain) {
+        String field = mappingField(fieldDomain);
+        if (root.get(field).getJavaType().isAssignableFrom(DeliveryStatusEntity.class)) {
+            return root.get(field).get("id");
+        }
+        return root.get(field);
+    }
+
+    private String mappingField(String fieldDomain) {
+        return MAPPING_FIELDS.get(fieldDomain);
     }
 
 }

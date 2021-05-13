@@ -14,7 +14,7 @@ public class DeliveryEntity {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "code", nullable = false, length = 20)
+    @Column(name = "code", nullable = false, length = 20, unique = true)
     private String code;
 
     @Column(name = "municipality_code", nullable = false, length = 8)

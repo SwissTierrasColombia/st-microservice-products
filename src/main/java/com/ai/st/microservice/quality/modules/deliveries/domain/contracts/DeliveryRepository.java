@@ -2,11 +2,15 @@ package com.ai.st.microservice.quality.modules.deliveries.domain.contracts;
 
 import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
+import com.ai.st.microservice.quality.modules.shared.domain.PageableDomain;
+import com.ai.st.microservice.quality.modules.shared.domain.criteria.Criteria;
 
 public interface DeliveryRepository {
 
     void save(Delivery delivery);
 
     Delivery search(DeliveryId id);
+
+    PageableDomain<Delivery> matching(Criteria criteria);
 
 }

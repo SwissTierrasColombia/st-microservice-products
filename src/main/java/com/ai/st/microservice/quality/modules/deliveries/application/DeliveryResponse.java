@@ -1,7 +1,6 @@
 package com.ai.st.microservice.quality.modules.deliveries.application;
 
 import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
-import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryStatusId;
 
 import java.util.Date;
 
@@ -14,10 +13,10 @@ public final class DeliveryResponse {
     private final String municipalityCode;
     private final String observations;
     private final Long operatorCode;
-    private final DeliveryStatusId deliveryStatusId;
+    private final Long deliveryStatusId;
 
     public DeliveryResponse(Long id, String code, Date deliveryDate, Long managerCode, String municipalityCode,
-                            String observations, Long operatorCode, DeliveryStatusId deliveryStatusId) {
+                            String observations, Long operatorCode, Long deliveryStatusId) {
         this.id = id;
         this.code = code;
         this.deliveryDate = deliveryDate;
@@ -36,7 +35,7 @@ public final class DeliveryResponse {
                 delivery.municipality().value(),
                 delivery.observations().value(),
                 delivery.operator().value(),
-                delivery.deliveryStatusId());
+                delivery.deliveryStatusId().value());
     }
 
     public Long id() {
@@ -67,7 +66,7 @@ public final class DeliveryResponse {
         return operatorCode;
     }
 
-    public DeliveryStatusId deliveryStatusId() {
+    public Long deliveryStatusId() {
         return deliveryStatusId;
     }
 

@@ -77,10 +77,14 @@ public final class ProductGetController extends ApiController {
             log.error("Error ProductGetController@searchProductsFromManager#Validation ---> " + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
             responseDto = new BasicResponseDto(e.getMessage(), 3);
+        } catch (DomainError e) {
+            log.error("Error ProductGetController@searchProductsFromManager#Domain ---> " + e.getMessage());
+            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            responseDto = new BasicResponseDto(e.errorMessage(), 2);
         } catch (Exception e) {
             log.error("Error ProductGetController@searchProductsFromManager#General ---> " + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 3);
+            responseDto = new BasicResponseDto(e.getMessage(), 1);
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);
