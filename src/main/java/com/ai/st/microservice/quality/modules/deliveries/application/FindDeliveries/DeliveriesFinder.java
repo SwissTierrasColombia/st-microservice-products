@@ -3,6 +3,7 @@ package com.ai.st.microservice.quality.modules.deliveries.application.FindDelive
 import com.ai.st.microservice.quality.modules.deliveries.application.DeliveryResponse;
 import com.ai.st.microservice.quality.modules.deliveries.application.Roles;
 import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
+import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryStatusId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryRepository;
 
 import com.ai.st.microservice.quality.modules.shared.application.PageableResponse;
@@ -11,16 +12,16 @@ import com.ai.st.microservice.quality.modules.shared.domain.Service;
 import com.ai.st.microservice.quality.modules.shared.domain.criteria.*;
 import com.ai.st.microservice.quality.modules.shared.domain.exceptions.ErrorFromInfrastructure;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public final class DeliveriesFinder {
 
     private final DeliveryRepository repository;
+
+    private final static int PAGE_DEFAULT = 1;
+    private final static int LIMIT_DEFAULT = 10;
 
     public DeliveriesFinder(DeliveryRepository repository) {
         this.repository = repository;
@@ -31,8 +32,17 @@ public final class DeliveriesFinder {
         List<Filter> filters = new ArrayList<>(
                 Collections.singletonList(filterByRole(query.role(), query.entityCode())));
 
-        if (query.stateId() != null) {
-            filters.add(filterByStatus(query.stateId()));
+        if (query.states().size() > 0) {
+            filters.add(filterByStatus(query.states(), query.role()));
+        } else {
+            List<Long> defaultStatuses = Arrays.asList(
+                    DeliveryStatusId.DRAFT,
+                    DeliveryStatusId.DELIVERED,
+                    DeliveryStatusId.IN_VALIDATION,
+                    DeliveryStatusId.ACCEPTED,
+                    DeliveryStatusId.REJECTED
+            );
+            filters.add(filterByStatus(defaultStatuses, query.role()));
         }
 
         Criteria criteria = new Criteria(
@@ -48,11 +58,11 @@ public final class DeliveriesFinder {
     }
 
     private int verifyPage(int page) {
-        return (page <= 0) ? 1 : page;
+        return (page <= 0) ? PAGE_DEFAULT : page;
     }
 
     private int verifyLimit(int limit) {
-        return (limit <= 9) ? 10 : limit;
+        return (limit <= 9) ? LIMIT_DEFAULT : limit;
     }
 
     private Filter filterByRole(Roles role, Long entityCode) {
@@ -61,9 +71,36 @@ public final class DeliveriesFinder {
         return new Filter(filterField, FilterOperator.EQUAL, new FilterValue(entityCode.toString()));
     }
 
-    private Filter filterByStatus(Long stateId) {
+    private Filter filterByStatus(List<Long> states, Roles role) {
+
+        List<DeliveryStatusId> statusesAllowed = new ArrayList<>(Arrays.asList(
+                new DeliveryStatusId(DeliveryStatusId.DELIVERED),
+                new DeliveryStatusId(DeliveryStatusId.IN_VALIDATION),
+                new DeliveryStatusId(DeliveryStatusId.ACCEPTED),
+                new DeliveryStatusId(DeliveryStatusId.REJECTED)
+        ));
+
+        if (role.equals(Roles.OPERATOR)) {
+            statusesAllowed.add(new DeliveryStatusId(DeliveryStatusId.DRAFT));
+        }
+
+        List<Long> statusesApproved = filterStatuses(states, statusesAllowed);
+
         return new Filter(
-                new FilterField("deliveryStatus"), FilterOperator.EQUAL, new FilterValue(stateId.toString()));
+                new FilterField("deliveryStatus"), FilterOperator.CONTAINS,
+                statusesApproved.stream().
+                        map(stateId -> new FilterValue(stateId.toString())).collect(Collectors.toList()));
+    }
+
+    private List<Long> filterStatuses(List<Long> statuses, List<DeliveryStatusId> allows) {
+        for (Long stateId : statuses) {
+            DeliveryStatusId deliveryStatusIdFound = allows.stream()
+                    .filter(deliveryStatusId -> deliveryStatusId.value().equals(stateId)).findAny().orElse(null);
+            if (deliveryStatusIdFound == null) {
+                statuses.remove(stateId);
+            }
+        }
+        return statuses;
     }
 
     private PageableResponse<DeliveryResponse> buildResponse(PageableDomain<Delivery> pageableDomain) {

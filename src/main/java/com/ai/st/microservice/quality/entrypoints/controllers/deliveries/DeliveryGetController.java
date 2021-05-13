@@ -5,13 +5,13 @@ import com.ai.st.microservice.common.business.ManagerBusiness;
 import com.ai.st.microservice.common.business.OperatorBusiness;
 import com.ai.st.microservice.common.dto.administration.MicroserviceUserDto;
 import com.ai.st.microservice.common.dto.general.BasicResponseDto;
-import com.ai.st.microservice.common.dto.managers.MicroserviceManagerDto;
-import com.ai.st.microservice.common.dto.operators.MicroserviceOperatorDto;
-import com.ai.st.microservice.common.exceptions.DisconnectedMicroserviceException;
+import com.ai.st.microservice.common.exceptions.InputValidationException;
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
+import com.ai.st.microservice.quality.modules.deliveries.application.DeliveryResponse;
 import com.ai.st.microservice.quality.modules.deliveries.application.FindDeliveries.DeliveriesFinder;
 import com.ai.st.microservice.quality.modules.deliveries.application.FindDeliveries.DeliveriesFinderQuery;
-import com.ai.st.microservice.quality.modules.deliveries.application.Roles;
+import com.ai.st.microservice.quality.modules.deliveries.application.SearchDelivery.DeliverySearcher;
+import com.ai.st.microservice.quality.modules.deliveries.application.SearchDelivery.DeliverySearcherQuery;
 import com.ai.st.microservice.quality.modules.shared.application.PageableResponse;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 import io.swagger.annotations.Api;
@@ -26,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Api(value = "Manage Deliveries", tags = {"Deliveries"})
 @RestController
@@ -33,17 +34,14 @@ public final class DeliveryGetController extends ApiController {
 
     private final Logger log = LoggerFactory.getLogger(DeliveryGetController.class);
 
-    private final AdministrationBusiness administrationBusiness;
-    private final ManagerBusiness managerBusiness;
-    private final OperatorBusiness operatorBusiness;
     private final DeliveriesFinder deliveriesFinder;
+    private final DeliverySearcher deliverySearcher;
 
     public DeliveryGetController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                 OperatorBusiness operatorBusiness, DeliveriesFinder deliveriesFinder) {
-        this.administrationBusiness = administrationBusiness;
-        this.managerBusiness = managerBusiness;
-        this.operatorBusiness = operatorBusiness;
+                                 OperatorBusiness operatorBusiness, DeliveriesFinder deliveriesFinder, DeliverySearcher deliverySearcher) {
+        super(administrationBusiness, managerBusiness, operatorBusiness);
         this.deliveriesFinder = deliveriesFinder;
+        this.deliverySearcher = deliverySearcher;
     }
 
     @GetMapping(value = "api/quality/v1/deliveries", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -55,7 +53,7 @@ public final class DeliveryGetController extends ApiController {
     public ResponseEntity<?> findDeliveries(
             @RequestParam(name = "page") int page,
             @RequestParam(name = "limit") int limit,
-            @RequestParam(name = "state_id", required = false) Long stateId,
+            @RequestParam(name = "states", required = false) List<Long> states,
             @RequestHeader("authorization") String headerAuthorization) {
 
         HttpStatus httpStatus;
@@ -63,31 +61,15 @@ public final class DeliveryGetController extends ApiController {
 
         try {
 
-            MicroserviceUserDto userDtoSession = administrationBusiness.getUserByToken(headerAuthorization);
-            if (userDtoSession == null) {
-                throw new DisconnectedMicroserviceException("Ha ocurrido un error consultando el usuario");
-            }
-
-            Roles role;
-            Long entityCode;
-
-            if (administrationBusiness.isManager(userDtoSession)) {
-                MicroserviceManagerDto managerDto = managerBusiness.getManagerByUserCode(userDtoSession.getId());
-                role = Roles.MANAGER;
-                entityCode = managerDto.getId();
-            } else {
-                MicroserviceOperatorDto operatorDto = operatorBusiness.getOperatorByUserCode(userDtoSession.getId());
-                role = Roles.OPERATOR;
-                entityCode = operatorDto.getId();
-            }
+            InformationSession session = this.getInformationSession(headerAuthorization);
 
             responseDto = deliveriesFinder.finder(
                     new DeliveriesFinderQuery(
                             page,
                             limit,
-                            stateId,
-                            role,
-                            entityCode));
+                            states,
+                            session.role(),
+                            session.entityCode()));
 
             httpStatus = HttpStatus.OK;
 
@@ -97,6 +79,50 @@ public final class DeliveryGetController extends ApiController {
             responseDto = new BasicResponseDto(e.errorMessage(), 2);
         } catch (Exception e) {
             log.error("Error DeliveryGetController@findDeliveries#General ---> " + e.getMessage());
+            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            responseDto = new BasicResponseDto(e.getMessage(), 1);
+        }
+
+        return new ResponseEntity<>(responseDto, httpStatus);
+    }
+
+    @GetMapping(value = "api/quality/v1/deliveries/{deliveryId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Search delivery")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Delivery got", response = DeliveryResponse.class),
+            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class)})
+    @ResponseBody
+    public ResponseEntity<?> searchDelivery(
+            @PathVariable Long deliveryId,
+            @RequestHeader("authorization") String headerAuthorization) {
+
+        HttpStatus httpStatus;
+        Object responseDto;
+
+        try {
+
+            if (deliveryId <= 0) {
+                throw new InputValidationException("El ID de la entrega no es válido.");
+            }
+
+            InformationSession session = this.getInformationSession(headerAuthorization);
+
+            responseDto = deliverySearcher.search(
+                    new DeliverySearcherQuery(deliveryId, session.role(), session.entityCode())
+            );
+
+            httpStatus = HttpStatus.OK;
+
+        } catch (InputValidationException e) {
+            log.error("Error DeliveryGetController@searchDelivery#Validation ---> " + e.getMessage());
+            httpStatus = HttpStatus.BAD_REQUEST;
+            responseDto = new BasicResponseDto(e.getMessage(), 3);
+        } catch (DomainError e) {
+            log.error("Error DeliveryGetController@searchDelivery#Domain ---> " + e.getMessage());
+            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+        } catch (Exception e) {
+            log.error("Error DeliveryGetController@searchDelivery#General ---> " + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
             responseDto = new BasicResponseDto(e.getMessage(), 1);
         }

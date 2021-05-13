@@ -6,7 +6,7 @@ import com.ai.st.microservice.quality.modules.deliveries.application.FindProduct
 import com.ai.st.microservice.quality.modules.deliveries.application.FindProductsFromDelivery.FindProductsFromDeliveryQuery;
 import com.ai.st.microservice.quality.modules.deliveries.application.Roles;
 import com.ai.st.microservice.quality.modules.deliveries.application.SearchDelivery.DeliverySearcher;
-import com.ai.st.microservice.quality.modules.deliveries.application.SearchDelivery.SearchDeliveryQuery;
+import com.ai.st.microservice.quality.modules.deliveries.application.SearchDelivery.DeliverySearcherQuery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductRepository;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryRepository;
@@ -66,7 +66,7 @@ public final class ProductAssigner {
     }
 
     private DeliveryResponse verifyDeliveryExists(DeliveryId deliveryId, OperatorCode operatorCode) {
-        return deliverySearcher.search(new SearchDeliveryQuery(
+        return deliverySearcher.search(new DeliverySearcherQuery(
                 deliveryId.value(), Roles.OPERATOR, operatorCode.value()
         ));
     }

@@ -1,11 +1,10 @@
 package com.ai.st.microservice.quality.entrypoints.controllers.deliveries;
 
 import com.ai.st.microservice.common.business.AdministrationBusiness;
+import com.ai.st.microservice.common.business.ManagerBusiness;
 import com.ai.st.microservice.common.business.OperatorBusiness;
 import com.ai.st.microservice.common.dto.administration.MicroserviceUserDto;
 import com.ai.st.microservice.common.dto.general.BasicResponseDto;
-import com.ai.st.microservice.common.dto.operators.MicroserviceOperatorDto;
-import com.ai.st.microservice.common.exceptions.DisconnectedMicroserviceException;
 import com.ai.st.microservice.common.exceptions.InputValidationException;
 
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
@@ -23,22 +22,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-
 @Api(value = "Manage Deliveries", tags = {"Deliveries"})
 @RestController
 public final class DeliveryPostController extends ApiController {
 
     private final Logger log = LoggerFactory.getLogger(DeliveryPostController.class);
 
-    private final AdministrationBusiness administrationBusiness;
-    private final OperatorBusiness operatorBusiness;
+
     private final DeliveryCreator deliveryCreator;
 
-    public DeliveryPostController(AdministrationBusiness administrationBusiness, OperatorBusiness operatorBusiness,
-                                  DeliveryCreator deliveryCreator) {
-        this.administrationBusiness = administrationBusiness;
+    public DeliveryPostController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
+                                  OperatorBusiness operatorBusiness, DeliveryCreator deliveryCreator) {
+        super(administrationBusiness, managerBusiness, operatorBusiness);
         this.deliveryCreator = deliveryCreator;
-        this.operatorBusiness = operatorBusiness;
     }
 
     @RequestMapping(value = "api/quality/v1/deliveries", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -55,12 +51,7 @@ public final class DeliveryPostController extends ApiController {
 
         try {
 
-            // user session
-            MicroserviceUserDto userDtoSession = administrationBusiness.getUserByToken(headerAuthorization);
-            if (userDtoSession == null) {
-                throw new DisconnectedMicroserviceException("Ha ocurrido un error consultando el usuario");
-            }
-            MicroserviceOperatorDto operatorDto = operatorBusiness.getOperatorByUserCode(userDtoSession.getId());
+            InformationSession session = this.getInformationSession(headerAuthorization);
 
             String municipalityCode = request.getMunicipalityCode();
             validateMunicipality(municipalityCode);
@@ -78,8 +69,8 @@ public final class DeliveryPostController extends ApiController {
                     new CreateDeliveryCommand(
                             municipalityCode,
                             managerCode,
-                            operatorDto.getId(),
-                            userDtoSession.getId(),
+                            session.entityCode(),
+                            session.userCode(),
                             observations,
                             products));
 

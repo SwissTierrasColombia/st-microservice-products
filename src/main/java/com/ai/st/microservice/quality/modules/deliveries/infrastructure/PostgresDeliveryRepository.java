@@ -189,7 +189,12 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
                             criteriaBuilder.equal(buildPath(root, filter.field().value()), filter.value().value());
                 case NOT_EQUAL:
                     return (root, query, criteriaBuilder) ->
-                            criteriaBuilder.notEqual(root.get(mappingField(filter.field().value())), filter.value().value());
+                            criteriaBuilder.notEqual(buildPath(root, filter.field().value()), filter.value().value());
+                case CONTAINS:
+                    return (root, query, criteriaBuilder) -> {
+                        List<String> list = filter.values().stream().map(FilterValue::value).collect(Collectors.toList());
+                        return buildPath(root, filter.field().value()).in(list);
+                    };
                 default:
                     throw new OperatorUnsupported();
             }

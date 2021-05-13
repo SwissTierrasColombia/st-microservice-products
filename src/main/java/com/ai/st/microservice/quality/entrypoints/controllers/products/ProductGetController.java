@@ -2,12 +2,12 @@ package com.ai.st.microservice.quality.entrypoints.controllers.products;
 
 import com.ai.st.microservice.common.business.AdministrationBusiness;
 import com.ai.st.microservice.common.business.ManagerBusiness;
+import com.ai.st.microservice.common.business.OperatorBusiness;
 import com.ai.st.microservice.common.dto.administration.MicroserviceUserDto;
 import com.ai.st.microservice.common.dto.general.BasicResponseDto;
-import com.ai.st.microservice.common.dto.managers.MicroserviceManagerDto;
-import com.ai.st.microservice.common.exceptions.DisconnectedMicroserviceException;
 import com.ai.st.microservice.common.exceptions.InputValidationException;
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
+import com.ai.st.microservice.quality.modules.deliveries.application.Roles;
 import com.ai.st.microservice.quality.modules.products.application.ProductResponse;
 import com.ai.st.microservice.quality.modules.products.application.FindProductsFromManager.ManagerProductsFinder;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
@@ -28,13 +28,11 @@ public final class ProductGetController extends ApiController {
 
     private final Logger log = LoggerFactory.getLogger(ProductGetController.class);
 
-    private final AdministrationBusiness administrationBusiness;
-    private final ManagerBusiness managerBusiness;
     private final ManagerProductsFinder productsFinder;
 
-    public ProductGetController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness, ManagerProductsFinder productsFinder) {
-        this.administrationBusiness = administrationBusiness;
-        this.managerBusiness = managerBusiness;
+    public ProductGetController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
+                                OperatorBusiness operatorBusiness, ManagerProductsFinder productsFinder) {
+        super(administrationBusiness, managerBusiness, operatorBusiness);
         this.productsFinder = productsFinder;
     }
 
@@ -56,14 +54,10 @@ public final class ProductGetController extends ApiController {
 
         try {
 
-            MicroserviceUserDto userDtoSession = administrationBusiness.getUserByToken(headerAuthorization);
-            if (userDtoSession == null) {
-                throw new DisconnectedMicroserviceException("Ha ocurrido un error consultando el usuario");
-            }
+            InformationSession session = this.getInformationSession(headerAuthorization);
 
-            if (administrationBusiness.isManager(userDtoSession)) {
-                MicroserviceManagerDto managerDto = managerBusiness.getManagerByUserCode(userDtoSession.getId());
-                managerCode = managerDto.getId();
+            if (session.role().equals(Roles.MANAGER)) {
+                managerCode = session.entityCode();
             }
 
             if (managerCode == null) {

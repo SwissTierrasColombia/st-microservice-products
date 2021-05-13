@@ -2,13 +2,13 @@ package com.ai.st.microservice.quality.modules.deliveries.application.SearchDeli
 
 import com.ai.st.microservice.quality.modules.deliveries.application.Roles;
 
-public final class SearchDeliveryQuery {
+public final class DeliverySearcherQuery {
 
     private final Long deliveryId;
     private final Roles role;
     private final Long entityCode;
 
-    public SearchDeliveryQuery(Long deliveryId, Roles role, Long entityCode) {
+    public DeliverySearcherQuery(Long deliveryId, Roles role, Long entityCode) {
         this.deliveryId = deliveryId;
         this.role = role;
         this.entityCode = entityCode;

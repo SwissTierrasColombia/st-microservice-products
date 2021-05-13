@@ -1,11 +1,10 @@
 package com.ai.st.microservice.quality.entrypoints.controllers.deliveries;
 
 import com.ai.st.microservice.common.business.AdministrationBusiness;
+import com.ai.st.microservice.common.business.ManagerBusiness;
 import com.ai.st.microservice.common.business.OperatorBusiness;
 import com.ai.st.microservice.common.dto.administration.MicroserviceUserDto;
 import com.ai.st.microservice.common.dto.general.BasicResponseDto;
-import com.ai.st.microservice.common.dto.operators.MicroserviceOperatorDto;
-import com.ai.st.microservice.common.exceptions.DisconnectedMicroserviceException;
 import com.ai.st.microservice.common.exceptions.InputValidationException;
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
 import com.ai.st.microservice.quality.modules.deliveries.application.AddProductToDelivery.AddProductToDeliveryCommand;
@@ -27,15 +26,11 @@ public final class DeliveryProductPutController extends ApiController {
 
     private final Logger log = LoggerFactory.getLogger(DeliveryProductPutController.class);
 
-    private final AdministrationBusiness administrationBusiness;
-    private final OperatorBusiness operatorBusiness;
     private final ProductAssigner assignProduct;
 
-
-    public DeliveryProductPutController(AdministrationBusiness administrationBusiness, OperatorBusiness operatorBusiness,
-                                        ProductAssigner assignProduct) {
-        this.administrationBusiness = administrationBusiness;
-        this.operatorBusiness = operatorBusiness;
+    public DeliveryProductPutController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
+                                        OperatorBusiness operatorBusiness, ProductAssigner assignProduct) {
+        super(administrationBusiness, managerBusiness, operatorBusiness);
         this.assignProduct = assignProduct;
     }
 
@@ -54,12 +49,7 @@ public final class DeliveryProductPutController extends ApiController {
 
         try {
 
-            // user session
-            MicroserviceUserDto userDtoSession = administrationBusiness.getUserByToken(headerAuthorization);
-            if (userDtoSession == null) {
-                throw new DisconnectedMicroserviceException("Ha ocurrido un error consultando el usuario");
-            }
-            MicroserviceOperatorDto operatorDto = operatorBusiness.getOperatorByUserCode(userDtoSession.getId());
+            InformationSession session = this.getInformationSession(headerAuthorization);
 
             validateDeliveryId(deliveryId);
 
@@ -70,7 +60,7 @@ public final class DeliveryProductPutController extends ApiController {
                     new AddProductToDeliveryCommand(
                             deliveryId,
                             productId,
-                            operatorDto.getId()));
+                            session.entityCode()));
 
             httpStatus = HttpStatus.OK;
 

@@ -18,7 +18,7 @@ public final class DeliverySearcher {
         this.repository = repository;
     }
 
-    public DeliveryResponse search(SearchDeliveryQuery query) {
+    public DeliveryResponse search(DeliverySearcherQuery query) {
 
         Delivery delivery = repository.search(new DeliveryId(query.deliveryId()));
 
