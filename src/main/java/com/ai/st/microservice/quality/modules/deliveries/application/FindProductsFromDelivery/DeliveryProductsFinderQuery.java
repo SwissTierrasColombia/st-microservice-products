@@ -2,13 +2,13 @@ package com.ai.st.microservice.quality.modules.deliveries.application.FindProduc
 
 import com.ai.st.microservice.quality.modules.deliveries.application.Roles;
 
-public final class FindProductsFromDeliveryQuery {
+public final class DeliveryProductsFinderQuery {
 
     private final Long deliveryId;
     private final Roles role;
     private final Long entityCode;
 
-    public FindProductsFromDeliveryQuery(Long deliveryId, Roles role, Long entityCode) {
+    public DeliveryProductsFinderQuery(Long deliveryId, Roles role, Long entityCode) {
         this.deliveryId = deliveryId;
         this.role = role;
         this.entityCode = entityCode;

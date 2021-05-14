@@ -13,10 +13,11 @@ public final class DeliveryResponse {
     private final String municipalityCode;
     private final String observations;
     private final Long operatorCode;
+    private final Long userCode;
     private final Long deliveryStatusId;
 
     public DeliveryResponse(Long id, String code, Date deliveryDate, Long managerCode, String municipalityCode,
-                            String observations, Long operatorCode, Long deliveryStatusId) {
+                            String observations, Long operatorCode, Long userCode, Long deliveryStatusId) {
         this.id = id;
         this.code = code;
         this.deliveryDate = deliveryDate;
@@ -25,6 +26,7 @@ public final class DeliveryResponse {
         this.observations = observations;
         this.operatorCode = operatorCode;
         this.deliveryStatusId = deliveryStatusId;
+        this.userCode = userCode;
     }
 
     public static DeliveryResponse fromAggregate(Delivery delivery) {
@@ -35,6 +37,7 @@ public final class DeliveryResponse {
                 delivery.municipality().value(),
                 delivery.observations().value(),
                 delivery.operator().value(),
+                delivery.user().value(),
                 delivery.deliveryStatusId().value());
     }
 
@@ -70,4 +73,7 @@ public final class DeliveryResponse {
         return deliveryStatusId;
     }
 
+    public Long userCode() {
+        return userCode;
+    }
 }

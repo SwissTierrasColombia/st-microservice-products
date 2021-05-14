@@ -3,7 +3,7 @@ package com.ai.st.microservice.quality.modules.deliveries.application.AddProduct
 import com.ai.st.microservice.quality.modules.deliveries.application.DeliveryProductResponse;
 import com.ai.st.microservice.quality.modules.deliveries.application.DeliveryResponse;
 import com.ai.st.microservice.quality.modules.deliveries.application.FindProductsFromDelivery.DeliveryProductsFinder;
-import com.ai.st.microservice.quality.modules.deliveries.application.FindProductsFromDelivery.FindProductsFromDeliveryQuery;
+import com.ai.st.microservice.quality.modules.deliveries.application.FindProductsFromDelivery.DeliveryProductsFinderQuery;
 import com.ai.st.microservice.quality.modules.deliveries.application.Roles;
 import com.ai.st.microservice.quality.modules.deliveries.application.SearchDelivery.DeliverySearcher;
 import com.ai.st.microservice.quality.modules.deliveries.application.SearchDelivery.DeliverySearcherQuery;
@@ -85,7 +85,7 @@ public final class ProductAssigner {
 
     private void verifyIfProductHasBeenAlreadyAddedToDelivery(DeliveryId deliveryId, ProductId productId, OperatorCode operatorCode) {
 
-        List<DeliveryProductResponse> deliveryProducts = deliveryProductsFinder.finder(new FindProductsFromDeliveryQuery(
+        List<DeliveryProductResponse> deliveryProducts = deliveryProductsFinder.finder(new DeliveryProductsFinderQuery(
                 deliveryId.value(), Roles.OPERATOR, operatorCode.value()
         ));
 

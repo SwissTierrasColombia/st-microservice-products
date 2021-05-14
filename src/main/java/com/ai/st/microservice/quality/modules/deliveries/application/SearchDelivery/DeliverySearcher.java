@@ -7,6 +7,8 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryRepository;
 import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.DeliveryNotFound;
 import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.UnauthorizedToSearchDelivery;
+import com.ai.st.microservice.quality.modules.shared.domain.ManagerCode;
+import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 
 @Service
@@ -24,6 +26,7 @@ public final class DeliverySearcher {
 
         verifyDelivery(delivery);
         verifyEntityBelongToDelivery(delivery, query.role(), query.entityCode());
+        verifyDeliveryState(delivery, query.role());
 
         return DeliveryResponse.fromAggregate(delivery);
     }
@@ -34,8 +37,16 @@ public final class DeliverySearcher {
     }
 
     private void verifyEntityBelongToDelivery(Delivery delivery, Roles role, Long entityCode) {
-        if ((role == Roles.MANAGER && !delivery.manager().value().equals(entityCode))
-                || (role == Roles.OPERATOR && !delivery.operator().value().equals(entityCode))) {
+        if (role == Roles.MANAGER && !delivery.deliveryBelongToManager(new ManagerCode(entityCode))) {
+            throw new UnauthorizedToSearchDelivery();
+        }
+        if (role == Roles.OPERATOR && !delivery.deliveryBelongToOperator(new OperatorCode(entityCode))) {
+            throw new UnauthorizedToSearchDelivery();
+        }
+    }
+
+    private void verifyDeliveryState(Delivery delivery, Roles role) {
+        if (role.equals(Roles.MANAGER) && !delivery.isAvailableToManager()) {
             throw new UnauthorizedToSearchDelivery();
         }
     }

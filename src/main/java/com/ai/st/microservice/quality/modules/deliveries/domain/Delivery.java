@@ -10,6 +10,7 @@ import com.ai.st.microservice.quality.modules.products.domain.ProductId;
 import com.ai.st.microservice.quality.modules.shared.domain.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -111,4 +112,43 @@ public final class Delivery extends AggregateRoot {
     public DeliveryCode code() {
         return code;
     }
+
+    public boolean isDraft() {
+        return deliveryStatusId.value().equals(DeliveryStatusId.DRAFT);
+    }
+
+    public static List<DeliveryStatusId> statusesAllowedToManager() {
+        return Arrays.asList(
+                new DeliveryStatusId(DeliveryStatusId.DELIVERED),
+                new DeliveryStatusId(DeliveryStatusId.IN_VALIDATION),
+                new DeliveryStatusId(DeliveryStatusId.ACCEPTED),
+                new DeliveryStatusId(DeliveryStatusId.REJECTED)
+        );
+    }
+
+    public static List<DeliveryStatusId> statusesAllowedToOperator() {
+        return Arrays.asList(
+                new DeliveryStatusId(DeliveryStatusId.DRAFT),
+                new DeliveryStatusId(DeliveryStatusId.DELIVERED),
+                new DeliveryStatusId(DeliveryStatusId.IN_VALIDATION),
+                new DeliveryStatusId(DeliveryStatusId.ACCEPTED),
+                new DeliveryStatusId(DeliveryStatusId.REJECTED)
+        );
+    }
+
+    public boolean isAvailableToManager() {
+        DeliveryStatusId statusFound =
+                statusesAllowedToManager().stream().filter(statusId -> statusId.equals(deliveryStatusId))
+                        .findAny().orElse(null);
+        return statusFound != null;
+    }
+
+    public boolean deliveryBelongToManager(ManagerCode managerCode) {
+        return managerCode.value().equals(manager.value());
+    }
+
+    public boolean deliveryBelongToOperator(OperatorCode operatorCode) {
+        return operatorCode.value().equals(operator.value());
+    }
+
 }

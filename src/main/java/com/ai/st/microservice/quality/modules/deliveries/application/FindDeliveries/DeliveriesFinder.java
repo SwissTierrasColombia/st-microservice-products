@@ -71,20 +71,12 @@ public final class DeliveriesFinder {
         return new Filter(filterField, FilterOperator.EQUAL, new FilterValue(entityCode.toString()));
     }
 
-    private Filter filterByStatus(List<Long> states, Roles role) {
+    private Filter filterByStatus(List<Long> statuses, Roles role) {
 
-        List<DeliveryStatusId> statusesAllowed = new ArrayList<>(Arrays.asList(
-                new DeliveryStatusId(DeliveryStatusId.DELIVERED),
-                new DeliveryStatusId(DeliveryStatusId.IN_VALIDATION),
-                new DeliveryStatusId(DeliveryStatusId.ACCEPTED),
-                new DeliveryStatusId(DeliveryStatusId.REJECTED)
-        ));
+        List<DeliveryStatusId> statusesAllowed = (role.equals(Roles.OPERATOR)) ?
+                Delivery.statusesAllowedToOperator() : Delivery.statusesAllowedToManager();
 
-        if (role.equals(Roles.OPERATOR)) {
-            statusesAllowed.add(new DeliveryStatusId(DeliveryStatusId.DRAFT));
-        }
-
-        List<Long> statusesApproved = filterStatuses(states, statusesAllowed);
+        List<Long> statusesApproved = filterStatuses(statuses, statusesAllowed);
 
         return new Filter(
                 new FilterField("deliveryStatus"), FilterOperator.CONTAINS,
