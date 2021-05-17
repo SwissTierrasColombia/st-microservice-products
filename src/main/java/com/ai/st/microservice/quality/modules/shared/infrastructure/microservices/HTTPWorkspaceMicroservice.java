@@ -9,7 +9,6 @@ import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.WorkspaceMicroservice;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +24,7 @@ public final class HTTPWorkspaceMicroservice implements WorkspaceMicroservice {
     @Override
     public boolean verifyOperatorBelongToManager(OperatorCode operatorCode, ManagerCode managerCode, MunicipalityCode municipalityCode) {
 
-        List<MicroserviceWorkspaceOperatorDto> workspacesOperators = new ArrayList<>();
+        List<MicroserviceWorkspaceOperatorDto> workspacesOperators;
         try {
             workspacesOperators = workspaceFeignClient.findWorkspacesByOperator(operatorCode.value());
 

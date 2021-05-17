@@ -3,6 +3,7 @@ package com.ai.st.microservice.quality.modules.deliveries.infrastructure;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductRepository;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProduct;
+import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductId;
 import com.ai.st.microservice.quality.modules.deliveries.infrastructure.persistence.jpa.DeliveryProductJPARepository;
 
 import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.jpa.entities.DeliveredProductEntity;
@@ -11,6 +12,7 @@ import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.
 import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.jpa.entities.ProductEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,6 +58,19 @@ public final class PostgresDeliveryProductRepository implements DeliveryProductR
         deliveredProductEntity.setObservations(deliveryProduct.deliveryProductObservations().value());
 
         repository.save(deliveredProductEntity);
+    }
+
+    @Override
+    public DeliveryProduct search(DeliveryProductId deliveryProductId) {
+        DeliveredProductEntity deliveredProductEntity = repository.findById(deliveryProductId.value()).orElse(null);
+        return (deliveredProductEntity == null) ? null :
+                DeliveryProduct.fromPrimitives(
+                        deliveredProductEntity.getId(),
+                        deliveredProductEntity.getCreatedAt(),
+                        deliveredProductEntity.getObservations(),
+                        deliveredProductEntity.getProduct().getId(),
+                        deliveredProductEntity.getStatus().getId()
+                );
     }
 
 }

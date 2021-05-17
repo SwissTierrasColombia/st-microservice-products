@@ -46,7 +46,7 @@ public final class ProductAssigner {
         this.deliveryProductsFinder = new DeliveryProductsFinder(deliveryProductRepository, deliveryRepository);
     }
 
-    public void assign(AddProductToDeliveryCommand command) {
+    public void assign(ProductAssignerCommand command) {
 
         DeliveryId deliveryId = new DeliveryId(command.deliveryId());
         OperatorCode operatorCode = new OperatorCode(command.operatorCode());

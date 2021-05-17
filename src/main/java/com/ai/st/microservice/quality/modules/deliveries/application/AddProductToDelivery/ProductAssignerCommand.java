@@ -1,12 +1,12 @@
 package com.ai.st.microservice.quality.modules.deliveries.application.AddProductToDelivery;
 
-public final class AddProductToDeliveryCommand {
+public final class ProductAssignerCommand {
 
     private final Long deliveryId;
     private final Long productId;
     private final Long operatorCode;
 
-    public AddProductToDeliveryCommand(Long deliveryId, Long productId, Long operatorCode) {
+    public ProductAssignerCommand(Long deliveryId, Long productId, Long operatorCode) {
         this.deliveryId = deliveryId;
         this.productId = productId;
         this.operatorCode = operatorCode;

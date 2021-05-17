@@ -3,11 +3,10 @@ package com.ai.st.microservice.quality.entrypoints.controllers.deliveries;
 import com.ai.st.microservice.common.business.AdministrationBusiness;
 import com.ai.st.microservice.common.business.ManagerBusiness;
 import com.ai.st.microservice.common.business.OperatorBusiness;
-import com.ai.st.microservice.common.dto.administration.MicroserviceUserDto;
 import com.ai.st.microservice.common.dto.general.BasicResponseDto;
 import com.ai.st.microservice.common.exceptions.InputValidationException;
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
-import com.ai.st.microservice.quality.modules.deliveries.application.AddProductToDelivery.AddProductToDeliveryCommand;
+import com.ai.st.microservice.quality.modules.deliveries.application.AddProductToDelivery.ProductAssignerCommand;
 import com.ai.st.microservice.quality.modules.deliveries.application.AddProductToDelivery.ProductAssigner;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 import io.swagger.annotations.*;
@@ -57,7 +56,7 @@ public final class DeliveryProductPutController extends ApiController {
             validateProduct(productId);
 
             assignProduct.assign(
-                    new AddProductToDeliveryCommand(
+                    new ProductAssignerCommand(
                             deliveryId,
                             productId,
                             session.entityCode()));

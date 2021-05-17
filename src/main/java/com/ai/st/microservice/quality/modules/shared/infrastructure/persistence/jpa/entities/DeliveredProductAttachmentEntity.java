@@ -5,12 +5,15 @@ import java.util.Date;
 
 @Entity
 @Table(name = "delivered_products_attachments", schema = "quality")
-public final class DeliveredProductAttachment {
+public final class DeliveredProductAttachmentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
+
+    @Column(name = "uuid", length = 36)
+    private String uuid;
 
     @Column(name = "created_at", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -20,12 +23,8 @@ public final class DeliveredProductAttachment {
     private String observations;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "delivered_product_id", referencedColumnName = "id")
+    @JoinColumn(name = "delivered_product_id", referencedColumnName = "id", nullable = false)
     private DeliveredProductEntity deliveredProductEntity;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "delivery_id", referencedColumnName = "id")
-    private DeliveryEntity deliveryEntity;
 
     public Long getId() {
         return id;
@@ -59,11 +58,12 @@ public final class DeliveredProductAttachment {
         this.observations = observations;
     }
 
-    public DeliveryEntity getDeliveryEntity() {
-        return deliveryEntity;
+    public String getUuid() {
+        return uuid;
     }
 
-    public void setDeliveryEntity(DeliveryEntity deliveryEntity) {
-        this.deliveryEntity = deliveryEntity;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
+
 }

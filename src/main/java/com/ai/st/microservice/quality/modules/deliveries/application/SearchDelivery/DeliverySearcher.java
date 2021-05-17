@@ -25,7 +25,9 @@ public final class DeliverySearcher {
         Delivery delivery = repository.search(new DeliveryId(query.deliveryId()));
 
         verifyDelivery(delivery);
+
         verifyEntityBelongToDelivery(delivery, query.role(), query.entityCode());
+
         verifyDeliveryState(delivery, query.role());
 
         return DeliveryResponse.fromAggregate(delivery);

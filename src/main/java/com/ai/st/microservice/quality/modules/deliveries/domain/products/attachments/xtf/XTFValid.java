@@ -2,13 +2,13 @@ package com.ai.st.microservice.quality.modules.deliveries.domain.products.attach
 
 public final class XTFValid {
 
-    private final boolean value;
+    private final Boolean value;
 
-    public XTFValid(boolean value) {
+    public XTFValid(Boolean value) {
         this.value = value;
     }
 
-    public boolean value() {
+    public Boolean value() {
         return value;
     }
 
