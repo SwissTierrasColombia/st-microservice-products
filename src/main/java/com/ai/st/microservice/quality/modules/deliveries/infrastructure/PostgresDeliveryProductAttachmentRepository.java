@@ -17,11 +17,12 @@ import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.
 
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public final class PostgresDeliveryProductAttachmentRepository implements DeliveryProductAttachmentRepository {
+public class PostgresDeliveryProductAttachmentRepository implements DeliveryProductAttachmentRepository {
 
     private final DeliveredProductAttachmentJPARepository deliveredProductAttachmentJPARepository;
     private final DeliveredProductAttachmentXTFJPARepository deliveredProductAttachmentXTFJPARepository;
@@ -213,6 +214,19 @@ public final class PostgresDeliveryProductAttachmentRepository implements Delive
 
         return deliveredProductAttachmentJPARepository.findByDeliveredProduct(deliveredProduct)
                 .stream().map(this::handleFind).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void remove(DeliveryProductAttachmentId id) {
+
+        DeliveredProductAttachmentEntity deliveredProductAttachmentEntity = new DeliveredProductAttachmentEntity();
+        deliveredProductAttachmentEntity.setId(id.value());
+
+        deliveredProductAttachmentXTFJPARepository.deleteByDeliveredProductAttachment(deliveredProductAttachmentEntity);
+        deliveredProductAttachmentFTPJPARepository.deleteByDeliveredProductAttachment(deliveredProductAttachmentEntity);
+        deliveredProductAttachmentDocumentJPARepository.deleteByDeliveredProductAttachment(deliveredProductAttachmentEntity);
+        deliveredProductAttachmentJPARepository.deleteById(id.value());
     }
 
 }

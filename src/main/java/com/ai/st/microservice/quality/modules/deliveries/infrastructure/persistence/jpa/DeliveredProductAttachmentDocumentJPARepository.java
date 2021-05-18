@@ -8,4 +8,6 @@ public interface DeliveredProductAttachmentDocumentJPARepository extends CrudRep
 
     DeliveredProductAttachmentDocumentEntity findByDeliveredProductAttachment(DeliveredProductAttachmentEntity attachment);
 
+    long deleteByDeliveredProductAttachment(DeliveredProductAttachmentEntity attachment);
+
 }

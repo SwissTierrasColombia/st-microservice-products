@@ -8,4 +8,6 @@ public interface DeliveredProductAttachmentFTPJPARepository extends CrudReposito
 
     DeliveredProductAttachmentFTPEntity findByDeliveredProductAttachment(DeliveredProductAttachmentEntity attachment);
 
+    long deleteByDeliveredProductAttachment(DeliveredProductAttachmentEntity attachment);
+
 }

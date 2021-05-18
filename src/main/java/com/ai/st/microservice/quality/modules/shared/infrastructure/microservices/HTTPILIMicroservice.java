@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 @Service
 public final class HTTPILIMicroservice implements ILIMicroservice {
 
-    private static final String MODEL_VERSION = "3.0";
-    private static final Long CONCEPT_ID = (long) 1;
+    private static final String MODEL_VERSION = "1.0";
+    private static final Long CONCEPT_ID = (long) 3;
     private static final String QUEUE_RESPONSE = "QUEUE_UPDATE_STATE_XTF_PRODUCTS";
 
     private final IliFeignClient iliFeignClient;

@@ -50,14 +50,14 @@ public final class AttachmentAssigner {
         DeliveryProductId deliveryProductId = new DeliveryProductId(command.deliveryProductId());
         OperatorCode operatorCode = new OperatorCode(command.operatorCode());
 
-        verifyDeliveryProductExists(deliveryId.value(), deliveryProductId.value(), operatorCode.value());
+        verifyPermissions(deliveryId.value(), deliveryProductId.value(), operatorCode.value());
 
         DeliveryProductAttachment attachment = handleAttachment(command.attachment(), deliveryId, deliveryProductId);
 
         attachmentRepository.save(attachment);
     }
 
-    private void verifyDeliveryProductExists(Long deliveryId, Long deliveryProductId, Long operatorCode) {
+    private void verifyPermissions(Long deliveryId, Long deliveryProductId, Long operatorCode) {
         deliveryProductSearcher.search(new DeliveryProductSearcherQuery(
                 deliveryId, deliveryProductId, Roles.OPERATOR, operatorCode
         ));

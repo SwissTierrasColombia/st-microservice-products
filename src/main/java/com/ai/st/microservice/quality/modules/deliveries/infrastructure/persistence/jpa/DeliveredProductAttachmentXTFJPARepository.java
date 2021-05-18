@@ -8,4 +8,6 @@ public interface DeliveredProductAttachmentXTFJPARepository extends CrudReposito
 
     DeliveredProductAttachmentXTFEntity findByDeliveredProductAttachment(DeliveredProductAttachmentEntity attachment);
 
+    long deleteByDeliveredProductAttachment(DeliveredProductAttachmentEntity attachment);
+
 }

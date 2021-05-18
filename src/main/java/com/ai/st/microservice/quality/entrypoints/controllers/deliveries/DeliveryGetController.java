@@ -3,7 +3,6 @@ package com.ai.st.microservice.quality.entrypoints.controllers.deliveries;
 import com.ai.st.microservice.common.business.AdministrationBusiness;
 import com.ai.st.microservice.common.business.ManagerBusiness;
 import com.ai.st.microservice.common.business.OperatorBusiness;
-import com.ai.st.microservice.common.dto.administration.MicroserviceUserDto;
 import com.ai.st.microservice.common.dto.general.BasicResponseDto;
 import com.ai.st.microservice.common.exceptions.InputValidationException;
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;

@@ -10,14 +10,16 @@ import java.util.List;
 
 public interface DeliveryProductAttachmentRepository {
 
-    void save(DeliveryProductAttachment deliveryProductAttachment);
-
     DeliveryProductAttachment search(DeliveryProductAttachmentId id);
 
     DeliveryProductAttachment search(DeliveryProductAttachmentUUID uuid);
 
+    List<DeliveryProductAttachment> findByDeliveryProductId(DeliveryProductId deliveryProductId);
+
+    void save(DeliveryProductAttachment deliveryProductAttachment);
+
     void updateXTFStatus(DeliveryProductAttachmentUUID uuid, XTFStatus status);
 
-    List<DeliveryProductAttachment> findByDeliveryProductId(DeliveryProductId deliveryProductId);
+    void remove(DeliveryProductAttachmentId id);
 
 }
