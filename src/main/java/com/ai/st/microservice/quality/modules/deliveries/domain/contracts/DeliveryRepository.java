@@ -9,8 +9,10 @@ public interface DeliveryRepository {
 
     void save(Delivery delivery);
 
-    Delivery search(DeliveryId id);
+    Delivery search(DeliveryId deliveryId);
 
     PageableDomain<Delivery> matching(Criteria criteria);
+
+    void remove(DeliveryId deliveryId);
 
 }

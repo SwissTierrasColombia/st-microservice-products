@@ -215,4 +215,9 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
         return MAPPING_FIELDS.get(fieldDomain);
     }
 
+    @Override
+    public void remove(DeliveryId deliveryId) {
+        deliveryJPARepository.deleteById(deliveryId.value());
+    }
+
 }
