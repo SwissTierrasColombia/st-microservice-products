@@ -4,7 +4,7 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.products.Deliver
 
 public abstract class DeliveryProductAttachment {
 
-    private final DeliveryProductAttachmentId id;
+    private final DeliveryProductAttachmentId deliveryProductAttachmentId;
     private final DeliveryProductAttachmentUUID uuid;
     private final DeliveryProductAttachmentObservations observations;
     private final DeliveryProductId deliveryProductId;
@@ -13,15 +13,15 @@ public abstract class DeliveryProductAttachment {
     public DeliveryProductAttachment(DeliveryProductAttachmentId id, DeliveryProductAttachmentUUID uuid,
                                      DeliveryProductAttachmentObservations observations,
                                      DeliveryProductId deliveryProductId, DeliveryProductAttachmentDate deliveryProductAttachmentDate) {
-        this.id = id;
+        this.deliveryProductAttachmentId = id;
         this.uuid = uuid;
         this.observations = observations;
         this.deliveryProductId = deliveryProductId;
         this.deliveryProductAttachmentDate = deliveryProductAttachmentDate;
     }
 
-    public DeliveryProductAttachmentId id() {
-        return id;
+    public DeliveryProductAttachmentId deliveryProductAttachmentId() {
+        return deliveryProductAttachmentId;
     }
 
     public DeliveryProductAttachmentObservations observations() {

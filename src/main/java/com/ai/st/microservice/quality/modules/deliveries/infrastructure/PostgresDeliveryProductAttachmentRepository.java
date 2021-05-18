@@ -1,6 +1,7 @@
 package com.ai.st.microservice.quality.modules.deliveries.infrastructure;
 
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductAttachmentRepository;
+import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.DeliveryProductAttachment;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.DeliveryProductAttachmentId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.DeliveryProductAttachmentUUID;
@@ -15,6 +16,9 @@ import com.ai.st.microservice.quality.modules.deliveries.infrastructure.persiste
 import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.jpa.entities.*;
 
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public final class PostgresDeliveryProductAttachmentRepository implements DeliveryProductAttachmentRepository {
@@ -45,7 +49,7 @@ public final class PostgresDeliveryProductAttachmentRepository implements Delive
         attachmentEntity.setUuid(deliveryProductAttachment.uuid().value());
         attachmentEntity.setCreatedAt(deliveryProductAttachment.deliveryProductAttachmentDate().value());
         attachmentEntity.setObservations(deliveryProductAttachment.observations().value());
-        attachmentEntity.setDeliveredProductEntity(deliveryProduct);
+        attachmentEntity.setDeliveredProduct(deliveryProduct);
 
         attachmentEntity = deliveredProductAttachmentJPARepository.save(attachmentEntity);
 
@@ -132,7 +136,7 @@ public final class PostgresDeliveryProductAttachmentRepository implements Delive
         if (xtfEntity != null) {
             return DeliveryProductXTFAttachment.fromPrimitives(
                     xtfEntity.getId(), deliveredProductAttachmentEntity.getUuid(), deliveredProductAttachmentEntity.getObservations(),
-                    deliveredProductAttachmentEntity.getDeliveredProductEntity().getId(), deliveredProductAttachmentEntity.getCreatedAt(),
+                    deliveredProductAttachmentEntity.getDeliveredProduct().getId(), deliveredProductAttachmentEntity.getCreatedAt(),
                     xtfEntity.getValid(), xtfEntity.getUrl(), xtfEntity.getVersion(), xtfEntity.getStatus().name()
             );
         }
@@ -142,7 +146,7 @@ public final class PostgresDeliveryProductAttachmentRepository implements Delive
         if (ftpEntity != null) {
             return DeliveryProductFTPAttachment.fromPrimitives(
                     ftpEntity.getId(), deliveredProductAttachmentEntity.getUuid(), deliveredProductAttachmentEntity.getObservations(),
-                    deliveredProductAttachmentEntity.getDeliveredProductEntity().getId(), deliveredProductAttachmentEntity.getCreatedAt(),
+                    deliveredProductAttachmentEntity.getDeliveredProduct().getId(), deliveredProductAttachmentEntity.getCreatedAt(),
                     ftpEntity.getDomain(), ftpEntity.getPort(), ftpEntity.getUsername(), ftpEntity.getPassword()
             );
         }
@@ -152,7 +156,7 @@ public final class PostgresDeliveryProductAttachmentRepository implements Delive
         if (documentEntity != null) {
             return DeliveryProductDocumentAttachment.fromPrimitives(
                     documentEntity.getId(), deliveredProductAttachmentEntity.getUuid(), deliveredProductAttachmentEntity.getObservations(),
-                    deliveredProductAttachmentEntity.getDeliveredProductEntity().getId(), deliveredProductAttachmentEntity.getCreatedAt(),
+                    deliveredProductAttachmentEntity.getDeliveredProduct().getId(), deliveredProductAttachmentEntity.getCreatedAt(),
                     documentEntity.getUrl()
             );
         }
@@ -170,7 +174,18 @@ public final class PostgresDeliveryProductAttachmentRepository implements Delive
 
             DeliveredProductAttachmentXTFEntity xtfEntity =
                     deliveredProductAttachmentXTFJPARepository.findByDeliveredProductAttachment(deliveredProductAttachmentEntity);
-            xtfEntity.setStatus(mappingEnum(status));
+
+            StatusXTFEnum statusEntity = mappingEnum(status);
+            xtfEntity.setStatus(statusEntity);
+
+
+            Boolean isValid = null;
+            if (status.value().equals(XTFStatus.Status.ACCEPTED)) {
+                isValid = true;
+            } else if (status.value().equals(XTFStatus.Status.REJECTED)) {
+                isValid = false;
+            }
+            xtfEntity.setValid(isValid);
 
             deliveredProductAttachmentXTFJPARepository.save(xtfEntity);
 
@@ -188,6 +203,16 @@ public final class PostgresDeliveryProductAttachmentRepository implements Delive
             default:
                 return StatusXTFEnum.IN_VALIDATION;
         }
+    }
+
+    @Override
+    public List<DeliveryProductAttachment> findByDeliveryProductId(DeliveryProductId deliveryProductId) {
+
+        DeliveredProductEntity deliveredProduct = new DeliveredProductEntity();
+        deliveredProduct.setId(deliveryProductId.value());
+
+        return deliveredProductAttachmentJPARepository.findByDeliveredProduct(deliveredProduct)
+                .stream().map(this::handleFind).collect(Collectors.toList());
     }
 
 }

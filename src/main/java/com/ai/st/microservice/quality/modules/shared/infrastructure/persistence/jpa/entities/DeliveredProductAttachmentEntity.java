@@ -24,7 +24,7 @@ public final class DeliveredProductAttachmentEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "delivered_product_id", referencedColumnName = "id", nullable = false)
-    private DeliveredProductEntity deliveredProductEntity;
+    private DeliveredProductEntity deliveredProduct;
 
     public Long getId() {
         return id;
@@ -42,12 +42,12 @@ public final class DeliveredProductAttachmentEntity {
         this.createdAt = createdAt;
     }
 
-    public DeliveredProductEntity getDeliveredProductEntity() {
-        return deliveredProductEntity;
+    public DeliveredProductEntity getDeliveredProduct() {
+        return deliveredProduct;
     }
 
-    public void setDeliveredProductEntity(DeliveredProductEntity deliveredProductEntity) {
-        this.deliveredProductEntity = deliveredProductEntity;
+    public void setDeliveredProduct(DeliveredProductEntity deliveredProduct) {
+        this.deliveredProduct = deliveredProduct;
     }
 
     public String getObservations() {

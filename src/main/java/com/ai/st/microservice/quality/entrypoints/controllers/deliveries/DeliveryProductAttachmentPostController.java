@@ -8,7 +8,6 @@ import com.ai.st.microservice.common.exceptions.InputValidationException;
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
 import com.ai.st.microservice.quality.modules.deliveries.application.AddAttachmentToProduct.AttachmentAssigner;
 import com.ai.st.microservice.quality.modules.deliveries.application.AddAttachmentToProduct.AttachmentAssignerCommand;
-import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.AddingAttachmentToProductFailed;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.CompressorFile;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.StoreFile;
@@ -45,7 +44,7 @@ public final class DeliveryProductAttachmentPostController extends ApiController
         this.compressorFile = compressorFile;
     }
 
-    @PostMapping(value = "api/quality/v1/deliveries/{deliveryId}/products/{productId}/attachments", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "api/quality/v1/deliveries/{deliveryId}/products/{deliveryProductId}/attachments", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Add attachment to product from delivery")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Delivery created"),
@@ -53,7 +52,7 @@ public final class DeliveryProductAttachmentPostController extends ApiController
     @ResponseBody
     public ResponseEntity<?> addAttachmentToProduct(
             @PathVariable Long deliveryId,
-            @PathVariable Long productId,
+            @PathVariable Long deliveryProductId,
             @ModelAttribute AddAttachmentToProductRequest request,
             @RequestHeader("authorization") String headerAuthorization) {
 
@@ -65,7 +64,7 @@ public final class DeliveryProductAttachmentPostController extends ApiController
             InformationSession session = this.getInformationSession(headerAuthorization);
 
             validateDeliveryId(deliveryId);
-            validateProduct(productId);
+            validateProduct(deliveryProductId);
 
             String observations = request.getObservations();
 
@@ -81,7 +80,7 @@ public final class DeliveryProductAttachmentPostController extends ApiController
             }
 
             attachmentAssigner.assign(new AttachmentAssignerCommand(
-                    deliveryId, productId, session.entityCode(), attachment
+                    deliveryId, deliveryProductId, session.entityCode(), attachment
             ));
 
             httpStatus = HttpStatus.OK;
