@@ -17,6 +17,10 @@ public final class DeliveryStatusId {
         this.value = value;
     }
 
+    public static DeliveryStatusId fromValue(Long value) {
+        return new DeliveryStatusId(value);
+    }
+
     private void ensureStatus(Long value) {
         if (!value.equals(DeliveryStatusId.DRAFT)
                 && !value.equals(DeliveryStatusId.DELIVERED)

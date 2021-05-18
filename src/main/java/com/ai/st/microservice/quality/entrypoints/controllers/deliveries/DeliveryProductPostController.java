@@ -21,19 +21,19 @@ import java.util.HashMap;
 
 @Api(value = "Manage Deliveries", tags = {"Deliveries"})
 @RestController
-public final class DeliveryProductPutController extends ApiController {
+public final class DeliveryProductPostController extends ApiController {
 
-    private final Logger log = LoggerFactory.getLogger(DeliveryProductPutController.class);
+    private final Logger log = LoggerFactory.getLogger(DeliveryProductPostController.class);
 
     private final ProductAssigner assignProduct;
 
-    public DeliveryProductPutController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                        OperatorBusiness operatorBusiness, ProductAssigner assignProduct) {
+    public DeliveryProductPostController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
+                                         OperatorBusiness operatorBusiness, ProductAssigner assignProduct) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.assignProduct = assignProduct;
     }
 
-    @RequestMapping(value = "api/quality/v1/deliveries/{deliveryId}/products", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "api/quality/v1/deliveries/{deliveryId}/products", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Add product to delivery")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Product added"),
