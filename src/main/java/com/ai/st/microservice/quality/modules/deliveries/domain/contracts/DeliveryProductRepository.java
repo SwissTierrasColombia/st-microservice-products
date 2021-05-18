@@ -14,4 +14,6 @@ public interface DeliveryProductRepository {
 
     DeliveryProduct search(DeliveryProductId deliveryProductId);
 
+    void remove(DeliveryProductId deliveryProductId);
+
 }

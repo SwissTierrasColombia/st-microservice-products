@@ -5,10 +5,8 @@ import com.ai.st.microservice.common.business.ManagerBusiness;
 import com.ai.st.microservice.common.business.OperatorBusiness;
 import com.ai.st.microservice.common.dto.general.BasicResponseDto;
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
-import com.ai.st.microservice.quality.modules.deliveries.application.FindDeliveries.DeliveriesFinderQuery;
 import com.ai.st.microservice.quality.modules.deliveries.application.FindProductsFromDelivery.DeliveryProductsFinder;
 import com.ai.st.microservice.quality.modules.deliveries.application.FindProductsFromDelivery.DeliveryProductsFinderQuery;
-import com.ai.st.microservice.quality.modules.deliveries.application.Roles;
 import com.ai.st.microservice.quality.modules.shared.application.PageableResponse;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 import io.swagger.annotations.Api;
@@ -64,7 +62,7 @@ public final class DeliveryProductGetController extends ApiController {
 
         } catch (DomainError e) {
             log.error("Error DeliveryProductGetController@findDeliveryProducts#Domain ---> " + e.getMessage());
-            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
             responseDto = new BasicResponseDto(e.errorMessage(), 2);
         } catch (Exception e) {
             log.error("Error DeliveryProductGetController@findDeliveryProducts#General ---> " + e.getMessage());

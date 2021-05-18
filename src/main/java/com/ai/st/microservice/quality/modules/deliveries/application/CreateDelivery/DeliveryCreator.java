@@ -26,14 +26,14 @@ public final class DeliveryCreator {
     private final DeliveryRepository deliveryRepository;
     private final WorkspaceMicroservice workspaceMicroservice;
     private final DateTime dateTime;
-    private final ManagerProductsFinder productsFinderByManager;
+    private final ManagerProductsFinder managerProductsFinder;
 
     public DeliveryCreator(DeliveryRepository deliveryRepository, ProductRepository productRepository,
                            WorkspaceMicroservice workspaceMicroservice, DateTime dateTime) {
         this.deliveryRepository = deliveryRepository;
         this.workspaceMicroservice = workspaceMicroservice;
         this.dateTime = dateTime;
-        this.productsFinderByManager = new ManagerProductsFinder(productRepository);
+        this.managerProductsFinder = new ManagerProductsFinder(productRepository);
     }
 
     public void create(CreateDeliveryCommand command) {
@@ -78,7 +78,7 @@ public final class DeliveryCreator {
     }
 
     private void verifyProductBelongToManager(ProductId productId, ManagerCode managerCode) {
-        List<ProductResponse> productResponseList = this.productsFinderByManager.finder(managerCode.value());
+        List<ProductResponse> productResponseList = this.managerProductsFinder.finder(managerCode.value());
         productResponseList.stream().filter(productResponse -> productResponse.id().equals(productId.value())).findAny()
                 .orElseThrow(ProductDoesNotBelongToManager::new);
     }

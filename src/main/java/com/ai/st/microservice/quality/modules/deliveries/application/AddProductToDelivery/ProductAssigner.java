@@ -1,17 +1,11 @@
 package com.ai.st.microservice.quality.modules.deliveries.application.AddProductToDelivery;
 
-import com.ai.st.microservice.quality.modules.deliveries.application.DeliveryProductResponse;
-import com.ai.st.microservice.quality.modules.deliveries.application.DeliveryResponse;
-import com.ai.st.microservice.quality.modules.deliveries.application.FindProductsFromDelivery.DeliveryProductsFinder;
-import com.ai.st.microservice.quality.modules.deliveries.application.FindProductsFromDelivery.DeliveryProductsFinderQuery;
-import com.ai.st.microservice.quality.modules.deliveries.application.Roles;
-import com.ai.st.microservice.quality.modules.deliveries.application.SearchDelivery.DeliverySearcher;
-import com.ai.st.microservice.quality.modules.deliveries.application.SearchDelivery.DeliverySearcherQuery;
+import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
+import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryStatusId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductRepository;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryRepository;
-import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.OperatorDoesNotBelongToDelivery;
-import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.ProductHasBeenAlreadyAddedToDelivery;
+import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.*;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.*;
 
 import com.ai.st.microservice.quality.modules.products.application.ProductResponse;
@@ -20,7 +14,6 @@ import com.ai.st.microservice.quality.modules.products.domain.ProductId;
 import com.ai.st.microservice.quality.modules.products.domain.contracts.ProductRepository;
 import com.ai.st.microservice.quality.modules.products.domain.exceptions.ProductDoesNotBelongToManager;
 
-import com.ai.st.microservice.quality.modules.shared.domain.ManagerCode;
 import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.DateTime;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
@@ -30,20 +23,17 @@ import java.util.List;
 @Service
 public final class ProductAssigner {
 
-    private final DeliveryProductRepository repository;
-    private final DeliverySearcher deliverySearcher;
-    private final ManagerProductsFinder productsFinderByManager;
-    private final DeliveryProductsFinder deliveryProductsFinder;
+    private final DeliveryRepository deliveryRepository;
+    private final DeliveryProductRepository deliveryProductRepository;
+    private final ManagerProductsFinder managerProductsFinder;
     private final DateTime dateTime;
 
-    public ProductAssigner(DeliveryProductRepository repository, DeliveryRepository deliveryRepository,
-                           ProductRepository productRepository, DeliveryProductRepository deliveryProductRepository,
-                           DateTime dateTime) {
-        this.repository = repository;
-        this.deliverySearcher = new DeliverySearcher(deliveryRepository);
-        this.productsFinderByManager = new ManagerProductsFinder(productRepository);
+    public ProductAssigner(DeliveryProductRepository deliveryProductRepository, DeliveryRepository deliveryRepository,
+                           ProductRepository productRepository, DateTime dateTime) {
         this.dateTime = dateTime;
-        this.deliveryProductsFinder = new DeliveryProductsFinder(deliveryProductRepository, deliveryRepository);
+        this.deliveryRepository = deliveryRepository;
+        this.deliveryProductRepository = deliveryProductRepository;
+        this.managerProductsFinder = new ManagerProductsFinder(productRepository);
     }
 
     public void assign(ProductAssignerCommand command) {
@@ -52,49 +42,52 @@ public final class ProductAssigner {
         OperatorCode operatorCode = new OperatorCode(command.operatorCode());
         ProductId productId = new ProductId(command.productId());
 
-        DeliveryResponse deliveryResponse = verifyDeliveryExists(deliveryId, operatorCode);
-        verifyOperatorIsOwnerDelivery(deliveryResponse, operatorCode);
-        verifyProductBelongToManager(productId, new ManagerCode(deliveryResponse.managerCode()));
-        verifyIfProductHasBeenAlreadyAddedToDelivery(deliveryId, productId, operatorCode);
+        verifyPermissions(deliveryId, productId, operatorCode);
 
         DeliveryProduct deliveryProduct = DeliveryProduct.create(
                 new DeliveryProductDate(dateTime.now()),
                 new DeliveryProductObservations(""), productId,
                 new DeliveryProductStatusId(DeliveryProductStatusId.PENDING));
 
-        repository.save(deliveryId, deliveryProduct);
+        deliveryProductRepository.save(deliveryId, deliveryProduct);
     }
 
-    private DeliveryResponse verifyDeliveryExists(DeliveryId deliveryId, OperatorCode operatorCode) {
-        return deliverySearcher.search(new DeliverySearcherQuery(
-                deliveryId.value(), Roles.OPERATOR, operatorCode.value()
-        ));
-    }
+    private void verifyPermissions(DeliveryId deliveryId, ProductId productId, OperatorCode operatorCode) {
 
-    private void verifyOperatorIsOwnerDelivery(DeliveryResponse deliveryResponse, OperatorCode operatorCode) {
-        if (!deliveryResponse.operatorCode().equals(operatorCode.value())) {
+
+        // verify delivery exists
+        Delivery delivery = deliveryRepository.search(deliveryId);
+        if (delivery == null) {
+            throw new DeliveryNotFound();
+        }
+
+        // verify owner of the delivery
+        if (!delivery.deliveryBelongToOperator(operatorCode)) {
             throw new OperatorDoesNotBelongToDelivery();
         }
+
+        // verify status of the delivery
+        if (!delivery.deliveryStatusId().value().equals(DeliveryStatusId.DRAFT)) {
+            throw new UnauthorizedToModifyDelivery("No se puede agregar el producto, porque el estado de la entrega no lo permite.");
+        }
+
+        verifyProductBelongToManager(productId.value(), delivery.manager().value());
+
+        verifyIfProductHasBeenAlreadyAddedToDelivery(deliveryId, productId);
     }
 
-    private void verifyProductBelongToManager(ProductId productId, ManagerCode managerCode) {
-        List<ProductResponse> productResponseList = this.productsFinderByManager.finder(managerCode.value());
-        productResponseList.stream().filter(productResponse -> productResponse.id().equals(productId.value())).findAny()
+    private void verifyProductBelongToManager(Long productId, Long managerCode) {
+        List<ProductResponse> productResponseList = this.managerProductsFinder.finder(managerCode);
+        productResponseList.stream().filter(productResponse -> productResponse.id().equals(productId)).findAny()
                 .orElseThrow(ProductDoesNotBelongToManager::new);
     }
 
-    private void verifyIfProductHasBeenAlreadyAddedToDelivery(DeliveryId deliveryId, ProductId productId, OperatorCode operatorCode) {
-
-        List<DeliveryProductResponse> deliveryProducts = deliveryProductsFinder.finder(new DeliveryProductsFinderQuery(
-                deliveryId.value(), Roles.OPERATOR, operatorCode.value()
-        ));
-
-        deliveryProducts.stream().filter(deliveryProductResponse -> deliveryProductResponse.productId().equals(productId.value()))
+    private void verifyIfProductHasBeenAlreadyAddedToDelivery(DeliveryId deliveryId, ProductId productId) {
+        List<DeliveryProduct> deliveryProducts = deliveryProductRepository.findProductsFromDelivery(deliveryId);
+        deliveryProducts.stream().filter(deliveryProduct -> deliveryProduct.productId().value().equals(productId.value()))
                 .findAny().ifPresent(s -> {
             throw new ProductHasBeenAlreadyAddedToDelivery();
         });
-
     }
-
 
 }

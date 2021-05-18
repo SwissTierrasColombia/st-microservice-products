@@ -74,7 +74,7 @@ public final class DeliveryGetController extends ApiController {
 
         } catch (DomainError e) {
             log.error("Error DeliveryGetController@findDeliveries#Domain ---> " + e.getMessage());
-            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
             responseDto = new BasicResponseDto(e.errorMessage(), 2);
         } catch (Exception e) {
             log.error("Error DeliveryGetController@findDeliveries#General ---> " + e.getMessage());
@@ -118,7 +118,7 @@ public final class DeliveryGetController extends ApiController {
             responseDto = new BasicResponseDto(e.getMessage(), 3);
         } catch (DomainError e) {
             log.error("Error DeliveryGetController@searchDelivery#Domain ---> " + e.getMessage());
-            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
             responseDto = new BasicResponseDto(e.errorMessage(), 2);
         } catch (Exception e) {
             log.error("Error DeliveryGetController@searchDelivery#General ---> " + e.getMessage());

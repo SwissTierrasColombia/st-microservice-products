@@ -2,35 +2,40 @@ package com.ai.st.microservice.quality.modules.deliveries.application.SearchDeli
 
 import com.ai.st.microservice.quality.modules.deliveries.application.DeliveryProductResponse;
 import com.ai.st.microservice.quality.modules.deliveries.application.Roles;
-import com.ai.st.microservice.quality.modules.deliveries.application.SearchDelivery.DeliverySearcher;
-import com.ai.st.microservice.quality.modules.deliveries.application.SearchDelivery.DeliverySearcherQuery;
+import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
+import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductRepository;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryRepository;
+import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.DeliveryNotFound;
 import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.DeliveryProductNotFound;
+import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.UnauthorizedToSearchDelivery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProduct;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductId;
+import com.ai.st.microservice.quality.modules.shared.domain.ManagerCode;
+import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 
 @Service
 public final class DeliveryProductSearcher {
 
+    private final DeliveryRepository deliveryRepository;
     private final DeliveryProductRepository deliveryProductRepository;
-    private final DeliverySearcher deliverySearcher;
 
     public DeliveryProductSearcher(DeliveryProductRepository deliveryProductRepository, DeliveryRepository deliveryRepository) {
         this.deliveryProductRepository = deliveryProductRepository;
-        this.deliverySearcher = new DeliverySearcher(deliveryRepository);
+        this.deliveryRepository = deliveryRepository;
     }
 
     public DeliveryProductResponse search(DeliveryProductSearcherQuery query) {
 
+        DeliveryId deliveryId = DeliveryId.fromValue(query.deliveryId());
         DeliveryProductId deliveryProductId = new DeliveryProductId(query.deliveryProductId());
 
         DeliveryProduct deliveryProduct = deliveryProductRepository.search(deliveryProductId);
 
         verifyDeliveryProduct(deliveryProduct);
 
-        verifyPermissions(query.deliveryId(), query.role(), query.entityCode());
+        verifyPermissions(deliveryId, query.role(), query.entityCode());
 
         return DeliveryProductResponse.fromAggregate(deliveryProduct);
     }
@@ -40,10 +45,27 @@ public final class DeliveryProductSearcher {
             throw new DeliveryProductNotFound();
     }
 
-    private void verifyPermissions(Long deliveryId, Roles role, Long entityCode) {
-        deliverySearcher.search(new DeliverySearcherQuery(
-                deliveryId, role, entityCode
-        ));
+    private void verifyPermissions(DeliveryId deliveryId, Roles role, Long entityCode) {
+
+        // verify delivery exists
+        Delivery delivery = deliveryRepository.search(deliveryId);
+        if (delivery == null) {
+            throw new DeliveryNotFound();
+        }
+
+        // verify owner of the delivery
+        if (role.equals(Roles.OPERATOR)) {
+            if (!delivery.deliveryBelongToOperator(OperatorCode.fromValue(entityCode))) {
+                throw new UnauthorizedToSearchDelivery();
+            }
+        }
+        if (role.equals(Roles.MANAGER)) {
+            // verify status of the delivery
+            if (!delivery.deliveryBelongToManager(ManagerCode.fromValue(entityCode)) || !delivery.isAvailableToManager()) {
+                throw new UnauthorizedToSearchDelivery();
+            }
+        }
+
     }
 
 }

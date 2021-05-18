@@ -1,13 +1,13 @@
 package com.ai.st.microservice.quality.modules.deliveries.application.AddAttachmentToProduct;
 
-import com.ai.st.microservice.quality.modules.deliveries.application.Roles;
-import com.ai.st.microservice.quality.modules.deliveries.application.SearchDeliveryProduct.DeliveryProductSearcher;
-import com.ai.st.microservice.quality.modules.deliveries.application.SearchDeliveryProduct.DeliveryProductSearcherQuery;
+import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
+import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryStatusId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductAttachmentRepository;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductRepository;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryRepository;
-import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.AttachmentUnsupported;
+import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.*;
+import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProduct;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.DeliveryProductAttachment;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.DeliveryProductAttachmentDate;
@@ -29,8 +29,9 @@ import java.util.UUID;
 @Service
 public final class AttachmentAssigner {
 
+    private final DeliveryRepository deliveryRepository;
+    private final DeliveryProductRepository deliveryProductRepository;
     private final DeliveryProductAttachmentRepository attachmentRepository;
-    private final DeliveryProductSearcher deliveryProductSearcher;
     private final DateTime dateTime;
     private final StoreFile storeFile;
     private final ILIMicroservice iliMicroservice;
@@ -41,7 +42,8 @@ public final class AttachmentAssigner {
         this.dateTime = dateTime;
         this.storeFile = storeFile;
         this.iliMicroservice = iliMicroservice;
-        this.deliveryProductSearcher = new DeliveryProductSearcher(deliveryProductRepository, deliveryRepository);
+        this.deliveryRepository = deliveryRepository;
+        this.deliveryProductRepository = deliveryProductRepository;
     }
 
     public void assign(AttachmentAssignerCommand command) {
@@ -50,17 +52,37 @@ public final class AttachmentAssigner {
         DeliveryProductId deliveryProductId = new DeliveryProductId(command.deliveryProductId());
         OperatorCode operatorCode = new OperatorCode(command.operatorCode());
 
-        verifyPermissions(deliveryId.value(), deliveryProductId.value(), operatorCode.value());
+        verifyPermissions(deliveryId, deliveryProductId, operatorCode);
 
         DeliveryProductAttachment attachment = handleAttachment(command.attachment(), deliveryId, deliveryProductId);
 
         attachmentRepository.save(attachment);
     }
 
-    private void verifyPermissions(Long deliveryId, Long deliveryProductId, Long operatorCode) {
-        deliveryProductSearcher.search(new DeliveryProductSearcherQuery(
-                deliveryId, deliveryProductId, Roles.OPERATOR, operatorCode
-        ));
+    private void verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId, OperatorCode operatorCode) {
+
+        // verify delivery exists
+        Delivery delivery = deliveryRepository.search(deliveryId);
+        if (delivery == null) {
+            throw new DeliveryNotFound();
+        }
+
+        // verify delivery product exists
+        DeliveryProduct deliveryProduct = deliveryProductRepository.search(deliveryProductId);
+        if (deliveryProduct == null) {
+            throw new DeliveryProductNotFound();
+        }
+
+        // verify owner of the delivery
+        if (!delivery.deliveryBelongToOperator(operatorCode)) {
+            throw new UnauthorizedToSearchDelivery();
+        }
+
+        // verify status of the delivery
+        if (!delivery.deliveryStatusId().value().equals(DeliveryStatusId.DRAFT)) {
+            throw new UnauthorizedToModifyDelivery("No se puede agregar adjuntos, porque el estado de la entrega no lo permite.");
+        }
+
     }
 
     private DeliveryProductAttachment handleAttachment(AttachmentAssignerCommand.Attachment attachment,

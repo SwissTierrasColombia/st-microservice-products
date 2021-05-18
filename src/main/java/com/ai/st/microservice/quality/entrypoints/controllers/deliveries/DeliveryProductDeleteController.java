@@ -6,8 +6,8 @@ import com.ai.st.microservice.common.business.OperatorBusiness;
 import com.ai.st.microservice.common.dto.general.BasicResponseDto;
 import com.ai.st.microservice.common.exceptions.InputValidationException;
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
-import com.ai.st.microservice.quality.modules.deliveries.application.RemoveAttachmentFromProduct.AttachmentProductRemover;
-import com.ai.st.microservice.quality.modules.deliveries.application.RemoveAttachmentFromProduct.AttachmentProductRemoverCommand;
+import com.ai.st.microservice.quality.modules.deliveries.application.RemoveProductFromDelivery.DeliveryProductRemover;
+import com.ai.st.microservice.quality.modules.deliveries.application.RemoveProductFromDelivery.DeliveryProductRemoverCommand;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,28 +23,27 @@ import java.util.HashMap;
 
 @Api(value = "Manage Deliveries", tags = {"Deliveries"})
 @RestController
-public final class DeliveryProductAttachmentDeleteController extends ApiController {
+public final class DeliveryProductDeleteController extends ApiController {
 
-    private final Logger log = LoggerFactory.getLogger(DeliveryProductAttachmentDeleteController.class);
+    private final Logger log = LoggerFactory.getLogger(DeliveryProductDeleteController.class);
 
-    private final AttachmentProductRemover attachmentProductRemover;
+    private final DeliveryProductRemover deliveryProductRemover;
 
-    public DeliveryProductAttachmentDeleteController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                                     OperatorBusiness operatorBusiness, AttachmentProductRemover attachmentProductRemover) {
+    public DeliveryProductDeleteController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
+                                           OperatorBusiness operatorBusiness, DeliveryProductRemover deliveryProductRemover) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
-        this.attachmentProductRemover = attachmentProductRemover;
+        this.deliveryProductRemover = deliveryProductRemover;
     }
 
-    @DeleteMapping(value = "api/quality/v1/deliveries/{deliveryId}/products/{deliveryProductId}/attachments/{attachmentId}")
-    @ApiOperation(value = "Remove attachment from delivery product")
+    @DeleteMapping(value = "api/quality/v1/deliveries/{deliveryId}/products/{deliveryProductId}")
+    @ApiOperation(value = "Remove product from delivery")
     @ApiResponses(value = {
-            @ApiResponse(code = 204, message = "Attachment removed"),
+            @ApiResponse(code = 204, message = "Product removed"),
             @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class)})
     @ResponseBody
-    public ResponseEntity<?> removeAttachmentFromProduct(
+    public ResponseEntity<?> removeProductFromDelivery(
             @PathVariable Long deliveryId,
             @PathVariable Long deliveryProductId,
-            @PathVariable Long attachmentId,
             @RequestHeader("authorization") String headerAuthorization) {
 
         HttpStatus httpStatus;
@@ -56,29 +55,31 @@ public final class DeliveryProductAttachmentDeleteController extends ApiControll
 
             validateDeliveryId(deliveryId);
             validateDeliveryProductId(deliveryProductId);
-            validateAttachmentId(attachmentId);
 
-            attachmentProductRemover.remove(
-                    new AttachmentProductRemoverCommand(
-                            deliveryId, deliveryProductId, attachmentId, session.entityCode()));
+            deliveryProductRemover.remove(
+                    new DeliveryProductRemoverCommand(
+                            deliveryId, deliveryProductId, session.entityCode()
+                    ));
 
             httpStatus = HttpStatus.NO_CONTENT;
 
         } catch (InputValidationException e) {
-            log.error("Error DeliveryProductAttachmentDeleteController@removeAttachmentFromProduct#Validation ---> " + e.getMessage());
+            log.error("Error DeliveryProductDeleteController@removeProductFromDelivery#Validation ---> " + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
             responseDto = new BasicResponseDto(e.getMessage(), 3);
         } catch (DomainError e) {
-            log.error("Error DeliveryProductAttachmentDeleteController@removeAttachmentFromProduct#Domain ---> " + e.getMessage());
+            log.error("Error DeliveryProductDeleteController@removeProductFromDelivery#Domain ---> " + e.getMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
             responseDto = new BasicResponseDto(e.errorMessage(), 2);
         } catch (Exception e) {
-            log.error("Error DeliveryProductAttachmentDeleteController@removeAttachmentFromProduct#General ---> " + e.getMessage());
+            log.error("Error DeliveryProductDeleteController@removeProductFromDelivery#General ---> " + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
             responseDto = new BasicResponseDto(e.getMessage(), 1);
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);
+
+
     }
 
     private void validateDeliveryId(Long deliveryId) throws InputValidationException {
@@ -90,12 +91,6 @@ public final class DeliveryProductAttachmentDeleteController extends ApiControll
     private void validateDeliveryProductId(Long deliveryProductId) throws InputValidationException {
         if (deliveryProductId == null || deliveryProductId <= 0) {
             throw new InputValidationException("El producto de la entrega no es válido.");
-        }
-    }
-
-    private void validateAttachmentId(Long attachmentId) throws InputValidationException {
-        if (attachmentId == null || attachmentId <= 0) {
-            throw new InputValidationException("El adjunto no válido.");
         }
     }
 

@@ -8,6 +8,10 @@ public final class DeliveryId {
         this.value = value;
     }
 
+    public static DeliveryId fromValue(Long value) {
+        return new DeliveryId(value);
+    }
+
     public Long value() {
         return value;
     }

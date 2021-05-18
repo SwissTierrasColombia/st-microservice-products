@@ -1,14 +1,12 @@
 package com.ai.st.microservice.quality.modules.deliveries.application.FindProductsFromDelivery;
 
-import com.ai.st.microservice.quality.modules.deliveries.application.DeliveryResponse;
 import com.ai.st.microservice.quality.modules.deliveries.application.DeliveryProductResponse;
 import com.ai.st.microservice.quality.modules.deliveries.application.Roles;
-import com.ai.st.microservice.quality.modules.deliveries.application.SearchDelivery.DeliverySearcher;
-import com.ai.st.microservice.quality.modules.deliveries.application.SearchDelivery.DeliverySearcherQuery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductRepository;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryRepository;
+import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.DeliveryNotFound;
 import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.UnauthorizedToSearchDelivery;
 
 import com.ai.st.microservice.quality.modules.shared.domain.ManagerCode;
@@ -21,12 +19,12 @@ import java.util.stream.Collectors;
 @Service
 public final class DeliveryProductsFinder {
 
+    private final DeliveryRepository deliveryRepository;
     private final DeliveryProductRepository deliveryProductRepository;
-    private final DeliverySearcher deliverySearcher;
 
     public DeliveryProductsFinder(DeliveryProductRepository deliveryProductRepository, DeliveryRepository deliveryRepository) {
         this.deliveryProductRepository = deliveryProductRepository;
-        this.deliverySearcher = new DeliverySearcher(deliveryRepository);
+        this.deliveryRepository = deliveryRepository;
     }
 
     public List<DeliveryProductResponse> finder(DeliveryProductsFinderQuery query) {
@@ -35,41 +33,33 @@ public final class DeliveryProductsFinder {
         Roles role = query.role();
         Long entityCode = query.entityCode();
 
-        DeliveryResponse deliveryResponse = verifyDeliveryExists(deliveryId.value(), role, entityCode);
-        Delivery delivery = createDeliveryFromResponse(deliveryResponse);
-
-        verifyEntityBelongToDelivery(delivery, role, entityCode);
-        verifyDeliveryState(delivery, role);
+        verifyPermissions(deliveryId, role, entityCode);
 
         return deliveryProductRepository.findProductsFromDelivery(deliveryId).stream()
                 .map(DeliveryProductResponse::fromAggregate).collect(Collectors.toList());
     }
 
-    private DeliveryResponse verifyDeliveryExists(Long deliveryId, Roles role, Long entityCode) {
-        return deliverySearcher.search(
-                new DeliverySearcherQuery(deliveryId, role, entityCode)
-        );
-    }
+    private void verifyPermissions(DeliveryId deliveryId, Roles role, Long entityCode) {
 
-    private void verifyEntityBelongToDelivery(Delivery delivery, Roles role, Long entityCode) {
-        if (role == Roles.MANAGER && !delivery.deliveryBelongToManager(new ManagerCode(entityCode))) {
-            throw new UnauthorizedToSearchDelivery();
+        // verify delivery exists
+        Delivery delivery = deliveryRepository.search(deliveryId);
+        if (delivery == null) {
+            throw new DeliveryNotFound();
         }
-        if (role == Roles.OPERATOR && !delivery.deliveryBelongToOperator(new OperatorCode(entityCode))) {
-            throw new UnauthorizedToSearchDelivery();
-        }
-    }
 
-    private void verifyDeliveryState(Delivery delivery, Roles role) {
-        if (role.equals(Roles.MANAGER) && !delivery.isAvailableToManager()) {
-            throw new UnauthorizedToSearchDelivery();
+        // verify owner of the delivery
+        if (role.equals(Roles.OPERATOR)) {
+            if (!delivery.deliveryBelongToOperator(OperatorCode.fromValue(entityCode))) {
+                throw new UnauthorizedToSearchDelivery();
+            }
         }
-    }
+        if (role.equals(Roles.MANAGER)) {
+            // verify status of the delivery
+            if (!delivery.deliveryBelongToManager(ManagerCode.fromValue(entityCode)) || !delivery.isAvailableToManager()) {
+                throw new UnauthorizedToSearchDelivery();
+            }
+        }
 
-    private Delivery createDeliveryFromResponse(DeliveryResponse deliveryResponse) {
-        return Delivery.fromPrimitives(deliveryResponse.id(), deliveryResponse.code(), deliveryResponse.municipalityCode(),
-                deliveryResponse.managerCode(), deliveryResponse.operatorCode(), deliveryResponse.userCode(),
-                deliveryResponse.observations(), deliveryResponse.deliveryDate(), deliveryResponse.deliveryStatusId());
     }
 
 }

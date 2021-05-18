@@ -17,6 +17,10 @@ public final class ManagerCode {
         if (value == null || value <= 0) throw new ManagerInvalid();
     }
 
+    public static ManagerCode fromValue(Long value) {
+        return new ManagerCode(value);
+    }
+
     public Long value() {
         return value;
     }

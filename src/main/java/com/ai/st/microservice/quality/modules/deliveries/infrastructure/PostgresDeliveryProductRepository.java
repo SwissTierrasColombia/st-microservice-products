@@ -73,4 +73,9 @@ public final class PostgresDeliveryProductRepository implements DeliveryProductR
                 );
     }
 
+    @Override
+    public void remove(DeliveryProductId deliveryProductId) {
+        repository.deleteById(deliveryProductId.value());
+    }
+
 }
