@@ -12,6 +12,7 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.products.Deliver
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.DeliveryProductAttachment;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.DeliveryProductAttachmentId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.document.DeliveryProductDocumentAttachment;
+import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.ftp.DeliveryProductFTPAttachment;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.xtf.DeliveryProductXTFAttachment;
 import com.ai.st.microservice.quality.modules.shared.domain.ManagerCode;
 import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
@@ -82,19 +83,17 @@ public final class AttachmentURLGetter {
 
     private String getPathFile(DeliveryProductAttachment deliveryProductAttachment) {
 
-        String pathFile = null;
-
         if (deliveryProductAttachment instanceof DeliveryProductXTFAttachment) {
             DeliveryProductXTFAttachment xtf = (DeliveryProductXTFAttachment) deliveryProductAttachment;
-            pathFile = xtf.url().value();
+            return xtf.url().value();
         }
 
         if (deliveryProductAttachment instanceof DeliveryProductDocumentAttachment) {
             DeliveryProductDocumentAttachment document = (DeliveryProductDocumentAttachment) deliveryProductAttachment;
-            pathFile = document.documentUrl().value();
+            return document.documentUrl().value();
         }
 
-        return pathFile;
+        throw new AttachmentUnsupportedToDownload();
     }
 
 }
