@@ -74,7 +74,7 @@ public final class AttachmentProductRemover {
         }
 
         // verify status of the delivery
-        if (!delivery.deliveryStatusId().value().equals(DeliveryStatusId.DRAFT)) {
+        if (!delivery.isDraft()) {
             throw new UnauthorizedToModifyDelivery("No se puede eliminar el adjunto, porque el estado de la entrega no lo permite.");
         }
 

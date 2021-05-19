@@ -12,7 +12,6 @@ import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.
 import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.jpa.entities.ProductEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,6 +75,15 @@ public final class PostgresDeliveryProductRepository implements DeliveryProductR
     @Override
     public void remove(DeliveryProductId deliveryProductId) {
         repository.deleteById(deliveryProductId.value());
+    }
+
+    @Override
+    public void update(DeliveryProduct deliveryProduct) {
+        DeliveredProductEntity deliveredProductEntity = repository.findById(deliveryProduct.deliveryProductId().value()).orElse(null);
+        if (deliveredProductEntity != null) {
+            deliveredProductEntity.setObservations(deliveryProduct.deliveryProductObservations().value());
+            repository.save(deliveredProductEntity);
+        }
     }
 
 }

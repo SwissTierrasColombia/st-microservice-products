@@ -2,7 +2,6 @@ package com.ai.st.microservice.quality.modules.deliveries.application.AddProduct
 
 import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
-import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryStatusId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductRepository;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryRepository;
 import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.*;
@@ -21,22 +20,22 @@ import com.ai.st.microservice.quality.modules.shared.domain.Service;
 import java.util.List;
 
 @Service
-public final class ProductAssigner {
+public final class DeliveryProductAssigner {
 
     private final DeliveryRepository deliveryRepository;
     private final DeliveryProductRepository deliveryProductRepository;
     private final ManagerProductsFinder managerProductsFinder;
     private final DateTime dateTime;
 
-    public ProductAssigner(DeliveryProductRepository deliveryProductRepository, DeliveryRepository deliveryRepository,
-                           ProductRepository productRepository, DateTime dateTime) {
+    public DeliveryProductAssigner(DeliveryProductRepository deliveryProductRepository, DeliveryRepository deliveryRepository,
+                                   ProductRepository productRepository, DateTime dateTime) {
         this.dateTime = dateTime;
         this.deliveryRepository = deliveryRepository;
         this.deliveryProductRepository = deliveryProductRepository;
         this.managerProductsFinder = new ManagerProductsFinder(productRepository);
     }
 
-    public void assign(ProductAssignerCommand command) {
+    public void assign(DeliveryProductAssignerCommand command) {
 
         DeliveryId deliveryId = new DeliveryId(command.deliveryId());
         OperatorCode operatorCode = new OperatorCode(command.operatorCode());
@@ -67,7 +66,7 @@ public final class ProductAssigner {
         }
 
         // verify status of the delivery
-        if (!delivery.deliveryStatusId().value().equals(DeliveryStatusId.DRAFT)) {
+        if (!delivery.isDraft()) {
             throw new UnauthorizedToModifyDelivery("No se puede agregar el producto, porque el estado de la entrega no lo permite.");
         }
 

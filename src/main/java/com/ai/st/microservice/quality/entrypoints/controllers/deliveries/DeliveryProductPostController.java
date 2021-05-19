@@ -6,8 +6,8 @@ import com.ai.st.microservice.common.business.OperatorBusiness;
 import com.ai.st.microservice.common.dto.general.BasicResponseDto;
 import com.ai.st.microservice.common.exceptions.InputValidationException;
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
-import com.ai.st.microservice.quality.modules.deliveries.application.AddProductToDelivery.ProductAssignerCommand;
-import com.ai.st.microservice.quality.modules.deliveries.application.AddProductToDelivery.ProductAssigner;
+import com.ai.st.microservice.quality.modules.deliveries.application.AddProductToDelivery.DeliveryProductAssignerCommand;
+import com.ai.st.microservice.quality.modules.deliveries.application.AddProductToDelivery.DeliveryProductAssigner;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
@@ -25,12 +25,12 @@ public final class DeliveryProductPostController extends ApiController {
 
     private final Logger log = LoggerFactory.getLogger(DeliveryProductPostController.class);
 
-    private final ProductAssigner assignProduct;
+    private final DeliveryProductAssigner deliveryProductAssigner;
 
     public DeliveryProductPostController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                         OperatorBusiness operatorBusiness, ProductAssigner assignProduct) {
+                                         OperatorBusiness operatorBusiness, DeliveryProductAssigner assignProduct) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
-        this.assignProduct = assignProduct;
+        this.deliveryProductAssigner = assignProduct;
     }
 
     @PostMapping(value = "api/quality/v1/deliveries/{deliveryId}/products", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -55,8 +55,8 @@ public final class DeliveryProductPostController extends ApiController {
             Long productId = request.getProductId();
             validateProduct(productId);
 
-            assignProduct.assign(
-                    new ProductAssignerCommand(
+            deliveryProductAssigner.assign(
+                    new DeliveryProductAssignerCommand(
                             deliveryId,
                             productId,
                             session.entityCode()));
@@ -64,15 +64,15 @@ public final class DeliveryProductPostController extends ApiController {
             httpStatus = HttpStatus.OK;
 
         } catch (InputValidationException e) {
-            log.error("Error DeliveryProductPutController@addProductToDelivery#Validation ---> " + e.getMessage());
+            log.error("Error DeliveryProductPostController@addProductToDelivery#Validation ---> " + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
             responseDto = new BasicResponseDto(e.getMessage(), 1);
         } catch (DomainError e) {
-            log.error("Error DeliveryProductPutController@addProductToDelivery#Domain ---> " + e.errorMessage());
+            log.error("Error DeliveryProductPostController@addProductToDelivery#Domain ---> " + e.errorMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
             responseDto = new BasicResponseDto(e.errorMessage(), 2);
         } catch (Exception e) {
-            log.error("Error DeliveryProductPutController@addProductToDelivery#General ---> " + e.getMessage());
+            log.error("Error DeliveryProductPostController@addProductToDelivery#General ---> " + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
             responseDto = new BasicResponseDto(e.getMessage(), 3);
         }

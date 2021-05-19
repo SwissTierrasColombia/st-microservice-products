@@ -8,6 +8,10 @@ public final class DeliveryProductObservations {
         this.value = value;
     }
 
+    public static DeliveryProductObservations fromValue(String value) {
+        return new DeliveryProductObservations(value);
+    }
+
     public String value() {
         return value;
     }

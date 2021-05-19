@@ -79,7 +79,7 @@ public final class AttachmentAssigner {
         }
 
         // verify status of the delivery
-        if (!delivery.deliveryStatusId().value().equals(DeliveryStatusId.DRAFT)) {
+        if (!delivery.isDraft()) {
             throw new UnauthorizedToModifyDelivery("No se puede agregar adjuntos, porque el estado de la entrega no lo permite.");
         }
 
