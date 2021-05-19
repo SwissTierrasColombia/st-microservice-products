@@ -14,8 +14,6 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.products.Deliver
 import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 
-import java.util.Date;
-
 @Service
 public final class DeliveryProductUpdater {
 
@@ -34,7 +32,7 @@ public final class DeliveryProductUpdater {
         OperatorCode operatorCode = OperatorCode.fromValue(command.operatorCode());
         DeliveryProductObservations observations = DeliveryProductObservations.fromValue(command.observations());
 
-        verifyPermissions(deliveryId, deliveryProductId, operatorCode);
+        verifyPermissions(deliveryId, operatorCode);
 
         // verify delivery product exists
         DeliveryProduct deliveryProduct = deliveryProductRepository.search(deliveryProductId);
@@ -51,14 +49,13 @@ public final class DeliveryProductUpdater {
         ));
     }
 
-    private void verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId, OperatorCode operatorCode) {
+    private void verifyPermissions(DeliveryId deliveryId, OperatorCode operatorCode) {
 
         // verify delivery exists
         Delivery delivery = deliveryRepository.search(deliveryId);
         if (delivery == null) {
             throw new DeliveryNotFound();
         }
-
 
         // verify owner of the delivery
         if (!delivery.deliveryBelongToOperator(operatorCode)) {

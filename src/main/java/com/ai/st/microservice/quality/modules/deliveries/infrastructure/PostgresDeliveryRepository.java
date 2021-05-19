@@ -203,7 +203,7 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
         }
     }
 
-    private Path buildPath(Root<DeliveryEntity> root, String fieldDomain) {
+    private Path<?> buildPath(Root<DeliveryEntity> root, String fieldDomain) {
         String field = mappingField(fieldDomain);
         if (root.get(field).getJavaType().isAssignableFrom(DeliveryStatusEntity.class)) {
             return root.get(field).get("id");
@@ -218,6 +218,15 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
     @Override
     public void remove(DeliveryId deliveryId) {
         deliveryJPARepository.deleteById(deliveryId.value());
+    }
+
+    @Override
+    public void update(Delivery delivery) {
+        DeliveryEntity deliveryEntity = deliveryJPARepository.findById(delivery.id().value()).orElse(null);
+        if (deliveryEntity != null) {
+            deliveryEntity.setObservations(delivery.observations().value());
+            deliveryJPARepository.save(deliveryEntity);
+        }
     }
 
 }

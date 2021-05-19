@@ -42,6 +42,11 @@ public final class Delivery extends AggregateRoot {
         this.deliveryProducts = deliveryProducts;
     }
 
+    public static Delivery create(DeliveryId id, DeliveryCode code, MunicipalityCode municipalityCode, ManagerCode manager, OperatorCode operatorCode,
+                                  UserCode user, DeliveryObservations observations, DeliveryDate date, DeliveryStatusId deliveryStatus) {
+        return new Delivery(id, code, municipalityCode, manager, operatorCode, user, observations, date, deliveryStatus, new ArrayList<>());
+    }
+
     public static Delivery create(DeliveryCode code, MunicipalityCode municipalityCode, ManagerCode manager, OperatorCode operatorCode,
                                   UserCode user, DeliveryObservations observations, DeliveryDate date, DeliveryStatusId deliveryStatus) {
         return new Delivery(null, code, municipalityCode, manager, operatorCode, user, observations, date, deliveryStatus, new ArrayList<>());

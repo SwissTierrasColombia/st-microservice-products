@@ -11,6 +11,10 @@ public class DeliveryObservations {
         this.value = value;
     }
 
+    public static DeliveryObservations fromValue(String value) {
+        return new DeliveryObservations(value);
+    }
+
     private void ensureObservations(String value) {
         if (value == null) throw new DeliveryObservationsInvalid();
     }
