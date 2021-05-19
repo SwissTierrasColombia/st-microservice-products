@@ -39,6 +39,8 @@ public final class AttachmentAssigner {
     private final StoreFile storeFile;
     private final ILIMicroservice iliMicroservice;
 
+    private final static int MAXIMUM_ATTACHMENTS_PER_PRODUCT = 5;
+
     public AttachmentAssigner(DeliveryProductAttachmentRepository attachmentRepository, DeliveryRepository deliveryRepository,
                               DeliveryProductRepository deliveryProductRepository, ProductRepository productRepository,
                               DateTime dateTime, StoreFile storeFile, ILIMicroservice iliMicroservice) {
@@ -86,6 +88,12 @@ public final class AttachmentAssigner {
         // verify status of the delivery
         if (!delivery.isDraft()) {
             throw new UnauthorizedToModifyDelivery("No se puede agregar adjuntos, porque el estado de la entrega no lo permite.");
+        }
+
+        // verify count attachments per product
+        long count = attachmentRepository.findByDeliveryProductId(deliveryProductId).size() + 1;
+        if (count > MAXIMUM_ATTACHMENTS_PER_PRODUCT) {
+            throw new NumberAttachmentsExceeded(MAXIMUM_ATTACHMENTS_PER_PRODUCT);
         }
 
         return deliveryProduct;
