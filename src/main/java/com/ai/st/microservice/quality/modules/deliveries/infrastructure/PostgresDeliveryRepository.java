@@ -2,6 +2,7 @@ package com.ai.st.microservice.quality.modules.deliveries.infrastructure;
 
 import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
+import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryStatusId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryRepository;
 import com.ai.st.microservice.quality.modules.deliveries.infrastructure.persistence.jpa.DeliveryJPARepository;
 import com.ai.st.microservice.quality.modules.deliveries.infrastructure.persistence.jpa.DeliveryProductStatusJPARepository;
@@ -225,6 +226,18 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
         DeliveryEntity deliveryEntity = deliveryJPARepository.findById(delivery.id().value()).orElse(null);
         if (deliveryEntity != null) {
             deliveryEntity.setObservations(delivery.observations().value());
+            deliveryJPARepository.save(deliveryEntity);
+        }
+    }
+
+    @Override
+    public void changeState(DeliveryId deliveryId, DeliveryStatusId deliveryStatusId) {
+        DeliveryEntity deliveryEntity = deliveryJPARepository.findById(deliveryId.value()).orElse(null);
+        if (deliveryEntity != null) {
+            DeliveryStatusEntity deliveryStatusEntity = new DeliveryStatusEntity();
+            deliveryStatusEntity.setId(deliveryStatusId.value());
+
+            deliveryEntity.setDeliveryStatus(deliveryStatusEntity);
             deliveryJPARepository.save(deliveryEntity);
         }
     }

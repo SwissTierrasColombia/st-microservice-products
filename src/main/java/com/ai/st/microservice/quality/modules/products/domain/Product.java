@@ -57,6 +57,10 @@ public final class Product {
         return createdAt;
     }
 
+    public boolean isConfiguredAsXTF() {
+        return productXTF().value();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

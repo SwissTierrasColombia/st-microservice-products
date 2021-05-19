@@ -1,6 +1,7 @@
 package com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments;
 
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductId;
+import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.xtf.DeliveryProductXTFAttachment;
 
 public abstract class DeliveryProductAttachment {
 
@@ -38,6 +39,10 @@ public abstract class DeliveryProductAttachment {
 
     public DeliveryProductAttachmentUUID uuid() {
         return uuid;
+    }
+
+    public boolean isXTF() {
+        return this instanceof DeliveryProductXTFAttachment;
     }
 
 }

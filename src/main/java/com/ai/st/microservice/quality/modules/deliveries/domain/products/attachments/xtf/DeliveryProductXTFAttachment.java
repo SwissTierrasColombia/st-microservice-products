@@ -61,4 +61,8 @@ public final class DeliveryProductXTFAttachment extends DeliveryProductAttachmen
         return status;
     }
 
+    public boolean accepted() {
+        return (status.value().equals(XTFStatus.Status.ACCEPTED));
+    }
+
 }
