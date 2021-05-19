@@ -2,7 +2,6 @@ package com.ai.st.microservice.quality.modules.deliveries.application.AddAttachm
 
 import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
-import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryStatusId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductAttachmentRepository;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductRepository;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryRepository;
@@ -17,6 +16,9 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachm
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.document.DocumentUrl;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.ftp.*;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.xtf.*;
+import com.ai.st.microservice.quality.modules.products.domain.Product;
+import com.ai.st.microservice.quality.modules.products.domain.ProductId;
+import com.ai.st.microservice.quality.modules.products.domain.contracts.ProductRepository;
 import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.DateTime;
@@ -32,13 +34,16 @@ public final class AttachmentAssigner {
     private final DeliveryRepository deliveryRepository;
     private final DeliveryProductRepository deliveryProductRepository;
     private final DeliveryProductAttachmentRepository attachmentRepository;
+    private final ProductRepository productRepository;
     private final DateTime dateTime;
     private final StoreFile storeFile;
     private final ILIMicroservice iliMicroservice;
 
     public AttachmentAssigner(DeliveryProductAttachmentRepository attachmentRepository, DeliveryRepository deliveryRepository,
-                              DeliveryProductRepository deliveryProductRepository, DateTime dateTime, StoreFile storeFile, ILIMicroservice iliMicroservice) {
+                              DeliveryProductRepository deliveryProductRepository, ProductRepository productRepository,
+                              DateTime dateTime, StoreFile storeFile, ILIMicroservice iliMicroservice) {
         this.attachmentRepository = attachmentRepository;
+        this.productRepository = productRepository;
         this.dateTime = dateTime;
         this.storeFile = storeFile;
         this.iliMicroservice = iliMicroservice;
@@ -52,14 +57,14 @@ public final class AttachmentAssigner {
         DeliveryProductId deliveryProductId = new DeliveryProductId(command.deliveryProductId());
         OperatorCode operatorCode = new OperatorCode(command.operatorCode());
 
-        verifyPermissions(deliveryId, deliveryProductId, operatorCode);
+        DeliveryProduct deliveryProduct = verifyPermissions(deliveryId, deliveryProductId, operatorCode);
 
-        DeliveryProductAttachment attachment = handleAttachment(command.attachment(), deliveryId, deliveryProductId);
+        DeliveryProductAttachment attachment = handleAttachment(command.attachment(), deliveryId, deliveryProductId, deliveryProduct.productId());
 
         attachmentRepository.save(attachment);
     }
 
-    private void verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId, OperatorCode operatorCode) {
+    private DeliveryProduct verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId, OperatorCode operatorCode) {
 
         // verify delivery exists
         Delivery delivery = deliveryRepository.search(deliveryId);
@@ -83,11 +88,17 @@ public final class AttachmentAssigner {
             throw new UnauthorizedToModifyDelivery("No se puede agregar adjuntos, porque el estado de la entrega no lo permite.");
         }
 
+        return deliveryProduct;
     }
 
     private DeliveryProductAttachment handleAttachment(AttachmentAssignerCommand.Attachment attachment,
                                                        DeliveryId deliveryId,
-                                                       DeliveryProductId deliveryProductId) {
+                                                       DeliveryProductId deliveryProductId,
+                                                       ProductId productId) {
+
+        if (!productIsXTF(productId) && attachment.isXTF()) {
+            throw new AttachmentTypeNotSupportedToProduct();
+        }
 
         DeliveryProductAttachmentDate attachmentDate = new DeliveryProductAttachmentDate(dateTime.now());
 
@@ -161,6 +172,14 @@ public final class AttachmentAssigner {
 
     private String buildNamespace(DeliveryId deliveryId) {
         return String.format("/entregas/%d", deliveryId.value());
+    }
+
+    private boolean productIsXTF(ProductId productId) {
+        Product product = productRepository.search(productId);
+        if (product != null) {
+            return product.isConfiguredAsXTF();
+        }
+        return false;
     }
 
 }

@@ -41,6 +41,10 @@ public final class AttachmentAssignerCommand {
         public String observations() {
             return observations;
         }
+
+        public boolean isXTF() {
+            return this instanceof XTFAttachment;
+        }
     }
 
     public static class XTFAttachment extends Attachment {
