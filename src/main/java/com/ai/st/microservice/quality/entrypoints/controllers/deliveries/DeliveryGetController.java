@@ -53,6 +53,10 @@ public final class DeliveryGetController extends ApiController {
             @RequestParam(name = "page") int page,
             @RequestParam(name = "limit") int limit,
             @RequestParam(name = "states", required = false) List<Long> states,
+            @RequestParam(name = "code", required = false) String code,
+            @RequestParam(name = "municipality", required = false) String municipality,
+            @RequestParam(name = "operator", required = false) Long operator,
+            @RequestParam(name = "manager", required = false) Long manager,
             @RequestHeader("authorization") String headerAuthorization) {
 
         HttpStatus httpStatus;
@@ -67,6 +71,10 @@ public final class DeliveryGetController extends ApiController {
                             page,
                             limit,
                             states,
+                            code,
+                            municipality,
+                            operator,
+                            manager,
                             session.role(),
                             session.entityCode()));
 

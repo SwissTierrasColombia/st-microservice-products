@@ -15,6 +15,10 @@ public final class DeliveryCode {
         if (value == null || value.isEmpty()) throw new DeliveryCodeInvalid();
     }
 
+    public static DeliveryCode fromValue(String value) {
+        return new DeliveryCode(value);
+    }
+
     public String value() {
         return value;
     }

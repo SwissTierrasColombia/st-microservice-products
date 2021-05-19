@@ -40,7 +40,9 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
                     new AbstractMap.SimpleEntry<>("deliveryDate", "createdAt"),
                     new AbstractMap.SimpleEntry<>("deliveryStatus", "deliveryStatus"),
                     new AbstractMap.SimpleEntry<>("manager", "managerCode"),
-                    new AbstractMap.SimpleEntry<>("operator", "operatorCode")
+                    new AbstractMap.SimpleEntry<>("operator", "operatorCode"),
+                    new AbstractMap.SimpleEntry<>("code", "code"),
+                    new AbstractMap.SimpleEntry<>("municipality", "municipalityCode")
             ));
 
     public PostgresDeliveryRepository(DeliveryStatusJPARepository deliveryStatusJPARepository,

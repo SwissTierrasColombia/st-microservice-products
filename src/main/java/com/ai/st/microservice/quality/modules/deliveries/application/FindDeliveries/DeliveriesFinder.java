@@ -3,12 +3,12 @@ package com.ai.st.microservice.quality.modules.deliveries.application.FindDelive
 import com.ai.st.microservice.quality.modules.deliveries.application.DeliveryResponse;
 import com.ai.st.microservice.quality.modules.deliveries.application.Roles;
 import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
+import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryCode;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryStatusId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryRepository;
 
 import com.ai.st.microservice.quality.modules.shared.application.PageableResponse;
-import com.ai.st.microservice.quality.modules.shared.domain.PageableDomain;
-import com.ai.st.microservice.quality.modules.shared.domain.Service;
+import com.ai.st.microservice.quality.modules.shared.domain.*;
 import com.ai.st.microservice.quality.modules.shared.domain.criteria.*;
 import com.ai.st.microservice.quality.modules.shared.domain.exceptions.ErrorFromInfrastructure;
 
@@ -43,6 +43,26 @@ public final class DeliveriesFinder {
                     DeliveryStatusId.REJECTED
             );
             filters.add(filterByStatus(defaultStatuses, query.role()));
+        }
+
+        String code = query.code();
+        if (code != null && !code.isEmpty()) {
+            filters.add(filterByCode(code));
+        }
+
+        String municipality = query.municipality();
+        if (municipality != null && !municipality.isEmpty()) {
+            filters.add(filterByMunicipality(municipality));
+        }
+
+        Long operator = query.operator();
+        if (operator != null && !query.role().equals(Roles.OPERATOR)) {
+            filters.add(filterByOperator(operator));
+        }
+
+        Long manager = query.manager();
+        if (manager != null && !query.role().equals(Roles.MANAGER)) {
+            filters.add(filterByManager(manager));
         }
 
         Criteria criteria = new Criteria(
@@ -93,6 +113,34 @@ public final class DeliveriesFinder {
             }
         }
         return statuses;
+    }
+
+    private Filter filterByCode(String code) {
+        return new Filter(
+                new FilterField("code"),
+                FilterOperator.EQUAL,
+                new FilterValue(DeliveryCode.fromValue(code).value()));
+    }
+
+    private Filter filterByMunicipality(String municipality) {
+        return new Filter(
+                new FilterField("municipality"),
+                FilterOperator.EQUAL,
+                new FilterValue(MunicipalityCode.fromValue(municipality).value()));
+    }
+
+    private Filter filterByOperator(Long operator) {
+        return new Filter(
+                new FilterField("operator"),
+                FilterOperator.EQUAL,
+                new FilterValue(OperatorCode.fromValue(operator).value().toString()));
+    }
+
+    private Filter filterByManager(Long manager) {
+        return new Filter(
+                new FilterField("manager"),
+                FilterOperator.EQUAL,
+                new FilterValue(ManagerCode.fromValue(manager).value().toString()));
     }
 
     private PageableResponse<DeliveryResponse> buildResponse(PageableDomain<Delivery> pageableDomain) {

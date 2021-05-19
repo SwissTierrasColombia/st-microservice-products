@@ -11,12 +11,21 @@ public final class DeliveriesFinderQuery {
     private final int page;
     private final int limit;
     private final List<Long> states;
+    private final String code;
+    private final String municipality;
+    private final Long operator;
+    private final Long manager;
     private final Roles role;
     private final Long entityCode;
 
-    public DeliveriesFinderQuery(int page, int limit, List<Long> states, Roles role, Long entityCode) {
+    public DeliveriesFinderQuery(int page, int limit, List<Long> states, String code,
+                                 String municipality, Long operator, Long manager, Roles role, Long entityCode) {
         this.page = page;
         this.limit = limit;
+        this.code = code;
+        this.municipality = municipality;
+        this.operator = operator;
+        this.manager = manager;
         this.role = role;
         this.entityCode = entityCode;
         this.states = Objects.requireNonNullElseGet(states, ArrayList::new);
@@ -24,6 +33,22 @@ public final class DeliveriesFinderQuery {
 
     public List<Long> states() {
         return states;
+    }
+
+    public String code() {
+        return code;
+    }
+
+    public String municipality() {
+        return municipality;
+    }
+
+    public Long operator() {
+        return operator;
+    }
+
+    public Long manager() {
+        return manager;
     }
 
     public Roles role() {
