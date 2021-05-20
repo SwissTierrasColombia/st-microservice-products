@@ -47,7 +47,8 @@ public class StMicroserviceProductsApplicationStartup implements ApplicationList
         if (count == 0) {
             deliveryStatusCreator.create(DeliveryStatusId.DRAFT, "BORRADOR");
             deliveryStatusCreator.create(DeliveryStatusId.DELIVERED, "ENTREGADO");
-            deliveryStatusCreator.create(DeliveryStatusId.IN_VALIDATION, "EN VALIDACIÓN");
+            deliveryStatusCreator.create(DeliveryStatusId.IN_REVIEW, "EN REVISIÓN");
+            deliveryStatusCreator.create(DeliveryStatusId.IN_CORRECTION, "EN CORRECCIÓN");
             deliveryStatusCreator.create(DeliveryStatusId.ACCEPTED, "ACEPTADO");
             deliveryStatusCreator.create(DeliveryStatusId.REJECTED, "RECHAZADO");
             log.info("The domains 'delivery statuses' have been loaded!");
@@ -60,7 +61,6 @@ public class StMicroserviceProductsApplicationStartup implements ApplicationList
         int count = deliveryProductStatusesFinder.finder().size();
         if (count == 0) {
             deliveryProductStatusCreator.create(DeliveryProductStatusId.PENDING, "PENDIENTE");
-            deliveryProductStatusCreator.create(DeliveryProductStatusId.IN_VALIDATION, "EN VALIDACIÓN");
             deliveryProductStatusCreator.create(DeliveryProductStatusId.ACCEPTED, "ACEPTADO");
             deliveryProductStatusCreator.create(DeliveryProductStatusId.REJECTED, "RECHAZADO");
             log.info("The domains 'delivery product statuses' have been loaded!");

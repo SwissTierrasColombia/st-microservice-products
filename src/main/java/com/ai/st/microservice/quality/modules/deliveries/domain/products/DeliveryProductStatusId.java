@@ -7,9 +7,8 @@ public final class DeliveryProductStatusId {
     private final Long value;
 
     public static final Long PENDING = (long) 1;
-    public static final Long IN_VALIDATION = (long) 2;
-    public static final Long ACCEPTED = (long) 3;
-    public static final Long REJECTED = (long) 4;
+    public static final Long ACCEPTED = (long) 2;
+    public static final Long REJECTED = (long) 3;
 
     public DeliveryProductStatusId(Long value) {
         ensureStatus(value);
@@ -18,7 +17,6 @@ public final class DeliveryProductStatusId {
 
     private void ensureStatus(Long value) {
         if (!value.equals(DeliveryProductStatusId.PENDING)
-                && !value.equals(DeliveryProductStatusId.IN_VALIDATION)
                 && !value.equals(DeliveryProductStatusId.ACCEPTED)
                 && !value.equals(DeliveryProductStatusId.REJECTED))
             throw new DeliveryProductStatusInvalid();

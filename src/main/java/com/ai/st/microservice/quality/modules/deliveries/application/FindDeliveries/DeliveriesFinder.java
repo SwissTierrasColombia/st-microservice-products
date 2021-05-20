@@ -38,7 +38,8 @@ public final class DeliveriesFinder {
             List<Long> defaultStatuses = Arrays.asList(
                     DeliveryStatusId.DRAFT,
                     DeliveryStatusId.DELIVERED,
-                    DeliveryStatusId.IN_VALIDATION,
+                    DeliveryStatusId.IN_REVIEW,
+                    DeliveryStatusId.IN_CORRECTION,
                     DeliveryStatusId.ACCEPTED,
                     DeliveryStatusId.REJECTED
             );

@@ -8,9 +8,10 @@ public final class DeliveryStatusId {
 
     public static final Long DRAFT = (long) 1;
     public static final Long DELIVERED = (long) 2;
-    public static final Long IN_VALIDATION = (long) 3;
-    public static final Long ACCEPTED = (long) 4;
-    public static final Long REJECTED = (long) 5;
+    public static final Long IN_REVIEW = (long) 3;
+    public static final Long IN_CORRECTION = (long) 4;
+    public static final Long ACCEPTED = (long) 5;
+    public static final Long REJECTED = (long) 6;
 
     public DeliveryStatusId(Long value) {
         ensureStatus(value);
@@ -24,7 +25,8 @@ public final class DeliveryStatusId {
     private void ensureStatus(Long value) {
         if (!value.equals(DeliveryStatusId.DRAFT)
                 && !value.equals(DeliveryStatusId.DELIVERED)
-                && !value.equals(DeliveryStatusId.IN_VALIDATION)
+                && !value.equals(DeliveryStatusId.IN_REVIEW)
+                && !value.equals(DeliveryStatusId.IN_CORRECTION)
                 && !value.equals(DeliveryStatusId.ACCEPTED)
                 && !value.equals(DeliveryStatusId.REJECTED))
             throw new DeliveryStatusInvalid();
