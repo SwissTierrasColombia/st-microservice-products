@@ -6,6 +6,7 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.products.Deliver
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductId;
 import com.ai.st.microservice.quality.modules.deliveries.infrastructure.persistence.jpa.DeliveryProductJPARepository;
 
+import com.ai.st.microservice.quality.modules.products.domain.ProductId;
 import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.jpa.entities.DeliveredProductEntity;
 import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.jpa.entities.DeliveryEntity;
 import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.jpa.entities.DeliveryProductStatusEntity;
@@ -25,16 +26,10 @@ public final class PostgresDeliveryProductRepository implements DeliveryProductR
     }
 
     @Override
-    public List<DeliveryProduct> findProductsFromDelivery(DeliveryId deliveryId) {
+    public List<DeliveryProduct> findByDeliveryId(DeliveryId deliveryId) {
         DeliveryEntity deliveryEntity = new DeliveryEntity();
         deliveryEntity.setId(deliveryId.value());
-        return repository.findByDelivery(deliveryEntity).stream().map(delivery -> DeliveryProduct.fromPrimitives(
-                delivery.getId(),
-                delivery.getCreatedAt(),
-                delivery.getObservations(),
-                delivery.getProduct().getId(),
-                delivery.getStatus().getId()
-        )).collect(Collectors.toList());
+        return repository.findByDelivery(deliveryEntity).stream().map(this::mapping).collect(Collectors.toList());
     }
 
     @Override
@@ -62,14 +57,7 @@ public final class PostgresDeliveryProductRepository implements DeliveryProductR
     @Override
     public DeliveryProduct search(DeliveryProductId deliveryProductId) {
         DeliveredProductEntity deliveredProductEntity = repository.findById(deliveryProductId.value()).orElse(null);
-        return (deliveredProductEntity == null) ? null :
-                DeliveryProduct.fromPrimitives(
-                        deliveredProductEntity.getId(),
-                        deliveredProductEntity.getCreatedAt(),
-                        deliveredProductEntity.getObservations(),
-                        deliveredProductEntity.getProduct().getId(),
-                        deliveredProductEntity.getStatus().getId()
-                );
+        return (deliveredProductEntity == null) ? null : mapping(deliveredProductEntity);
     }
 
     @Override
@@ -84,6 +72,22 @@ public final class PostgresDeliveryProductRepository implements DeliveryProductR
             deliveredProductEntity.setObservations(deliveryProduct.deliveryProductObservations().value());
             repository.save(deliveredProductEntity);
         }
+    }
+
+    @Override
+    public List<DeliveryProduct> findByProductId(ProductId productId) {
+        ProductEntity productEntity = new ProductEntity();
+        productEntity.setId(productId.value());
+        return repository.findByProduct(productEntity).stream().map(this::mapping).collect(Collectors.toList());
+    }
+
+    private DeliveryProduct mapping(DeliveredProductEntity deliveredProductEntity) {
+        return DeliveryProduct.fromPrimitives(
+                deliveredProductEntity.getId(),
+                deliveredProductEntity.getCreatedAt(),
+                deliveredProductEntity.getObservations(),
+                deliveredProductEntity.getProduct().getId(),
+                deliveredProductEntity.getStatus().getId());
     }
 
 }

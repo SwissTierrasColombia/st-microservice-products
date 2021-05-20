@@ -35,7 +35,7 @@ public final class DeliveryProductsFinder {
 
         verifyPermissions(deliveryId, role, entityCode);
 
-        return deliveryProductRepository.findProductsFromDelivery(deliveryId).stream()
+        return deliveryProductRepository.findByDeliveryId(deliveryId).stream()
                 .map(DeliveryProductResponse::fromAggregate).collect(Collectors.toList());
     }
 

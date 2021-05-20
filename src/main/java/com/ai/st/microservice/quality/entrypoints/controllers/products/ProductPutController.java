@@ -53,6 +53,8 @@ public final class ProductPutController extends ApiController {
 
             InformationSession session = this.getInformationSession(headerAuthorization);
 
+            validateProductId(productId);
+
             String name = request.getName();
             validateName(name);
 
@@ -82,6 +84,11 @@ public final class ProductPutController extends ApiController {
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);
+    }
+
+    private void validateProductId(Long productId) throws InputValidationException {
+        if (productId == null || productId <= 0)
+            throw new InputValidationException("El nombre del producto es requerido.");
     }
 
     private void validateName(String name) throws InputValidationException {

@@ -83,7 +83,7 @@ public final class DeliveryProductAssigner {
     }
 
     private void verifyIfProductHasBeenAlreadyAddedToDelivery(DeliveryId deliveryId, ProductId productId) {
-        List<DeliveryProduct> deliveryProducts = deliveryProductRepository.findProductsFromDelivery(deliveryId);
+        List<DeliveryProduct> deliveryProducts = deliveryProductRepository.findByDeliveryId(deliveryId);
         deliveryProducts.stream().filter(deliveryProduct -> deliveryProduct.productId().value().equals(productId.value()))
                 .findAny().ifPresent(s -> {
             throw new ProductHasBeenAlreadyAddedToDelivery();

@@ -4,7 +4,6 @@ import com.ai.st.microservice.quality.modules.deliveries.application.RemoveProdu
 import com.ai.st.microservice.quality.modules.deliveries.application.RemoveProductFromDelivery.DeliveryProductRemoverCommand;
 import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
-import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryStatusId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductAttachmentRepository;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductRepository;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryRepository;
@@ -63,7 +62,7 @@ public final class DeliveryRemover {
     }
 
     private void removeProductsFromDelivery(DeliveryId deliveryId, OperatorCode operatorCode) {
-        deliveryProductRepository.findProductsFromDelivery(deliveryId).forEach(deliveryProduct ->
+        deliveryProductRepository.findByDeliveryId(deliveryId).forEach(deliveryProduct ->
                 removeProductFromDelivery(deliveryId, deliveryProduct, operatorCode));
     }
 

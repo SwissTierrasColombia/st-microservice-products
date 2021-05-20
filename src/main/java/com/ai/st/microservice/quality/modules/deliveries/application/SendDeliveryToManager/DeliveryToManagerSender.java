@@ -70,7 +70,7 @@ public final class DeliveryToManagerSender {
     }
 
     private void verifyIntegrityOfProducts(DeliveryId deliveryId) {
-        List<DeliveryProduct> deliveryProducts = deliveryProductRepository.findProductsFromDelivery(deliveryId);
+        List<DeliveryProduct> deliveryProducts = deliveryProductRepository.findByDeliveryId(deliveryId);
         deliveryProducts.forEach(deliveryProduct -> {
             List<DeliveryProductAttachment> attachments = attachmentRepository.findByDeliveryProductId(deliveryProduct.deliveryProductId());
             if (productIsXTF(deliveryProduct.productId())) {

@@ -56,6 +56,11 @@ public final class PostgresProductRepository implements ProductRepository {
         }
     }
 
+    @Override
+    public void remove(ProductId productId) {
+        repository.deleteById(productId.value());
+    }
+
     private Product mappingProduct(ProductEntity entity) {
         return Product.fromPrimitives(entity.getId(), entity.getName(),
                 entity.getDescription(), entity.getManagerCode(), entity.getXTF(), entity.getCreatedAt());
