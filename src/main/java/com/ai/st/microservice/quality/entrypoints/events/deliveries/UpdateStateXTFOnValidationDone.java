@@ -1,4 +1,4 @@
-package com.ai.st.microservice.quality.entrypoints.events;
+package com.ai.st.microservice.quality.entrypoints.events.deliveries;
 
 import com.ai.st.microservice.common.dto.ili.MicroserviceValidationDto;
 import com.ai.st.microservice.quality.modules.deliveries.application.UpdateXTFStatus.XTFStatusUpdater;

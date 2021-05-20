@@ -18,9 +18,11 @@ public final class ManagerProductsFinder {
         this.repository = repository;
     }
 
-    public List<ProductResponse> finder(Long managerCode) {
+    public List<ProductResponse> finder(ManagerProductsFinderQuery query) {
 
-        List<Product> products = repository.findProductsByManager(new ManagerCode(managerCode));
+        ManagerCode managerCode = ManagerCode.fromValue(query.managerCode());
+
+        List<Product> products = repository.findProductsByManager(managerCode);
 
         return products.stream().map(ProductResponse::fromAggregate).collect(Collectors.toList());
     }

@@ -3,7 +3,7 @@ package com.ai.st.microservice.quality.modules.shared.infrastructure.microservic
 import com.ai.st.microservice.common.clients.IliFeignClient;
 import com.ai.st.microservice.common.dto.ili.MicroserviceIlivalidatorBackgroundDto;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.DeliveryProductAttachmentUUID;
-import com.ai.st.microservice.quality.modules.products.domain.exceptions.MicroserviceUnreachable;
+import com.ai.st.microservice.quality.modules.shared.domain.exceptions.MicroserviceUnreachable;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.ILIMicroservice;
 import org.springframework.stereotype.Service;
 

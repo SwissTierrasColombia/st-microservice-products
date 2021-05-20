@@ -7,6 +7,7 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.Delive
 import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.*;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.*;
 
+import com.ai.st.microservice.quality.modules.products.application.FindProductsFromManager.ManagerProductsFinderQuery;
 import com.ai.st.microservice.quality.modules.products.application.ProductResponse;
 import com.ai.st.microservice.quality.modules.products.application.FindProductsFromManager.ManagerProductsFinder;
 import com.ai.st.microservice.quality.modules.products.domain.ProductId;
@@ -76,7 +77,7 @@ public final class DeliveryProductAssigner {
     }
 
     private void verifyProductBelongToManager(Long productId, Long managerCode) {
-        List<ProductResponse> productResponseList = this.managerProductsFinder.finder(managerCode);
+        List<ProductResponse> productResponseList = this.managerProductsFinder.finder(new ManagerProductsFinderQuery(managerCode));
         productResponseList.stream().filter(productResponse -> productResponse.id().equals(productId)).findAny()
                 .orElseThrow(ProductDoesNotBelongToManager::new);
     }

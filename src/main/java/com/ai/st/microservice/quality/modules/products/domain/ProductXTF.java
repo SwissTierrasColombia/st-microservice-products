@@ -14,6 +14,10 @@ public final class ProductXTF {
         return value;
     }
 
+    public static ProductXTF fromValue(boolean value) {
+        return new ProductXTF(value);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

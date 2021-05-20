@@ -2,7 +2,7 @@ package com.ai.st.microservice.quality.modules.shared.infrastructure.microservic
 
 import com.ai.st.microservice.common.clients.WorkspaceFeignClient;
 import com.ai.st.microservice.common.dto.workspaces.MicroserviceWorkspaceOperatorDto;
-import com.ai.st.microservice.quality.modules.products.domain.exceptions.MicroserviceUnreachable;
+import com.ai.st.microservice.quality.modules.shared.domain.exceptions.MicroserviceUnreachable;
 import com.ai.st.microservice.quality.modules.shared.domain.ManagerCode;
 import com.ai.st.microservice.quality.modules.shared.domain.MunicipalityCode;
 import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;

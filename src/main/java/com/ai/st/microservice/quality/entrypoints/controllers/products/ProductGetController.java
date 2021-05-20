@@ -3,14 +3,15 @@ package com.ai.st.microservice.quality.entrypoints.controllers.products;
 import com.ai.st.microservice.common.business.AdministrationBusiness;
 import com.ai.st.microservice.common.business.ManagerBusiness;
 import com.ai.st.microservice.common.business.OperatorBusiness;
-import com.ai.st.microservice.common.dto.administration.MicroserviceUserDto;
 import com.ai.st.microservice.common.dto.general.BasicResponseDto;
 import com.ai.st.microservice.common.exceptions.InputValidationException;
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
 import com.ai.st.microservice.quality.modules.deliveries.application.Roles;
+import com.ai.st.microservice.quality.modules.products.application.FindProductsFromManager.ManagerProductsFinderQuery;
 import com.ai.st.microservice.quality.modules.products.application.ProductResponse;
 import com.ai.st.microservice.quality.modules.products.application.FindProductsFromManager.ManagerProductsFinder;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 
+@Api(value = "Manage products", tags = {"Products"})
 @RestController
 public final class ProductGetController extends ApiController {
 
@@ -41,7 +43,7 @@ public final class ProductGetController extends ApiController {
         return null;
     }
 
-    @RequestMapping(value = "api/quality/v1/products", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "api/quality/v1/products", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Search products from manager")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Products", responseContainer = "List", response = ProductResponse.class),
@@ -64,16 +66,20 @@ public final class ProductGetController extends ApiController {
                 throw new InputValidationException("El gestor es requerido.");
             }
 
-            responseDto = productsFinder.finder(managerCode);
+            responseDto = productsFinder.finder(
+                    new ManagerProductsFinderQuery(
+                            managerCode
+                    )
+            );
             httpStatus = HttpStatus.OK;
 
         } catch (InputValidationException e) {
             log.error("Error ProductGetController@searchProductsFromManager#Validation ---> " + e.getMessage());
-            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            httpStatus = HttpStatus.BAD_REQUEST;
             responseDto = new BasicResponseDto(e.getMessage(), 3);
         } catch (DomainError e) {
             log.error("Error ProductGetController@searchProductsFromManager#Domain ---> " + e.getMessage());
-            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
             responseDto = new BasicResponseDto(e.errorMessage(), 2);
         } catch (Exception e) {
             log.error("Error ProductGetController@searchProductsFromManager#General ---> " + e.getMessage());

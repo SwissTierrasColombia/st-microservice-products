@@ -6,6 +6,7 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.products.Deliver
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductObservations;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductStatusId;
 
+import com.ai.st.microservice.quality.modules.products.application.FindProductsFromManager.ManagerProductsFinderQuery;
 import com.ai.st.microservice.quality.modules.products.application.ProductResponse;
 import com.ai.st.microservice.quality.modules.products.application.FindProductsFromManager.ManagerProductsFinder;
 import com.ai.st.microservice.quality.modules.products.domain.ProductId;
@@ -78,7 +79,8 @@ public final class DeliveryCreator {
     }
 
     private void verifyProductBelongToManager(ProductId productId, ManagerCode managerCode) {
-        List<ProductResponse> productResponseList = this.managerProductsFinder.finder(managerCode.value());
+        List<ProductResponse> productResponseList = this.managerProductsFinder.
+                finder(new ManagerProductsFinderQuery(managerCode.value()));
         productResponseList.stream().filter(productResponse -> productResponse.id().equals(productId.value())).findAny()
                 .orElseThrow(ProductDoesNotBelongToManager::new);
     }

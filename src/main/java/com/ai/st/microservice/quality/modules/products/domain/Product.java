@@ -3,7 +3,6 @@ package com.ai.st.microservice.quality.modules.products.domain;
 import com.ai.st.microservice.quality.modules.shared.domain.ManagerCode;
 
 import java.util.Date;
-import java.util.Objects;
 
 public final class Product {
 
@@ -12,15 +11,19 @@ public final class Product {
     private final ProductDescription description;
     private final ManagerCode managerCode;
     private final ProductXTF productXTF;
-    private final Date createdAt;
+    private final ProductDate productDate;
 
-    public Product(ProductId id, ProductName name, ProductDescription description, ManagerCode managerCode, ProductXTF productXTF, Date createdAt) {
+    public Product(ProductId id, ProductName name, ProductDescription description, ManagerCode managerCode, ProductXTF productXTF, ProductDate createdAt) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.managerCode = managerCode;
         this.productXTF = productXTF;
-        this.createdAt = createdAt;
+        this.productDate = createdAt;
+    }
+
+    public static Product create(ProductName name, ProductDescription description, ManagerCode managerCode, ProductXTF productXTF, ProductDate createdAt) {
+        return new Product(null, name, description, managerCode, productXTF, createdAt);
     }
 
     public static Product fromPrimitives(Long id, String name, String description, Long managerCode, boolean productXTF, Date createdAt) {
@@ -30,7 +33,7 @@ public final class Product {
                 new ProductDescription(description),
                 new ManagerCode(managerCode),
                 new ProductXTF(productXTF),
-                createdAt);
+                new ProductDate(createdAt));
     }
 
     public ProductId id() {
@@ -53,27 +56,12 @@ public final class Product {
         return productXTF;
     }
 
-    public Date createdAt() {
-        return createdAt;
+    public ProductDate productDate() {
+        return productDate;
     }
 
     public boolean isConfiguredAsXTF() {
         return productXTF().value();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Product product = (Product) o;
-        return id.equals(product.id) && name.equals(product.name)
-                && description.equals(product.description)
-                && managerCode.equals(product.managerCode)
-                && productXTF.equals(product.productXTF) && createdAt.equals(product.createdAt);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, managerCode, productXTF, createdAt);
-    }
 }

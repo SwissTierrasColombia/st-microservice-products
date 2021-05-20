@@ -29,7 +29,7 @@ public final class ProductResponse {
                 product.description().value(),
                 product.managerCode().value(),
                 product.productXTF().value(),
-                product.createdAt());
+                product.productDate().value());
     }
 
     public Long id() {

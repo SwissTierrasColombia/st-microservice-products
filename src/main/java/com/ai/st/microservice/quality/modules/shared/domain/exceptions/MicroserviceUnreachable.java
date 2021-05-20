@@ -1,4 +1,4 @@
-package com.ai.st.microservice.quality.modules.products.domain.exceptions;
+package com.ai.st.microservice.quality.modules.shared.domain.exceptions;
 
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 
