@@ -6,9 +6,9 @@ import com.ai.st.microservice.common.business.OperatorBusiness;
 import com.ai.st.microservice.common.dto.general.BasicResponseDto;
 import com.ai.st.microservice.common.exceptions.InputValidationException;
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
-import com.ai.st.microservice.quality.modules.products.application.CreateProduct.ProductCreator;
-import com.ai.st.microservice.quality.modules.products.application.CreateProduct.ProductCreatorCommand;
 import com.ai.st.microservice.quality.modules.products.application.ProductResponse;
+import com.ai.st.microservice.quality.modules.products.application.UpdateProduct.ProductUpdater;
+import com.ai.st.microservice.quality.modules.products.application.UpdateProduct.ProductUpdaterCommand;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
@@ -22,27 +22,29 @@ import java.util.HashMap;
 
 @Api(value = "Manage products", tags = {"Products"})
 @RestController
-public final class ProductPostController extends ApiController {
+public final class ProductPutController extends ApiController {
 
-    private final Logger log = LoggerFactory.getLogger(ProductPostController.class);
+    private final Logger log = LoggerFactory.getLogger(ProductPutController.class);
 
-    private final ProductCreator productCreator;
+    private final ProductUpdater productUpdater;
 
-    public ProductPostController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                 OperatorBusiness operatorBusiness, ProductCreator productCreator) {
+    public ProductPutController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
+                                OperatorBusiness operatorBusiness, ProductUpdater productUpdater) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
-        this.productCreator = productCreator;
+        this.productUpdater = productUpdater;
     }
 
-    @PostMapping(value = "api/quality/v1/products", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Create product")
+    @PutMapping(value = "api/quality/v1/products/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Update product")
     @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Product created", response = ProductResponse.class),
+            @ApiResponse(code = 200, message = "Product updated", response = ProductResponse.class),
             @ApiResponse(code = 500, message = "Error Server")})
     @ResponseBody
-    public ResponseEntity<?> createProduct(
-            @RequestBody CreateProductRequest request,
+    public ResponseEntity<?> updateProduct(
+            @PathVariable Long productId,
+            @RequestBody UpdateProductRequest request,
             @RequestHeader("authorization") String headerAuthorization) {
+
 
         HttpStatus httpStatus;
         Object responseDto = null;
@@ -57,24 +59,24 @@ public final class ProductPostController extends ApiController {
             String description = request.getDescription();
             validateDescription(description);
 
-            productCreator.create(
-                    new ProductCreatorCommand(
-                            name, description, request.isXTF(), session.entityCode()
+            productUpdater.update(
+                    new ProductUpdaterCommand(
+                            productId, name, description, request.isXTF(), session.entityCode()
                     )
             );
 
-            httpStatus = HttpStatus.CREATED;
+            httpStatus = HttpStatus.OK;
 
         } catch (InputValidationException e) {
-            log.error("Error ProductPostController@createProduct#Validation ---> " + e.getMessage());
+            log.error("Error ProductPutController@updateProduct#Validation ---> " + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
             responseDto = new BasicResponseDto(e.getMessage(), 3);
         } catch (DomainError e) {
-            log.error("Error ProductPostController@createProduct#Domain ---> " + e.getMessage());
+            log.error("Error ProductPutController@updateProduct#Domain ---> " + e.getMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
             responseDto = new BasicResponseDto(e.errorMessage(), 2);
         } catch (Exception e) {
-            log.error("Error ProductPostController@createProduct#General ---> " + e.getMessage());
+            log.error("Error ProductPutController@updateProduct#General ---> " + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
             responseDto = new BasicResponseDto(e.getMessage(), 1);
         }
@@ -96,10 +98,11 @@ public final class ProductPostController extends ApiController {
     public HashMap<Class<? extends DomainError>, HttpStatus> errorMapping() {
         return null;
     }
+
 }
 
-@ApiModel(value = "CreateProductRequest")
-final class CreateProductRequest {
+@ApiModel(value = "UpdateProductRequest")
+final class UpdateProductRequest {
 
     @ApiModelProperty(notes = "Name")
     private String name;
@@ -107,7 +110,7 @@ final class CreateProductRequest {
     @ApiModelProperty(notes = "Description")
     private String description;
 
-    @ApiModelProperty(notes = "is xtf?")
+    @ApiModelProperty(notes = "Is xtf?")
     private boolean isXTF;
 
     public String getName() {

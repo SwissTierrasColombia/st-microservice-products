@@ -21,6 +21,10 @@ public final class ProductId {
         return value;
     }
 
+    public static ProductId fromValue(Long value) {
+        return new ProductId(value);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

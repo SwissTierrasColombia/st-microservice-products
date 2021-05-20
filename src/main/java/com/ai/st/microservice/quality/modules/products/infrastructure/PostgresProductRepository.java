@@ -45,6 +45,17 @@ public final class PostgresProductRepository implements ProductRepository {
         repository.save(productEntity);
     }
 
+    @Override
+    public void update(Product product) {
+        ProductEntity productEntity = repository.findById(product.id().value()).orElse(null);
+        if (productEntity != null) {
+            productEntity.setName(product.name().value());
+            productEntity.setDescription(product.description().value());
+            productEntity.setXTF(product.productXTF().value());
+            repository.save(productEntity);
+        }
+    }
+
     private Product mappingProduct(ProductEntity entity) {
         return Product.fromPrimitives(entity.getId(), entity.getName(),
                 entity.getDescription(), entity.getManagerCode(), entity.getXTF(), entity.getCreatedAt());
