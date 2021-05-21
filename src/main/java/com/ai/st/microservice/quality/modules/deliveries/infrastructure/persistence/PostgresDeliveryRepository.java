@@ -10,7 +10,7 @@ import com.ai.st.microservice.quality.modules.deliveries.infrastructure.persiste
 import com.ai.st.microservice.quality.modules.products.infrastructure.persistence.jpa.ProductJPARepository;
 import com.ai.st.microservice.quality.modules.shared.domain.PageableDomain;
 import com.ai.st.microservice.quality.modules.shared.domain.criteria.*;
-import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.jpa.entities.*;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.entities.*;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

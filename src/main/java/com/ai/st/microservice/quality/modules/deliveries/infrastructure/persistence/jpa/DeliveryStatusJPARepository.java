@@ -1,6 +1,6 @@
 package com.ai.st.microservice.quality.modules.deliveries.infrastructure.persistence.jpa;
 
-import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.jpa.entities.DeliveryStatusEntity;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.entities.DeliveryStatusEntity;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

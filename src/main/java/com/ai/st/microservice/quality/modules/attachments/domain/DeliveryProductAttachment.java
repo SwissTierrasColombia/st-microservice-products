@@ -2,8 +2,9 @@ package com.ai.st.microservice.quality.modules.attachments.domain;
 
 import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductId;
 import com.ai.st.microservice.quality.modules.attachments.domain.xtf.DeliveryProductXTFAttachment;
+import com.ai.st.microservice.quality.modules.shared.domain.AggregateRoot;
 
-public abstract class DeliveryProductAttachment {
+public abstract class DeliveryProductAttachment extends AggregateRoot {
 
     private final DeliveryProductAttachmentId deliveryProductAttachmentId;
     private final DeliveryProductAttachmentUUID uuid;

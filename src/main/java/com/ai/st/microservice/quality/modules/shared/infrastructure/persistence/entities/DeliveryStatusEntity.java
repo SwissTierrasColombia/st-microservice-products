@@ -1,10 +1,10 @@
-package com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.jpa.entities;
+package com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.entities;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "delivery_product_statuses", schema = "quality")
-public class DeliveryProductStatusEntity {
+@Table(name = "delivery_statuses", schema = "quality")
+public class DeliveryStatusEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -122,6 +122,10 @@ public final class Delivery extends AggregateRoot {
         return deliveryStatusId.value().equals(DeliveryStatusId.DRAFT);
     }
 
+    public boolean isInReview() {
+        return deliveryStatusId.value().equals(DeliveryStatusId.IN_REVIEW);
+    }
+
     public boolean isDelivered() {
         return deliveryStatusId.value().equals(DeliveryStatusId.DELIVERED);
     }

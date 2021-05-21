@@ -2,12 +2,13 @@ package com.ai.st.microservice.quality.modules.delivered_products.domain;
 
 import com.ai.st.microservice.quality.modules.attachments.domain.DeliveryProductAttachment;
 import com.ai.st.microservice.quality.modules.products.domain.ProductId;
+import com.ai.st.microservice.quality.modules.shared.domain.AggregateRoot;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public final class DeliveryProduct {
+public final class DeliveryProduct extends AggregateRoot {
 
     private final DeliveryProductId deliveryProductId;
     private final DeliveryProductDate deliveryProductDate;
@@ -45,6 +46,10 @@ public final class DeliveryProduct {
                                          ProductId productId, DeliveryProductStatusId deliveryProductStatusId) {
         return new DeliveryProduct(null, deliveryProductDate, deliveryProductObservations,
                 productId, deliveryProductStatusId, new ArrayList<>());
+    }
+
+    public boolean isPending() {
+        return deliveryProductStatusId.value().equals(DeliveryProductStatusId.PENDING);
     }
 
     public DeliveryProductId deliveryProductId() {

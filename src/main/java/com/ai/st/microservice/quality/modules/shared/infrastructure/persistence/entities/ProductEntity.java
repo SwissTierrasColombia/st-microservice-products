@@ -1,4 +1,4 @@
-package com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.jpa.entities;
+package com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.entities;
 
 import com.ai.st.microservice.quality.modules.products.domain.ProductDate;
 

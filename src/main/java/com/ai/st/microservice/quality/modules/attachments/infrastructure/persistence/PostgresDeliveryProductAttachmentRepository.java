@@ -13,7 +13,7 @@ import com.ai.st.microservice.quality.modules.attachments.infrastructure.persist
 import com.ai.st.microservice.quality.modules.attachments.infrastructure.persistence.jpa.DeliveredProductAttachmentFTPJPARepository;
 import com.ai.st.microservice.quality.modules.attachments.infrastructure.persistence.jpa.DeliveredProductAttachmentJPARepository;
 import com.ai.st.microservice.quality.modules.attachments.infrastructure.persistence.jpa.DeliveredProductAttachmentXTFJPARepository;
-import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.jpa.entities.*;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.entities.*;
 
 import org.springframework.stereotype.Service;
 

@@ -6,6 +6,8 @@ import com.ai.st.microservice.common.business.OperatorBusiness;
 import com.ai.st.microservice.common.dto.general.BasicResponseDto;
 import com.ai.st.microservice.common.exceptions.InputValidationException;
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
+import com.ai.st.microservice.quality.modules.feedbacks.application.create_feedback.FeedbackCreator;
+import com.ai.st.microservice.quality.modules.feedbacks.application.create_feedback.FeedbackCreatorCommand;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 import io.swagger.annotations.*;
 import org.apache.commons.io.FilenameUtils;
@@ -26,9 +28,12 @@ public final class DeliveredProductFeedbackPostController extends ApiController 
 
     private final Logger log = LoggerFactory.getLogger(DeliveredProductFeedbackPostController.class);
 
+    private final FeedbackCreator feedbackCreator;
+
     public DeliveredProductFeedbackPostController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                                  OperatorBusiness operatorBusiness) {
+                                                  OperatorBusiness operatorBusiness, FeedbackCreator feedbackCreator) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
+        this.feedbackCreator = feedbackCreator;
     }
 
 
@@ -53,10 +58,23 @@ public final class DeliveredProductFeedbackPostController extends ApiController 
 
             validateDeliveryId(deliveryId);
             validateDeliveryProductId(deliveryProductId);
-            validateAttachment(request.getAttachment());
-            validateFeedback(request.getFeedback(), request.getStatus());
 
+            MultipartFile attachment = request.getAttachment();
+            validateAttachment(attachment);
 
+            String feedback = request.getFeedback();
+            validateFeedback(feedback);
+
+            feedbackCreator.handle(
+                    new FeedbackCreatorCommand(
+                            deliveryId,
+                            deliveryProductId,
+                            session.entityCode(),
+                            feedback,
+                            (attachment != null) ? attachment.getBytes() : null,
+                            getExtensionFile(attachment)
+                    )
+            );
 
             httpStatus = HttpStatus.CREATED;
 
@@ -73,7 +91,6 @@ public final class DeliveredProductFeedbackPostController extends ApiController 
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
             responseDto = new BasicResponseDto(e.getMessage(), 3);
         }
-
 
         return new ResponseEntity<>(responseDto, httpStatus);
     }
@@ -93,7 +110,7 @@ public final class DeliveredProductFeedbackPostController extends ApiController 
 
     private void validateAttachment(MultipartFile file) throws InputValidationException {
         if (file != null) {
-            String extension = Objects.requireNonNull(FilenameUtils.getExtension(file.getOriginalFilename()));
+            String extension = getExtensionFile(file);
             boolean isZip = extension.equalsIgnoreCase("zip");
             if (!isZip) {
                 throw new InputValidationException("El adjunto debe cargarse en formato zip");
@@ -101,10 +118,15 @@ public final class DeliveredProductFeedbackPostController extends ApiController 
         }
     }
 
-    private void validateFeedback(String feedback, CreateFeedbackRequest.Statuses status) throws InputValidationException {
-        if (status.equals(CreateFeedbackRequest.Statuses.REJECTED) && (feedback == null || feedback.isEmpty())) {
-            throw new InputValidationException("Se debe enviar comentarios de retroalimentación al rechazar el producto.");
+    private void validateFeedback(String feedback) throws InputValidationException {
+        if (feedback == null || feedback.isEmpty()) {
+            throw new InputValidationException("Los comentarios de retroalimentación son requeridos.");
         }
+    }
+
+    private String getExtensionFile(MultipartFile file) {
+        return (file == null) ? null :
+                Objects.requireNonNull(FilenameUtils.getExtension(file.getOriginalFilename()));
     }
 
     @Override
@@ -118,24 +140,11 @@ public final class DeliveredProductFeedbackPostController extends ApiController 
 @ApiModel(value = "CreateFeedbackRequest")
 final class CreateFeedbackRequest {
 
-    enum Statuses {ACCEPTED, REJECTED}
-
-    @ApiModelProperty(notes = "Status", required = true)
-    private Statuses status;
-
-    @ApiModelProperty(notes = "Feedback")
+    @ApiModelProperty(notes = "Feedback", required = true)
     private String feedback;
 
     @ApiModelProperty(notes = "Attachment")
     private MultipartFile attachment;
-
-    public Statuses getStatus() {
-        return status;
-    }
-
-    public void setStatus(Statuses status) {
-        this.status = status;
-    }
 
     public String getFeedback() {
         return feedback;

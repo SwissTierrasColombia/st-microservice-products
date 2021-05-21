@@ -1,6 +1,6 @@
 package com.ai.st.microservice.quality.modules.deliveries.infrastructure.persistence;
 
-import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.jpa.entities.DeliveryStatusEntity;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.entities.DeliveryStatusEntity;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryStatus;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryStatusRepository;
 import com.ai.st.microservice.quality.modules.deliveries.infrastructure.persistence.jpa.DeliveryStatusJPARepository;

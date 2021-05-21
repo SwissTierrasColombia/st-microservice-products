@@ -1,6 +1,6 @@
 package com.ai.st.microservice.quality.modules.deliveries.infrastructure.persistence.jpa;
 
-import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.jpa.entities.DeliveryEntity;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.entities.DeliveryEntity;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
