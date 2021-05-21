@@ -7,8 +7,8 @@ import com.ai.st.microservice.common.dto.general.BasicResponseDto;
 import com.ai.st.microservice.common.exceptions.InputValidationException;
 
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
-import com.ai.st.microservice.quality.modules.deliveries.application.CreateDelivery.CreateDeliveryCommand;
-import com.ai.st.microservice.quality.modules.deliveries.application.CreateDelivery.DeliveryCreator;
+import com.ai.st.microservice.quality.modules.deliveries.application.create_delivery.CreateDeliveryCommand;
+import com.ai.st.microservice.quality.modules.deliveries.application.create_delivery.DeliveryCreator;
 import com.ai.st.microservice.quality.modules.shared.domain.*;
 
 import io.swagger.annotations.*;

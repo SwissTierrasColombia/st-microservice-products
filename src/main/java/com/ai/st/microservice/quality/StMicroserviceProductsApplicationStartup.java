@@ -1,14 +1,14 @@
 package com.ai.st.microservice.quality;
 
-import com.ai.st.microservice.quality.modules.deliveries.application.CreateDeliveryProductStatus.DeliveryProductStatusCreator;
-import com.ai.st.microservice.quality.modules.deliveries.application.CreateDeliveryProductStatus.DeliveryProductStatusCreatorCommand;
-import com.ai.st.microservice.quality.modules.deliveries.application.CreateDeliveryStatus.DeliveryStatusCreator;
-import com.ai.st.microservice.quality.modules.deliveries.application.CreateDeliveryStatus.DeliveryStatusCreatorCommand;
-import com.ai.st.microservice.quality.modules.deliveries.application.FindAllDeliveryProductStatuses.DeliveryProductStatusesFinder;
-import com.ai.st.microservice.quality.modules.deliveries.application.FindAllDeliveryProductStatuses.DeliveryProductStatusesFinderQuery;
-import com.ai.st.microservice.quality.modules.deliveries.application.FindAllDeliveryStatuses.DeliveryStatusesFinder;
-import com.ai.st.microservice.quality.modules.deliveries.application.FindAllDeliveryStatuses.DeliveryStatusesFinderQuery;
-import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductStatusId;
+import com.ai.st.microservice.quality.modules.delivered_products.application.create_delivery_product_status.DeliveryProductStatusCreator;
+import com.ai.st.microservice.quality.modules.delivered_products.application.create_delivery_product_status.DeliveryProductStatusCreatorCommand;
+import com.ai.st.microservice.quality.modules.deliveries.application.create_delivery_status.DeliveryStatusCreator;
+import com.ai.st.microservice.quality.modules.deliveries.application.create_delivery_status.DeliveryStatusCreatorCommand;
+import com.ai.st.microservice.quality.modules.delivered_products.application.find_delivery_product_statuses.DeliveryProductStatusesFinder;
+import com.ai.st.microservice.quality.modules.delivered_products.application.find_delivery_product_statuses.DeliveryProductStatusesFinderQuery;
+import com.ai.st.microservice.quality.modules.deliveries.application.find_delivery_statuses.DeliveryStatusesFinder;
+import com.ai.st.microservice.quality.modules.deliveries.application.find_delivery_statuses.DeliveryStatusesFinderQuery;
+import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductStatusId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryStatusId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

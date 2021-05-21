@@ -1,9 +1,9 @@
 package com.ai.st.microservice.quality.modules.deliveries.domain;
 
-import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProduct;
-import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductDate;
-import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductObservations;
-import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductStatusId;
+import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProduct;
+import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductDate;
+import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductObservations;
+import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductStatusId;
 
 import com.ai.st.microservice.quality.modules.products.domain.ProductId;
 

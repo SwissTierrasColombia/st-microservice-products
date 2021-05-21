@@ -1,6 +1,6 @@
 package com.ai.st.microservice.quality.modules.shared.domain.contracts;
 
-import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.DeliveryProductAttachmentUUID;
+import com.ai.st.microservice.quality.modules.attachments.domain.DeliveryProductAttachmentUUID;
 
 public interface ILIMicroservice {
 
