@@ -1,12 +1,13 @@
 package com.ai.st.microservice.quality.modules.deliveries.application.FindDeliveries;
 
 import com.ai.st.microservice.quality.modules.deliveries.application.Roles;
+import com.ai.st.microservice.quality.modules.shared.application.Query;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public final class DeliveriesFinderQuery {
+public final class DeliveriesFinderQuery implements Query {
 
     private final int page;
     private final int limit;

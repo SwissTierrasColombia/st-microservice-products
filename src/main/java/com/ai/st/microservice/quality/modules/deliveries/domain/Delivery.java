@@ -126,7 +126,7 @@ public final class Delivery extends AggregateRoot {
         return Arrays.asList(
                 new DeliveryStatusId(DeliveryStatusId.DELIVERED),
                 new DeliveryStatusId(DeliveryStatusId.IN_REVIEW),
-                new DeliveryStatusId(DeliveryStatusId.IN_CORRECTION),
+                new DeliveryStatusId(DeliveryStatusId.IN_REMEDIATION),
                 new DeliveryStatusId(DeliveryStatusId.ACCEPTED),
                 new DeliveryStatusId(DeliveryStatusId.REJECTED)
         );
@@ -137,7 +137,7 @@ public final class Delivery extends AggregateRoot {
                 new DeliveryStatusId(DeliveryStatusId.DRAFT),
                 new DeliveryStatusId(DeliveryStatusId.DELIVERED),
                 new DeliveryStatusId(DeliveryStatusId.IN_REVIEW),
-                new DeliveryStatusId(DeliveryStatusId.IN_CORRECTION),
+                new DeliveryStatusId(DeliveryStatusId.IN_REMEDIATION),
                 new DeliveryStatusId(DeliveryStatusId.ACCEPTED),
                 new DeliveryStatusId(DeliveryStatusId.REJECTED)
         );

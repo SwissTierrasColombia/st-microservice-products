@@ -34,7 +34,7 @@ public final class UpdateStateXTFOnValidationDone {
                 XTFStatusUpdaterCommand.Status status = (validationDto.getIsValid())
                         ? XTFStatusUpdaterCommand.Status.ACCEPTED : XTFStatusUpdaterCommand.Status.REJECTED;
 
-                xtfStatusUpdater.update(new XTFStatusUpdaterCommand(
+                xtfStatusUpdater.handle(new XTFStatusUpdaterCommand(
                         status,
                         validationDto.getReferenceId()
                 ));

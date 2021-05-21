@@ -1,6 +1,8 @@
 package com.ai.st.microservice.quality.modules.deliveries.application.SendDeliveryToManager;
 
-public final class DeliveryToManagerSenderCommand {
+import com.ai.st.microservice.quality.modules.shared.application.Command;
+
+public final class DeliveryToManagerSenderCommand implements Command {
 
     private final Long deliveryId;
     private final Long operatorCode;

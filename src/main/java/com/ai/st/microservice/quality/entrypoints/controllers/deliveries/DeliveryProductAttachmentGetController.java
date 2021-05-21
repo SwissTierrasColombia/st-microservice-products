@@ -74,11 +74,11 @@ public final class DeliveryProductAttachmentGetController extends ApiController 
             validateDeliveryId(deliveryId);
             validateDeliveryProductId(deliveryProductId);
 
-            responseDto = attachmentsProductFinder.find(
+            responseDto = attachmentsProductFinder.handle(
                     new AttachmentsProductFinderQuery(
                             deliveryId, deliveryProductId, session.role(), session.entityCode()
                     )
-            );
+            ).list();
 
             httpStatus = HttpStatus.OK;
 
@@ -119,9 +119,9 @@ public final class DeliveryProductAttachmentGetController extends ApiController 
             validateDeliveryProductId(deliveryProductId);
             validateAttachmentId(attachmentId);
 
-            String pathFile = attachmentURLGetter.get(new AttachmentURLGetterQuery(
+            String pathFile = attachmentURLGetter.handle(new AttachmentURLGetterQuery(
                     deliveryId, deliveryProductId, attachmentId, session.role(), session.entityCode()
-            ));
+            )).value();
 
             Path path = Paths.get(pathFile);
             String fileName = path.getFileName().toString();

@@ -1,8 +1,10 @@
 package com.ai.st.microservice.quality.modules.deliveries.application.CreateDelivery;
 
+import com.ai.st.microservice.quality.modules.shared.application.Command;
+
 import java.util.List;
 
-public final class CreateDeliveryCommand {
+public final class CreateDeliveryCommand implements Command {
 
     private final String municipalityCode;
     private final Long managerCode;

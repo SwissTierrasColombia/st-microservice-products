@@ -11,12 +11,13 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.Deliv
 import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.UnauthorizedToModifyDelivery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.UnauthorizedToSearchDelivery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProduct;
+import com.ai.st.microservice.quality.modules.shared.application.CommandUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.StoreFile;
 
 @Service
-public final class DeliveryRemover {
+public final class DeliveryRemover implements CommandUseCase<DeliveryRemoverCommand> {
 
     private final DeliveryRepository deliveryRepository;
     private final DeliveryProductRepository deliveryProductRepository;
@@ -29,7 +30,8 @@ public final class DeliveryRemover {
         this.deliveryProductRemover = new DeliveryProductRemover(deliveryRepository, deliveryProductRepository, attachmentRepository, storeFile);
     }
 
-    public void remove(DeliveryRemoverCommand command) {
+    @Override
+    public void handle(DeliveryRemoverCommand command) {
 
         DeliveryId deliveryId = DeliveryId.fromValue(command.deliveryId());
         OperatorCode operatorCode = OperatorCode.fromValue(command.operatorCode());
@@ -67,7 +69,7 @@ public final class DeliveryRemover {
     }
 
     private void removeProductFromDelivery(DeliveryId deliveryId, DeliveryProduct deliveryProduct, OperatorCode operatorCode) {
-        deliveryProductRemover.remove(new DeliveryProductRemoverCommand(
+        deliveryProductRemover.handle(new DeliveryProductRemoverCommand(
                 deliveryId.value(),
                 deliveryProduct.deliveryProductId().value(),
                 operatorCode.value()

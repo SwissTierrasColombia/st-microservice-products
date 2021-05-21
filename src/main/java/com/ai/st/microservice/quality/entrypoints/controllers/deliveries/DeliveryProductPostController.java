@@ -55,7 +55,7 @@ public final class DeliveryProductPostController extends ApiController {
             Long productId = request.getProductId();
             validateProduct(productId);
 
-            deliveryProductAssigner.assign(
+            deliveryProductAssigner.handle(
                     new DeliveryProductAssignerCommand(
                             deliveryId,
                             productId,

@@ -15,6 +15,10 @@ public final class DeliveryProductStatusId {
         this.value = value;
     }
 
+    public static DeliveryProductStatusId fromValue(Long value) {
+        return new DeliveryProductStatusId(value);
+    }
+
     private void ensureStatus(Long value) {
         if (!value.equals(DeliveryProductStatusId.PENDING)
                 && !value.equals(DeliveryProductStatusId.ACCEPTED)

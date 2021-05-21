@@ -1,6 +1,8 @@
 package com.ai.st.microservice.quality.modules.products.application.RemoveProduct;
 
-public final class ProductRemoverCommand {
+import com.ai.st.microservice.quality.modules.shared.application.Command;
+
+public final class ProductRemoverCommand implements Command {
 
     private final Long productId;
     private final Long managerCode;

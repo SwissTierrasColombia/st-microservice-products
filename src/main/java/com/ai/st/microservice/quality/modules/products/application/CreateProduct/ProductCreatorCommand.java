@@ -1,6 +1,8 @@
 package com.ai.st.microservice.quality.modules.products.application.CreateProduct;
 
-public final class ProductCreatorCommand {
+import com.ai.st.microservice.quality.modules.shared.application.Command;
+
+public final class ProductCreatorCommand implements Command {
 
     private final String name;
     private final String description;

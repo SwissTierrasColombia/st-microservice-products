@@ -15,6 +15,10 @@ public final class DeliveryProductStatusName {
         if (value == null) throw new DeliveryProductStatusNameInvalid();
     }
 
+    public static DeliveryProductStatusName fromValue(String value) {
+        return new DeliveryProductStatusName(value);
+    }
+
     public String value() {
         return value;
     }

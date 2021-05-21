@@ -1,6 +1,8 @@
 package com.ai.st.microservice.quality.modules.deliveries.application.UpdateProductFromDelivery;
 
-public final class DeliveryProductUpdaterCommand {
+import com.ai.st.microservice.quality.modules.shared.application.Command;
+
+public final class DeliveryProductUpdaterCommand implements Command {
 
     private final Long deliveryId;
     private final Long deliveryProductId;

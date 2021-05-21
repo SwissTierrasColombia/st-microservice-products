@@ -66,7 +66,7 @@ public final class DeliveryGetController extends ApiController {
 
             InformationSession session = this.getInformationSession(headerAuthorization);
 
-            responseDto = deliveriesFinder.finder(
+            responseDto = deliveriesFinder.handle(
                     new DeliveriesFinderQuery(
                             page,
                             limit,
@@ -114,7 +114,7 @@ public final class DeliveryGetController extends ApiController {
 
             InformationSession session = this.getInformationSession(headerAuthorization);
 
-            responseDto = deliverySearcher.search(
+            responseDto = deliverySearcher.handle(
                     new DeliverySearcherQuery(deliveryId, session.role(), session.entityCode())
             );
 

@@ -1,6 +1,8 @@
 package com.ai.st.microservice.quality.modules.products.application.UpdateProduct;
 
-public final class ProductUpdaterCommand {
+import com.ai.st.microservice.quality.modules.shared.application.Command;
+
+public final class ProductUpdaterCommand implements Command {
 
     private final Long productId;
     private final String name;

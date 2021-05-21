@@ -79,7 +79,7 @@ public final class DeliveryProductAttachmentPostController extends ApiController
                 throw new InputValidationException("Se debe enviar un tipo de adjunto (ftp,documento,xtf).");
             }
 
-            attachmentAssigner.assign(new AttachmentAssignerCommand(
+            attachmentAssigner.handle(new AttachmentAssignerCommand(
                     deliveryId, deliveryProductId, session.entityCode(), attachment
             ));
 

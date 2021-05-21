@@ -54,9 +54,9 @@ public final class DeliveryProductGetController extends ApiController {
 
             InformationSession session = this.getInformationSession(headerAuthorization);
 
-            responseDto = deliveryProductsFinder.finder(
+            responseDto = deliveryProductsFinder.handle(
                     new DeliveryProductsFinderQuery(
-                            deliveryId, session.role(), session.entityCode()));
+                            deliveryId, session.role(), session.entityCode())).list();
 
             httpStatus = HttpStatus.OK;
 

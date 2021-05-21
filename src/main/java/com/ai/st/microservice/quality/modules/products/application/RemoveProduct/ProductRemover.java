@@ -7,11 +7,12 @@ import com.ai.st.microservice.quality.modules.products.domain.contracts.ProductR
 import com.ai.st.microservice.quality.modules.products.domain.exceptions.ProductDoesNotBelongToManager;
 import com.ai.st.microservice.quality.modules.products.domain.exceptions.ProductNotFound;
 import com.ai.st.microservice.quality.modules.products.domain.exceptions.UnauthorizedToRemoveProduct;
+import com.ai.st.microservice.quality.modules.shared.application.CommandUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.ManagerCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 
 @Service
-public final class ProductRemover {
+public final class ProductRemover implements CommandUseCase<ProductRemoverCommand> {
 
     private final ProductRepository productRepository;
     private final DeliveryProductRepository deliveryProductRepository;
@@ -21,7 +22,8 @@ public final class ProductRemover {
         this.deliveryProductRepository = deliveryProductRepository;
     }
 
-    public void remove(ProductRemoverCommand command) {
+    @Override
+    public void handle(ProductRemoverCommand command) {
 
         ProductId productId = ProductId.fromValue(command.productId());
         ManagerCode managerCode = ManagerCode.fromValue(command.managerCode());

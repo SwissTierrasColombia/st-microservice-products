@@ -55,7 +55,7 @@ public final class ProductDeleteController extends ApiController {
 
             validateProductId(productId);
 
-            productRemover.remove(
+            productRemover.handle(
                     new ProductRemoverCommand(
                             productId, session.entityCode()
                     )

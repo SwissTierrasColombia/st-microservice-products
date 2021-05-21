@@ -1,10 +1,11 @@
 package com.ai.st.microservice.quality.modules.deliveries.application;
 
 import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
+import com.ai.st.microservice.quality.modules.shared.application.Response;
 
 import java.util.Date;
 
-public final class DeliveryResponse {
+public final class DeliveryResponse implements Response {
 
     private final Long id;
     private final String code;

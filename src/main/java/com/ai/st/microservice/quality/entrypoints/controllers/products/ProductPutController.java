@@ -61,7 +61,7 @@ public final class ProductPutController extends ApiController {
             String description = request.getDescription();
             validateDescription(description);
 
-            productUpdater.update(
+            productUpdater.handle(
                     new ProductUpdaterCommand(
                             productId, name, description, request.isXTF(), session.entityCode()
                     )

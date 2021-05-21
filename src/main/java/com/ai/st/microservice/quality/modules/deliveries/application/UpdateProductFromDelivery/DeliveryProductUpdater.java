@@ -11,11 +11,12 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.Unaut
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProduct;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductObservations;
+import com.ai.st.microservice.quality.modules.shared.application.CommandUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 
 @Service
-public final class DeliveryProductUpdater {
+public final class DeliveryProductUpdater implements CommandUseCase<DeliveryProductUpdaterCommand> {
 
     private final DeliveryRepository deliveryRepository;
     private final DeliveryProductRepository deliveryProductRepository;
@@ -25,7 +26,8 @@ public final class DeliveryProductUpdater {
         this.deliveryProductRepository = deliveryProductRepository;
     }
 
-    public void update(DeliveryProductUpdaterCommand command) {
+    @Override
+    public void handle(DeliveryProductUpdaterCommand command) {
 
         DeliveryId deliveryId = DeliveryId.fromValue(command.deliveryId());
         DeliveryProductId deliveryProductId = DeliveryProductId.fromValue(command.deliveryProductId());

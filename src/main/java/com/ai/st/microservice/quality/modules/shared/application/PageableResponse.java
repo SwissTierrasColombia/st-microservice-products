@@ -2,7 +2,7 @@ package com.ai.st.microservice.quality.modules.shared.application;
 
 import java.util.List;
 
-public final class PageableResponse<T> {
+public final class PageableResponse<T> implements Response {
 
     private final List<T> items;
     private final int currentPage;

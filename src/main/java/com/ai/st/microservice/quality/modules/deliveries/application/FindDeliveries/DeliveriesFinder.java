@@ -8,6 +8,7 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryStatusId
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryRepository;
 
 import com.ai.st.microservice.quality.modules.shared.application.PageableResponse;
+import com.ai.st.microservice.quality.modules.shared.application.QueryUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.*;
 import com.ai.st.microservice.quality.modules.shared.domain.criteria.*;
 import com.ai.st.microservice.quality.modules.shared.domain.exceptions.ErrorFromInfrastructure;
@@ -16,7 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public final class DeliveriesFinder {
+public final class DeliveriesFinder implements QueryUseCase<DeliveriesFinderQuery, PageableResponse<DeliveryResponse>> {
 
     private final DeliveryRepository repository;
 
@@ -27,7 +28,8 @@ public final class DeliveriesFinder {
         this.repository = repository;
     }
 
-    public PageableResponse<DeliveryResponse> finder(DeliveriesFinderQuery query) {
+    @Override
+    public PageableResponse<DeliveryResponse> handle(DeliveriesFinderQuery query) {
 
         List<Filter> filters = new ArrayList<>(
                 Collections.singletonList(filterByRole(query.role(), query.entityCode())));
@@ -39,7 +41,7 @@ public final class DeliveriesFinder {
                     DeliveryStatusId.DRAFT,
                     DeliveryStatusId.DELIVERED,
                     DeliveryStatusId.IN_REVIEW,
-                    DeliveryStatusId.IN_CORRECTION,
+                    DeliveryStatusId.IN_REMEDIATION,
                     DeliveryStatusId.ACCEPTED,
                     DeliveryStatusId.REJECTED
             );

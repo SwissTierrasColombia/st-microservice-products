@@ -4,10 +4,11 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.products.Deliver
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductStatusId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductStatusName;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductStatusRepository;
+import com.ai.st.microservice.quality.modules.shared.application.CommandUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 
 @Service
-public final class DeliveryProductStatusCreator {
+public final class DeliveryProductStatusCreator implements CommandUseCase<DeliveryProductStatusCreatorCommand> {
 
     private final DeliveryProductStatusRepository repository;
 
@@ -15,8 +16,12 @@ public final class DeliveryProductStatusCreator {
         this.repository = repository;
     }
 
-    public void create(Long id, String name) {
-        DeliveryProductStatus deliveryProductStatus = new DeliveryProductStatus(new DeliveryProductStatusId(id), new DeliveryProductStatusName(name));
+    @Override
+    public void handle(DeliveryProductStatusCreatorCommand command) {
+        DeliveryProductStatus deliveryProductStatus = new DeliveryProductStatus(
+                DeliveryProductStatusId.fromValue(command.id()),
+                DeliveryProductStatusName.fromValue(command.name()));
         repository.save(deliveryProductStatus);
     }
+
 }

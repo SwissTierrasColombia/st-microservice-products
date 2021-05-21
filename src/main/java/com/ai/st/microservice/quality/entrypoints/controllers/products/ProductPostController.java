@@ -57,7 +57,7 @@ public final class ProductPostController extends ApiController {
             String description = request.getDescription();
             validateDescription(description);
 
-            productCreator.create(
+            productCreator.handle(
                     new ProductCreatorCommand(
                             name, description, request.isXTF(), session.entityCode()
                     )

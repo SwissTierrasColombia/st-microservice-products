@@ -1,8 +1,9 @@
 package com.ai.st.microservice.quality.modules.deliveries.application.SearchDelivery;
 
 import com.ai.st.microservice.quality.modules.deliveries.application.Roles;
+import com.ai.st.microservice.quality.modules.shared.application.Query;
 
-public final class DeliverySearcherQuery {
+public final class DeliverySearcherQuery implements Query {
 
     private final Long deliveryId;
     private final Roles role;

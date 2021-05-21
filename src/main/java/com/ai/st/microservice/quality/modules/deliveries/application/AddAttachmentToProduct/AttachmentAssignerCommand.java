@@ -1,6 +1,8 @@
 package com.ai.st.microservice.quality.modules.deliveries.application.AddAttachmentToProduct;
 
-public final class AttachmentAssignerCommand {
+import com.ai.st.microservice.quality.modules.shared.application.Command;
+
+public final class AttachmentAssignerCommand implements Command {
 
     private final Long deliveryId;
     private final Long deliveryProductId;

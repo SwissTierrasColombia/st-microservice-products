@@ -2,13 +2,15 @@ package com.ai.st.microservice.quality.modules.deliveries.application.FindAllDel
 
 import com.ai.st.microservice.quality.modules.deliveries.application.DeliveryProductStatusResponse;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductStatusRepository;
+import com.ai.st.microservice.quality.modules.shared.application.ListResponse;
+import com.ai.st.microservice.quality.modules.shared.application.QueryUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public final class DeliveryProductStatusesFinder {
+public final class DeliveryProductStatusesFinder implements QueryUseCase<DeliveryProductStatusesFinderQuery, ListResponse<DeliveryProductStatusResponse>> {
+
 
     private final DeliveryProductStatusRepository repository;
 
@@ -16,8 +18,9 @@ public final class DeliveryProductStatusesFinder {
         this.repository = repository;
     }
 
-    public List<DeliveryProductStatusResponse> finder() {
-        return repository.all().stream().map(DeliveryProductStatusResponse::fromAggregate).collect(Collectors.toList());
+    @Override
+    public ListResponse<DeliveryProductStatusResponse> handle(DeliveryProductStatusesFinderQuery query) {
+        return new ListResponse<>(repository.all().stream().map(DeliveryProductStatusResponse::fromAggregate).collect(Collectors.toList()));
     }
 
 }

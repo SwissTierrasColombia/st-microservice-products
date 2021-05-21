@@ -7,12 +7,13 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryRepository;
 import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.DeliveryNotFound;
 import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.UnauthorizedToSearchDelivery;
+import com.ai.st.microservice.quality.modules.shared.application.QueryUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.ManagerCode;
 import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 
 @Service
-public final class DeliverySearcher {
+public final class DeliverySearcher implements QueryUseCase<DeliverySearcherQuery, DeliveryResponse> {
 
     private final DeliveryRepository repository;
 
@@ -20,7 +21,8 @@ public final class DeliverySearcher {
         this.repository = repository;
     }
 
-    public DeliveryResponse search(DeliverySearcherQuery query) {
+    @Override
+    public DeliveryResponse handle(DeliverySearcherQuery query) {
 
         Delivery delivery = repository.search(new DeliveryId(query.deliveryId()));
 

@@ -14,6 +14,7 @@ import com.ai.st.microservice.quality.modules.products.domain.ProductId;
 import com.ai.st.microservice.quality.modules.products.domain.contracts.ProductRepository;
 import com.ai.st.microservice.quality.modules.products.domain.exceptions.ProductDoesNotBelongToManager;
 
+import com.ai.st.microservice.quality.modules.shared.application.CommandUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.DateTime;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
@@ -21,7 +22,7 @@ import com.ai.st.microservice.quality.modules.shared.domain.Service;
 import java.util.List;
 
 @Service
-public final class DeliveryProductAssigner {
+public final class DeliveryProductAssigner implements CommandUseCase<DeliveryProductAssignerCommand> {
 
     private final DeliveryRepository deliveryRepository;
     private final DeliveryProductRepository deliveryProductRepository;
@@ -36,7 +37,8 @@ public final class DeliveryProductAssigner {
         this.managerProductsFinder = new ManagerProductsFinder(productRepository);
     }
 
-    public void assign(DeliveryProductAssignerCommand command) {
+    @Override
+    public void handle(DeliveryProductAssignerCommand command) {
 
         DeliveryId deliveryId = new DeliveryId(command.deliveryId());
         OperatorCode operatorCode = new OperatorCode(command.operatorCode());
@@ -77,7 +79,7 @@ public final class DeliveryProductAssigner {
     }
 
     private void verifyProductBelongToManager(Long productId, Long managerCode) {
-        List<ProductResponse> productResponseList = this.managerProductsFinder.finder(new ManagerProductsFinderQuery(managerCode));
+        List<ProductResponse> productResponseList = this.managerProductsFinder.handle(new ManagerProductsFinderQuery(managerCode)).list();
         productResponseList.stream().filter(productResponse -> productResponse.id().equals(productId)).findAny()
                 .orElseThrow(ProductDoesNotBelongToManager::new);
     }

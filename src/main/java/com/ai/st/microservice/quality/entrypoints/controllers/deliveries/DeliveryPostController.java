@@ -64,7 +64,7 @@ public final class DeliveryPostController extends ApiController {
             List<Long> products = request.getDeliveredProducts();
             validateProducts(request.getDeliveredProducts());
 
-            deliveryCreator.create(
+            deliveryCreator.handle(
                     new CreateDeliveryCommand(
                             municipalityCode,
                             managerCode,

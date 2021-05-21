@@ -4,7 +4,6 @@ import com.ai.st.microservice.quality.modules.deliveries.application.RemoveAttac
 import com.ai.st.microservice.quality.modules.deliveries.application.RemoveAttachmentFromProduct.AttachmentProductRemoverCommand;
 import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
-import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryStatusId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductAttachmentRepository;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductRepository;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryRepository;
@@ -15,12 +14,13 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.Unaut
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProduct;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.DeliveryProductAttachment;
+import com.ai.st.microservice.quality.modules.shared.application.CommandUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.StoreFile;
 
 @Service
-public final class DeliveryProductRemover {
+public final class DeliveryProductRemover implements CommandUseCase<DeliveryProductRemoverCommand> {
 
     private final DeliveryRepository deliveryRepository;
     private final DeliveryProductRepository deliveryProductRepository;
@@ -35,7 +35,8 @@ public final class DeliveryProductRemover {
         this.attachmentProductRemover = new AttachmentProductRemover(attachmentRepository, deliveryProductRepository, deliveryRepository, storeFile);
     }
 
-    public void remove(DeliveryProductRemoverCommand command) {
+    @Override
+    public void handle(DeliveryProductRemoverCommand command) {
 
         DeliveryId deliveryId = DeliveryId.fromValue(command.deliveryId());
         DeliveryProductId deliveryProductId = DeliveryProductId.fromValue(command.deliveryProductId());
@@ -80,7 +81,7 @@ public final class DeliveryProductRemover {
     }
 
     private void removeAttachment(DeliveryId deliveryId, DeliveryProductAttachment attachment, OperatorCode operatorCode) {
-        attachmentProductRemover.remove(new AttachmentProductRemoverCommand(
+        attachmentProductRemover.handle(new AttachmentProductRemoverCommand(
                 deliveryId.value(),
                 attachment.deliveryProductId().value(),
                 attachment.deliveryProductAttachmentId().value(),

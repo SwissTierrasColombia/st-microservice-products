@@ -55,7 +55,7 @@ public final class DeliveryDeleteController extends ApiController {
 
             validateDeliveryId(deliveryId);
 
-            deliveryRemover.remove(
+            deliveryRemover.handle(
                     new DeliveryRemoverCommand(
                             deliveryId, session.entityCode()
                     ));

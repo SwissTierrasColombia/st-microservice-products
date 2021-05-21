@@ -58,7 +58,7 @@ public final class DeliveryProductAttachmentDeleteController extends ApiControll
             validateDeliveryProductId(deliveryProductId);
             validateAttachmentId(attachmentId);
 
-            attachmentProductRemover.remove(
+            attachmentProductRemover.handle(
                     new AttachmentProductRemoverCommand(
                             deliveryId, deliveryProductId, attachmentId, session.entityCode()));
 

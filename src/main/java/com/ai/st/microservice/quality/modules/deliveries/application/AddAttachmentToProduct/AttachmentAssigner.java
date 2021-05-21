@@ -19,6 +19,7 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachm
 import com.ai.st.microservice.quality.modules.products.domain.Product;
 import com.ai.st.microservice.quality.modules.products.domain.ProductId;
 import com.ai.st.microservice.quality.modules.products.domain.contracts.ProductRepository;
+import com.ai.st.microservice.quality.modules.shared.application.CommandUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.DateTime;
@@ -29,7 +30,7 @@ import com.ai.st.microservice.quality.modules.shared.domain.contracts.StoreFile;
 import java.util.UUID;
 
 @Service
-public final class AttachmentAssigner {
+public final class AttachmentAssigner implements CommandUseCase<AttachmentAssignerCommand> {
 
     private final DeliveryRepository deliveryRepository;
     private final DeliveryProductRepository deliveryProductRepository;
@@ -53,7 +54,8 @@ public final class AttachmentAssigner {
         this.deliveryProductRepository = deliveryProductRepository;
     }
 
-    public void assign(AttachmentAssignerCommand command) {
+    @Override
+    public void handle(AttachmentAssignerCommand command) {
 
         DeliveryId deliveryId = new DeliveryId(command.deliveryId());
         DeliveryProductId deliveryProductId = new DeliveryProductId(command.deliveryProductId());

@@ -1,6 +1,8 @@
 package com.ai.st.microservice.quality.modules.deliveries.application.RemoveDelivery;
 
-public final class DeliveryRemoverCommand {
+import com.ai.st.microservice.quality.modules.shared.application.Command;
+
+public final class DeliveryRemoverCommand implements Command {
 
     private final Long deliveryId;
     private final Long operatorCode;

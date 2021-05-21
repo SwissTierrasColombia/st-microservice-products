@@ -2,12 +2,13 @@ package com.ai.st.microservice.quality.modules.products.application.CreateProduc
 
 import com.ai.st.microservice.quality.modules.products.domain.*;
 import com.ai.st.microservice.quality.modules.products.domain.contracts.ProductRepository;
+import com.ai.st.microservice.quality.modules.shared.application.CommandUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.ManagerCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.DateTime;
 
 @Service
-public final class ProductCreator {
+public final class ProductCreator implements CommandUseCase<ProductCreatorCommand> {
 
     private final ProductRepository repository;
     private final DateTime dateTime;
@@ -17,7 +18,8 @@ public final class ProductCreator {
         this.dateTime = dateTime;
     }
 
-    public void create(ProductCreatorCommand command) {
+    @Override
+    public void handle(ProductCreatorCommand command) {
 
         ProductName productName = ProductName.fromValue(command.name());
         ProductDescription productDescription = ProductDescription.fromValue(command.description());

@@ -16,6 +16,7 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachm
 import com.ai.st.microservice.quality.modules.products.domain.Product;
 import com.ai.st.microservice.quality.modules.products.domain.ProductId;
 import com.ai.st.microservice.quality.modules.products.domain.contracts.ProductRepository;
+import com.ai.st.microservice.quality.modules.shared.application.CommandUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 
@@ -23,7 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public final class DeliveryToManagerSender {
+public final class DeliveryToManagerSender implements CommandUseCase<DeliveryToManagerSenderCommand> {
 
     private final DeliveryRepository deliveryRepository;
     private final DeliveryProductRepository deliveryProductRepository;
@@ -38,7 +39,8 @@ public final class DeliveryToManagerSender {
         this.attachmentRepository = attachmentRepository;
     }
 
-    public void send(DeliveryToManagerSenderCommand command) {
+    @Override
+    public void handle(DeliveryToManagerSenderCommand command) {
 
         DeliveryId deliveryId = DeliveryId.fromValue(command.deliveryId());
         OperatorCode operatorCode = OperatorCode.fromValue(command.operatorCode());

@@ -55,7 +55,7 @@ public final class DeliveryPatchController extends ApiController {
 
             validateDeliveryId(deliveryId);
 
-            deliveryToManagerSender.send(
+            deliveryToManagerSender.handle(
                     new DeliveryToManagerSenderCommand(
                             deliveryId, session.entityCode()
                     ));

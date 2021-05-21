@@ -11,12 +11,13 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.Deliv
 import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.UnauthorizedToSearchDelivery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProduct;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductId;
+import com.ai.st.microservice.quality.modules.shared.application.QueryUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.ManagerCode;
 import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 
 @Service
-public final class DeliveryProductSearcher {
+public final class DeliveryProductSearcher implements QueryUseCase<DeliveryProductSearcherQuery, DeliveryProductResponse> {
 
     private final DeliveryRepository deliveryRepository;
     private final DeliveryProductRepository deliveryProductRepository;
@@ -26,7 +27,8 @@ public final class DeliveryProductSearcher {
         this.deliveryRepository = deliveryRepository;
     }
 
-    public DeliveryProductResponse search(DeliveryProductSearcherQuery query) {
+    @Override
+    public DeliveryProductResponse handle(DeliveryProductSearcherQuery query) {
 
         DeliveryId deliveryId = DeliveryId.fromValue(query.deliveryId());
         DeliveryProductId deliveryProductId = new DeliveryProductId(query.deliveryProductId());

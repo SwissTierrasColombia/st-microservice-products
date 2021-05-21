@@ -12,14 +12,15 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.products.Deliver
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.DeliveryProductAttachment;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.DeliveryProductAttachmentId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.document.DeliveryProductDocumentAttachment;
-import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.ftp.DeliveryProductFTPAttachment;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.xtf.DeliveryProductXTFAttachment;
+import com.ai.st.microservice.quality.modules.shared.application.QueryUseCase;
+import com.ai.st.microservice.quality.modules.shared.application.StringResponse;
 import com.ai.st.microservice.quality.modules.shared.domain.ManagerCode;
 import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 
 @Service
-public final class AttachmentURLGetter {
+public final class AttachmentURLGetter implements QueryUseCase<AttachmentURLGetterQuery, StringResponse> {
 
     private final DeliveryRepository deliveryRepository;
     private final DeliveryProductRepository deliveryProductRepository;
@@ -32,7 +33,8 @@ public final class AttachmentURLGetter {
         this.deliveryProductRepository = deliveryProductRepository;
     }
 
-    public String get(AttachmentURLGetterQuery query) {
+    @Override
+    public StringResponse handle(AttachmentURLGetterQuery query) {
 
         DeliveryId deliveryId = new DeliveryId(query.deliveryId());
         DeliveryProductId deliveryProductId = new DeliveryProductId(query.deliveryProductId());
@@ -43,7 +45,7 @@ public final class AttachmentURLGetter {
         DeliveryProductAttachment deliveryProductAttachment = attachmentRepository.search(attachmentId);
         checkAttachmentExits(deliveryProductAttachment);
 
-        return getPathFile(deliveryProductAttachment);
+        return new StringResponse(getPathFile(deliveryProductAttachment));
     }
 
     private void verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId, Roles role, Long entityCode) {

@@ -1,6 +1,8 @@
 package com.ai.st.microservice.quality.modules.deliveries.application.RemoveAttachmentFromProduct;
 
-public final class AttachmentProductRemoverCommand {
+import com.ai.st.microservice.quality.modules.shared.application.Command;
+
+public final class AttachmentProductRemoverCommand implements Command {
 
     private final Long deliveryId;
     private final Long deliveryProductId;

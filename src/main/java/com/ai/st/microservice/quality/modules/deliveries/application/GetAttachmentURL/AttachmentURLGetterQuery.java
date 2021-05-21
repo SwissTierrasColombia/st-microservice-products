@@ -1,8 +1,9 @@
 package com.ai.st.microservice.quality.modules.deliveries.application.GetAttachmentURL;
 
 import com.ai.st.microservice.quality.modules.deliveries.application.Roles;
+import com.ai.st.microservice.quality.modules.shared.application.Query;
 
-public final class AttachmentURLGetterQuery {
+public final class AttachmentURLGetterQuery implements Query {
 
     private final Long deliveryId;
     private final Long deliveryProductId;

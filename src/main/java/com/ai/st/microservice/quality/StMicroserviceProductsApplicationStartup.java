@@ -1,9 +1,13 @@
 package com.ai.st.microservice.quality;
 
 import com.ai.st.microservice.quality.modules.deliveries.application.CreateDeliveryProductStatus.DeliveryProductStatusCreator;
+import com.ai.st.microservice.quality.modules.deliveries.application.CreateDeliveryProductStatus.DeliveryProductStatusCreatorCommand;
 import com.ai.st.microservice.quality.modules.deliveries.application.CreateDeliveryStatus.DeliveryStatusCreator;
+import com.ai.st.microservice.quality.modules.deliveries.application.CreateDeliveryStatus.DeliveryStatusCreatorCommand;
 import com.ai.st.microservice.quality.modules.deliveries.application.FindAllDeliveryProductStatuses.DeliveryProductStatusesFinder;
+import com.ai.st.microservice.quality.modules.deliveries.application.FindAllDeliveryProductStatuses.DeliveryProductStatusesFinderQuery;
 import com.ai.st.microservice.quality.modules.deliveries.application.FindAllDeliveryStatuses.DeliveryStatusesFinder;
+import com.ai.st.microservice.quality.modules.deliveries.application.FindAllDeliveryStatuses.DeliveryStatusesFinderQuery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.DeliveryProductStatusId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryStatusId;
 import org.slf4j.Logger;
@@ -43,14 +47,14 @@ public class StMicroserviceProductsApplicationStartup implements ApplicationList
 
     public void initDeliveryStatuses() {
 
-        int count = deliveryStatusesFinder.finder().size();
+        int count = deliveryStatusesFinder.handle(new DeliveryStatusesFinderQuery()).size();
         if (count == 0) {
-            deliveryStatusCreator.create(DeliveryStatusId.DRAFT, "BORRADOR");
-            deliveryStatusCreator.create(DeliveryStatusId.DELIVERED, "ENTREGADO");
-            deliveryStatusCreator.create(DeliveryStatusId.IN_REVIEW, "EN REVISIÓN");
-            deliveryStatusCreator.create(DeliveryStatusId.IN_CORRECTION, "EN CORRECCIÓN");
-            deliveryStatusCreator.create(DeliveryStatusId.ACCEPTED, "ACEPTADO");
-            deliveryStatusCreator.create(DeliveryStatusId.REJECTED, "RECHAZADO");
+            deliveryStatusCreator.handle(new DeliveryStatusCreatorCommand(DeliveryStatusId.DRAFT, "BORRADOR"));
+            deliveryStatusCreator.handle(new DeliveryStatusCreatorCommand(DeliveryStatusId.DELIVERED, "ENTREGADO"));
+            deliveryStatusCreator.handle(new DeliveryStatusCreatorCommand(DeliveryStatusId.IN_REVIEW, "EN REVISIÓN"));
+            deliveryStatusCreator.handle(new DeliveryStatusCreatorCommand(DeliveryStatusId.IN_REMEDIATION, "EN CORRECCIÓN"));
+            deliveryStatusCreator.handle(new DeliveryStatusCreatorCommand(DeliveryStatusId.ACCEPTED, "ACEPTADO"));
+            deliveryStatusCreator.handle(new DeliveryStatusCreatorCommand(DeliveryStatusId.REJECTED, "RECHAZADO"));
             log.info("The domains 'delivery statuses' have been loaded!");
         }
 
@@ -58,11 +62,11 @@ public class StMicroserviceProductsApplicationStartup implements ApplicationList
 
     public void initProductStatuses() {
 
-        int count = deliveryProductStatusesFinder.finder().size();
+        int count = deliveryProductStatusesFinder.handle(new DeliveryProductStatusesFinderQuery()).size();
         if (count == 0) {
-            deliveryProductStatusCreator.create(DeliveryProductStatusId.PENDING, "PENDIENTE");
-            deliveryProductStatusCreator.create(DeliveryProductStatusId.ACCEPTED, "ACEPTADO");
-            deliveryProductStatusCreator.create(DeliveryProductStatusId.REJECTED, "RECHAZADO");
+            deliveryProductStatusCreator.handle(new DeliveryProductStatusCreatorCommand(DeliveryProductStatusId.PENDING, "PENDIENTE"));
+            deliveryProductStatusCreator.handle(new DeliveryProductStatusCreatorCommand(DeliveryProductStatusId.ACCEPTED, "ACEPTADO"));
+            deliveryProductStatusCreator.handle(new DeliveryProductStatusCreatorCommand(DeliveryProductStatusId.REJECTED, "RECHAZADO"));
             log.info("The domains 'delivery product statuses' have been loaded!");
         }
 

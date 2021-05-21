@@ -2,7 +2,6 @@ package com.ai.st.microservice.quality.modules.deliveries.application.RemoveAtta
 
 import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
-import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryStatusId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductAttachmentRepository;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryProductRepository;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryRepository;
@@ -16,12 +15,13 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachm
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.DeliveryProductAttachmentId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.document.DeliveryProductDocumentAttachment;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.xtf.DeliveryProductXTFAttachment;
+import com.ai.st.microservice.quality.modules.shared.application.CommandUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.StoreFile;
 
 @Service
-public final class AttachmentProductRemover {
+public final class AttachmentProductRemover implements CommandUseCase<AttachmentProductRemoverCommand> {
 
     private final DeliveryRepository deliveryRepository;
     private final DeliveryProductRepository deliveryProductRepository;
@@ -36,7 +36,8 @@ public final class AttachmentProductRemover {
         this.deliveryProductRepository = deliveryProductRepository;
     }
 
-    public void remove(AttachmentProductRemoverCommand command) {
+    @Override
+    public void handle(AttachmentProductRemoverCommand command) {
 
         DeliveryId deliveryId = new DeliveryId(command.deliveryId());
         DeliveryProductId deliveryProductId = new DeliveryProductId(command.deliveryProductId());

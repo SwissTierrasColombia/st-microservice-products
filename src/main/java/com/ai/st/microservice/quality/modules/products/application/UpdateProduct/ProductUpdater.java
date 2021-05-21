@@ -4,11 +4,12 @@ import com.ai.st.microservice.quality.modules.products.domain.*;
 import com.ai.st.microservice.quality.modules.products.domain.contracts.ProductRepository;
 import com.ai.st.microservice.quality.modules.products.domain.exceptions.ProductDoesNotBelongToManager;
 import com.ai.st.microservice.quality.modules.products.domain.exceptions.ProductNotFound;
+import com.ai.st.microservice.quality.modules.shared.application.CommandUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.ManagerCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 
 @Service
-public final class ProductUpdater {
+public final class ProductUpdater implements CommandUseCase<ProductUpdaterCommand> {
 
     private final ProductRepository repository;
 
@@ -16,7 +17,8 @@ public final class ProductUpdater {
         this.repository = productRepository;
     }
 
-    public void update(ProductUpdaterCommand command) {
+    @Override
+    public void handle(ProductUpdaterCommand command) {
 
         ProductId productId = ProductId.fromValue(command.productId());
         ManagerCode managerCode = ManagerCode.fromValue(command.managerCode());

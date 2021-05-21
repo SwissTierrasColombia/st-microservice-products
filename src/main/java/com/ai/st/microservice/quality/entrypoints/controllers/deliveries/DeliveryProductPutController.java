@@ -59,7 +59,7 @@ public final class DeliveryProductPutController extends ApiController {
             String observations = request.getObservations();
             validateObservations(observations);
 
-            deliveryProductUpdater.update(
+            deliveryProductUpdater.handle(
                     new DeliveryProductUpdaterCommand(
                             deliveryId, deliveryProductId, observations, session.entityCode()
                     ));

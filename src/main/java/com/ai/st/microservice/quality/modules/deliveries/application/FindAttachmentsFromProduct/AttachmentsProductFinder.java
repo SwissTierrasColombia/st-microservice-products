@@ -16,15 +16,16 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachm
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.document.DeliveryProductDocumentAttachment;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.ftp.DeliveryProductFTPAttachment;
 import com.ai.st.microservice.quality.modules.deliveries.domain.products.attachments.xtf.DeliveryProductXTFAttachment;
+import com.ai.st.microservice.quality.modules.shared.application.ListResponse;
+import com.ai.st.microservice.quality.modules.shared.application.QueryUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.ManagerCode;
 import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public final class AttachmentsProductFinder {
+public final class AttachmentsProductFinder implements QueryUseCase<AttachmentsProductFinderQuery, ListResponse<AttachmentProductResponse>> {
 
     private final DeliveryRepository deliveryRepository;
     private final DeliveryProductRepository deliveryProductRepository;
@@ -37,15 +38,16 @@ public final class AttachmentsProductFinder {
         this.deliveryProductRepository = deliveryProductRepository;
     }
 
-    public List<AttachmentProductResponse> find(AttachmentsProductFinderQuery query) {
+    @Override
+    public ListResponse<AttachmentProductResponse> handle(AttachmentsProductFinderQuery query) {
 
         DeliveryId deliveryId = new DeliveryId(query.deliveryId());
         DeliveryProductId deliveryProductId = new DeliveryProductId(query.deliveryProductId());
 
         verifyPermissions(deliveryId, deliveryProductId, query.role(), query.entityCode());
 
-        return attachmentRepository.findByDeliveryProductId(deliveryProductId)
-                .stream().map(this::mappingResponse).collect(Collectors.toList());
+        return new ListResponse<>(attachmentRepository.findByDeliveryProductId(deliveryProductId)
+                .stream().map(this::mappingResponse).collect(Collectors.toList()));
     }
 
     private void verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId, Roles role, Long entityCode) {

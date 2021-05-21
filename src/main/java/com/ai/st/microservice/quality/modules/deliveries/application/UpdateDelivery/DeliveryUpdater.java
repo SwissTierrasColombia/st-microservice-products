@@ -5,10 +5,11 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.Delive
 import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.DeliveryNotFound;
 import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.UnauthorizedToModifyDelivery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.UnauthorizedToSearchDelivery;
+import com.ai.st.microservice.quality.modules.shared.application.CommandUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.*;
 
 @Service
-public final class DeliveryUpdater {
+public final class DeliveryUpdater implements CommandUseCase<DeliveryUpdaterCommand> {
 
     private final DeliveryRepository deliveryRepository;
 
@@ -16,7 +17,8 @@ public final class DeliveryUpdater {
         this.deliveryRepository = deliveryRepository;
     }
 
-    public void update(DeliveryUpdaterCommand command) {
+    @Override
+    public void handle(DeliveryUpdaterCommand command) {
 
         DeliveryId deliveryId = DeliveryId.fromValue(command.deliveryId());
         OperatorCode operatorCode = OperatorCode.fromValue(command.operatorCode());

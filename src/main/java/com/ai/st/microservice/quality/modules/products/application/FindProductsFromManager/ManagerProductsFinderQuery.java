@@ -1,6 +1,8 @@
 package com.ai.st.microservice.quality.modules.products.application.FindProductsFromManager;
 
-public final class ManagerProductsFinderQuery {
+import com.ai.st.microservice.quality.modules.shared.application.Query;
+
+public final class ManagerProductsFinderQuery implements Query {
 
     private final Long managerCode;
 

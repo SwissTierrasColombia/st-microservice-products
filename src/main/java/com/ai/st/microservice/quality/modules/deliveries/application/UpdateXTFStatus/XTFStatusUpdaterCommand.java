@@ -1,6 +1,8 @@
 package com.ai.st.microservice.quality.modules.deliveries.application.UpdateXTFStatus;
 
-public final class XTFStatusUpdaterCommand {
+import com.ai.st.microservice.quality.modules.shared.application.Command;
+
+public final class XTFStatusUpdaterCommand implements Command {
 
     public enum Status {ACCEPTED, REJECTED}
 

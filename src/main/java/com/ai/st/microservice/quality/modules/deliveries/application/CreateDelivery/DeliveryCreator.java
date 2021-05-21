@@ -13,6 +13,7 @@ import com.ai.st.microservice.quality.modules.products.domain.ProductId;
 import com.ai.st.microservice.quality.modules.products.domain.contracts.ProductRepository;
 import com.ai.st.microservice.quality.modules.products.domain.exceptions.ProductDoesNotBelongToManager;
 
+import com.ai.st.microservice.quality.modules.shared.application.CommandUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.*;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.DateTime;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.WorkspaceMicroservice;
@@ -22,7 +23,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import java.util.List;
 
 @Service
-public final class DeliveryCreator {
+public final class DeliveryCreator implements CommandUseCase<CreateDeliveryCommand> {
 
     private final DeliveryRepository deliveryRepository;
     private final WorkspaceMicroservice workspaceMicroservice;
@@ -37,7 +38,8 @@ public final class DeliveryCreator {
         this.managerProductsFinder = new ManagerProductsFinder(productRepository);
     }
 
-    public void create(CreateDeliveryCommand command) {
+    @Override
+    public void handle(CreateDeliveryCommand command) {
 
         MunicipalityCode municipalityCode = new MunicipalityCode(command.municipalityCode());
         ManagerCode managerCode = new ManagerCode(command.managerCode());
@@ -80,7 +82,7 @@ public final class DeliveryCreator {
 
     private void verifyProductBelongToManager(ProductId productId, ManagerCode managerCode) {
         List<ProductResponse> productResponseList = this.managerProductsFinder.
-                finder(new ManagerProductsFinderQuery(managerCode.value()));
+                handle(new ManagerProductsFinderQuery(managerCode.value())).list();
         productResponseList.stream().filter(productResponse -> productResponse.id().equals(productId.value())).findAny()
                 .orElseThrow(ProductDoesNotBelongToManager::new);
     }

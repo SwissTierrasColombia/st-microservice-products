@@ -66,11 +66,10 @@ public final class ProductGetController extends ApiController {
                 throw new InputValidationException("El gestor es requerido.");
             }
 
-            responseDto = productsFinder.finder(
+            responseDto = productsFinder.handle(
                     new ManagerProductsFinderQuery(
                             managerCode
-                    )
-            );
+                    )).list();
             httpStatus = HttpStatus.OK;
 
         } catch (InputValidationException e) {

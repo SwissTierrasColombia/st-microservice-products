@@ -9,6 +9,8 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.Delive
 import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.DeliveryNotFound;
 import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.UnauthorizedToSearchDelivery;
 
+import com.ai.st.microservice.quality.modules.shared.application.ListResponse;
+import com.ai.st.microservice.quality.modules.shared.application.QueryUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.ManagerCode;
 import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
@@ -17,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public final class DeliveryProductsFinder {
+public final class DeliveryProductsFinder implements QueryUseCase<DeliveryProductsFinderQuery, ListResponse<DeliveryProductResponse>> {
 
     private final DeliveryRepository deliveryRepository;
     private final DeliveryProductRepository deliveryProductRepository;
@@ -27,7 +29,8 @@ public final class DeliveryProductsFinder {
         this.deliveryRepository = deliveryRepository;
     }
 
-    public List<DeliveryProductResponse> finder(DeliveryProductsFinderQuery query) {
+    @Override
+    public ListResponse<DeliveryProductResponse> handle(DeliveryProductsFinderQuery query) {
 
         DeliveryId deliveryId = new DeliveryId(query.deliveryId());
         Roles role = query.role();
@@ -35,8 +38,8 @@ public final class DeliveryProductsFinder {
 
         verifyPermissions(deliveryId, role, entityCode);
 
-        return deliveryProductRepository.findByDeliveryId(deliveryId).stream()
-                .map(DeliveryProductResponse::fromAggregate).collect(Collectors.toList());
+        return new ListResponse<>(deliveryProductRepository.findByDeliveryId(deliveryId).stream()
+                .map(DeliveryProductResponse::fromAggregate).collect(Collectors.toList()));
     }
 
     private void verifyPermissions(DeliveryId deliveryId, Roles role, Long entityCode) {
