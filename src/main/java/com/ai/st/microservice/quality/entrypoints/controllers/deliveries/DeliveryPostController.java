@@ -27,7 +27,6 @@ public final class DeliveryPostController extends ApiController {
 
     private final Logger log = LoggerFactory.getLogger(DeliveryPostController.class);
 
-
     private final DeliveryCreator deliveryCreator;
 
     public DeliveryPostController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
@@ -36,7 +35,7 @@ public final class DeliveryPostController extends ApiController {
         this.deliveryCreator = deliveryCreator;
     }
 
-    @RequestMapping(value = "api/quality/v1/deliveries", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "api/quality/v1/deliveries", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Create delivery")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Delivery created"),
