@@ -1,4 +1,4 @@
-package com.ai.st.microservice.quality.modules.deliveries.application.SendDeliveryToManager;
+package com.ai.st.microservice.quality.modules.deliveries.application.CorrectDelivery;
 
 import com.ai.st.microservice.quality.modules.deliveries.application.VerifyIntegrityDelivery.IntegrityDeliveryChecker;
 import com.ai.st.microservice.quality.modules.deliveries.application.VerifyIntegrityDelivery.IntegrityDeliveryCheckerCommand;
@@ -17,26 +17,28 @@ import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 
 @Service
-public final class DeliveryToManagerSender implements CommandUseCase<DeliveryToManagerSenderCommand> {
+public final class DeliveryCorrection implements CommandUseCase<DeliveryCorrectionCommand> {
 
     private final DeliveryRepository deliveryRepository;
     private final IntegrityDeliveryChecker integrityDeliveryChecker;
 
-    public DeliveryToManagerSender(DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository,
-                                   ProductRepository productRepository, DeliveryProductAttachmentRepository attachmentRepository) {
+    public DeliveryCorrection(DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository,
+                              ProductRepository productRepository, DeliveryProductAttachmentRepository attachmentRepository) {
         this.deliveryRepository = deliveryRepository;
         this.integrityDeliveryChecker = new IntegrityDeliveryChecker(deliveryProductRepository, attachmentRepository, productRepository);
     }
 
     @Override
-    public void handle(DeliveryToManagerSenderCommand command) {
+    public void handle(DeliveryCorrectionCommand command) {
 
         DeliveryId deliveryId = DeliveryId.fromValue(command.deliveryId());
         OperatorCode operatorCode = OperatorCode.fromValue(command.operatorCode());
 
         verifyPermissions(deliveryId, operatorCode);
 
-        deliveryRepository.changeState(deliveryId, DeliveryStatusId.fromValue(DeliveryStatusId.DELIVERED));
+        // TODO: update statuses from rejected to pending
+
+        deliveryRepository.changeState(deliveryId, DeliveryStatusId.fromValue(DeliveryStatusId.IN_REVIEW));
     }
 
     private void verifyPermissions(DeliveryId deliveryId, OperatorCode operatorCode) {
@@ -53,12 +55,11 @@ public final class DeliveryToManagerSender implements CommandUseCase<DeliveryToM
         }
 
         // verify status of the delivery
-        if (!delivery.isDraft()) {
-            throw new UnauthorizedToModifyDelivery("No se puede enviar la entrega, porque el estado de la misma no lo permite.");
+        if (!delivery.isInRemediation()) {
+            throw new UnauthorizedToModifyDelivery("No se puede re enviar la entrega, porque el estado de la misma no lo permite.");
         }
 
         integrityDeliveryChecker.handle(new IntegrityDeliveryCheckerCommand(deliveryId.value()));
     }
-
 
 }

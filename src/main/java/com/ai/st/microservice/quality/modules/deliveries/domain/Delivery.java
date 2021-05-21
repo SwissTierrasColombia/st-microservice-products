@@ -122,6 +122,14 @@ public final class Delivery extends AggregateRoot {
         return deliveryStatusId.value().equals(DeliveryStatusId.DRAFT);
     }
 
+    public boolean isDelivered() {
+        return deliveryStatusId.value().equals(DeliveryStatusId.DELIVERED);
+    }
+
+    public boolean isInRemediation() {
+        return deliveryStatusId.value().equals(DeliveryStatusId.IN_REMEDIATION);
+    }
+
     public static List<DeliveryStatusId> statusesAllowedToManager() {
         return Arrays.asList(
                 new DeliveryStatusId(DeliveryStatusId.DELIVERED),
