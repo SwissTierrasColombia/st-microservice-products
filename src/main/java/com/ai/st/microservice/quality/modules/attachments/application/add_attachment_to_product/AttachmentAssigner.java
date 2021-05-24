@@ -3,6 +3,7 @@ package com.ai.st.microservice.quality.modules.attachments.application.add_attac
 import com.ai.st.microservice.quality.modules.attachments.domain.exceptions.AttachmentTypeNotSupportedToProduct;
 import com.ai.st.microservice.quality.modules.attachments.domain.exceptions.AttachmentUnsupported;
 import com.ai.st.microservice.quality.modules.attachments.domain.exceptions.NumberAttachmentsExceeded;
+import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductStatusId;
 import com.ai.st.microservice.quality.modules.delivered_products.domain.exceptions.DeliveryProductNotFound;
 import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
@@ -70,6 +71,8 @@ public final class AttachmentAssigner implements CommandUseCase<AttachmentAssign
         DeliveryProductAttachment attachment = handleAttachment(command.attachment(), deliveryId, deliveryProductId, deliveryProduct.productId());
 
         attachmentRepository.save(attachment);
+
+        changeProductStatusToPending(deliveryProductId);
     }
 
     private DeliveryProduct verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId, OperatorCode operatorCode) {
@@ -92,8 +95,13 @@ public final class AttachmentAssigner implements CommandUseCase<AttachmentAssign
         }
 
         // verify status of the delivery
-        if (!delivery.isDraft()) {
+        if (!delivery.isDraft() && !delivery.isInRemediation()) {
             throw new UnauthorizedToModifyDelivery("No se puede agregar adjuntos, porque el estado de la entrega no lo permite.");
+        }
+
+        // verify status of the delivery product
+        if (deliveryProduct.isAccepted()) {
+            throw new UnauthorizedToModifyDelivery("No se puede agregar adjuntos, porque el producto ya fue aceptado.");
         }
 
         // verify count attachments per product
@@ -194,6 +202,11 @@ public final class AttachmentAssigner implements CommandUseCase<AttachmentAssign
             return product.isConfiguredAsXTF();
         }
         return false;
+    }
+
+    private void changeProductStatusToPending(DeliveryProductId deliveryProductId) {
+        deliveryProductRepository.changeStatus(deliveryProductId,
+                DeliveryProductStatusId.fromValue(DeliveryProductStatusId.PENDING));
     }
 
 }

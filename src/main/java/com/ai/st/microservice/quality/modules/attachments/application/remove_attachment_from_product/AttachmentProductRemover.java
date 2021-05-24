@@ -1,5 +1,6 @@
 package com.ai.st.microservice.quality.modules.attachments.application.remove_attachment_from_product;
 
+import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductStatusId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
 import com.ai.st.microservice.quality.modules.attachments.domain.contracts.DeliveryProductAttachmentRepository;
@@ -51,6 +52,8 @@ public final class AttachmentProductRemover implements CommandUseCase<Attachment
         if (deliveryProductAttachment != null) {
             deleteStorage(deliveryProductAttachment);
             attachmentRepository.remove(attachmentId);
+
+            changeProductStatusToPending(deliveryProductId);
         }
 
     }
@@ -75,8 +78,13 @@ public final class AttachmentProductRemover implements CommandUseCase<Attachment
         }
 
         // verify status of the delivery
-        if (!delivery.isDraft()) {
+        if (!delivery.isDraft() && !delivery.isInRemediation()) {
             throw new UnauthorizedToModifyDelivery("No se puede eliminar el adjunto, porque el estado de la entrega no lo permite.");
+        }
+
+        // verify status of the delivery product
+        if (deliveryProduct.isAccepted()) {
+            throw new UnauthorizedToModifyDelivery("No se puede eliminar el adjunto, porque el producto ya fue aceptado.");
         }
 
     }
@@ -96,6 +104,11 @@ public final class AttachmentProductRemover implements CommandUseCase<Attachment
         }
 
         storeFile.deleteFile(pathFile);
+    }
+
+    private void changeProductStatusToPending(DeliveryProductId deliveryProductId) {
+        deliveryProductRepository.changeStatus(deliveryProductId,
+                DeliveryProductStatusId.fromValue(DeliveryProductStatusId.PENDING));
     }
 
 }

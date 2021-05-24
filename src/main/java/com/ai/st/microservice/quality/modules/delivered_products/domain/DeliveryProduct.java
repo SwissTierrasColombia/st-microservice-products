@@ -52,6 +52,10 @@ public final class DeliveryProduct extends AggregateRoot {
         return deliveryProductStatusId.value().equals(DeliveryProductStatusId.PENDING);
     }
 
+    public boolean isAccepted() {
+        return deliveryProductStatusId.value().equals(DeliveryProductStatusId.ACCEPTED);
+    }
+
     public DeliveryProductId deliveryProductId() {
         return deliveryProductId;
     }
