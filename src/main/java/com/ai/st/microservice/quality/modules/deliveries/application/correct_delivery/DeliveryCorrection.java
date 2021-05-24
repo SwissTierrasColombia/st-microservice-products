@@ -1,5 +1,6 @@
 package com.ai.st.microservice.quality.modules.deliveries.application.correct_delivery;
 
+import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProduct;
 import com.ai.st.microservice.quality.modules.deliveries.application.verify_integrity_delivery.IntegrityDeliveryChecker;
 import com.ai.st.microservice.quality.modules.deliveries.application.verify_integrity_delivery.IntegrityDeliveryCheckerCommand;
 import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
@@ -20,11 +21,14 @@ import com.ai.st.microservice.quality.modules.shared.domain.Service;
 public final class DeliveryCorrection implements CommandUseCase<DeliveryCorrectionCommand> {
 
     private final DeliveryRepository deliveryRepository;
+    private final DeliveryProductRepository deliveryProductRepository;
     private final IntegrityDeliveryChecker integrityDeliveryChecker;
 
-    public DeliveryCorrection(DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository,
-                              ProductRepository productRepository, DeliveryProductAttachmentRepository attachmentRepository) {
+    public DeliveryCorrection(DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository1,
+                              DeliveryProductRepository deliveryProductRepository, ProductRepository productRepository,
+                              DeliveryProductAttachmentRepository attachmentRepository) {
         this.deliveryRepository = deliveryRepository;
+        this.deliveryProductRepository = deliveryProductRepository1;
         this.integrityDeliveryChecker = new IntegrityDeliveryChecker(deliveryProductRepository, attachmentRepository, productRepository);
     }
 
@@ -35,8 +39,6 @@ public final class DeliveryCorrection implements CommandUseCase<DeliveryCorrecti
         OperatorCode operatorCode = OperatorCode.fromValue(command.operatorCode());
 
         verifyPermissions(deliveryId, operatorCode);
-
-        // TODO: update statuses from rejected to pending
 
         deliveryRepository.changeStatus(deliveryId, DeliveryStatusId.fromValue(DeliveryStatusId.IN_REVIEW));
     }
@@ -60,6 +62,14 @@ public final class DeliveryCorrection implements CommandUseCase<DeliveryCorrecti
         }
 
         integrityDeliveryChecker.handle(new IntegrityDeliveryCheckerCommand(deliveryId.value()));
+
+        verifyIfThereIsSomeRejectedProduct(deliveryId);
+    }
+
+    private void verifyIfThereIsSomeRejectedProduct(DeliveryId deliveryId) {
+        long count = deliveryProductRepository.findByDeliveryId(deliveryId).stream().filter(DeliveryProduct::isRejected).count();
+        if (count > 0)
+            throw new UnauthorizedToModifyDelivery("No se puede re enviar la entrega, porque hay productos que no han sido corregidos.");
     }
 
 }

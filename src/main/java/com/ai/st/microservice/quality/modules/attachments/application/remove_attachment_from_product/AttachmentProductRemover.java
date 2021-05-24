@@ -1,5 +1,7 @@
 package com.ai.st.microservice.quality.modules.attachments.application.remove_attachment_from_product;
 
+import com.ai.st.microservice.quality.modules.attachments.domain.exceptions.AttachmentNotFound;
+import com.ai.st.microservice.quality.modules.attachments.domain.exceptions.RemovingAttachmentToProductFailed;
 import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductStatusId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
@@ -45,20 +47,18 @@ public final class AttachmentProductRemover implements CommandUseCase<Attachment
         DeliveryProductAttachmentId attachmentId = new DeliveryProductAttachmentId(command.attachmentId());
         OperatorCode operatorCode = new OperatorCode(command.operatorCode());
 
-        verifyPermissions(deliveryId, deliveryProductId, operatorCode);
+        DeliveryProductAttachment deliveryProductAttachment =
+                verifyPermissions(deliveryId, deliveryProductId, attachmentId, operatorCode);
 
-        DeliveryProductAttachment deliveryProductAttachment = attachmentRepository.search(attachmentId);
+        deleteStorage(deliveryProductAttachment);
 
-        if (deliveryProductAttachment != null) {
-            deleteStorage(deliveryProductAttachment);
-            attachmentRepository.remove(attachmentId);
+        attachmentRepository.remove(attachmentId);
 
-            changeProductStatusToPending(deliveryProductId);
-        }
-
+        changeProductStatusToPending(deliveryProductId);
     }
 
-    private void verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId, OperatorCode operatorCode) {
+    private DeliveryProductAttachment verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId,
+                                                        DeliveryProductAttachmentId attachmentId, OperatorCode operatorCode) {
 
         // verify delivery exists
         Delivery delivery = deliveryRepository.search(deliveryId);
@@ -70,6 +70,11 @@ public final class AttachmentProductRemover implements CommandUseCase<Attachment
         DeliveryProduct deliveryProduct = deliveryProductRepository.search(deliveryProductId);
         if (deliveryProduct == null) {
             throw new DeliveryProductNotFound();
+        }
+
+        DeliveryProductAttachment deliveryProductAttachment = attachmentRepository.search(attachmentId);
+        if (deliveryProductAttachment == null) {
+            throw new AttachmentNotFound();
         }
 
         // verify owner of the delivery
@@ -87,6 +92,12 @@ public final class AttachmentProductRemover implements CommandUseCase<Attachment
             throw new UnauthorizedToModifyDelivery("No se puede eliminar el adjunto, porque el producto ya fue aceptado.");
         }
 
+        // verify attachment belong to delivery product
+        if (!deliveryProductAttachment.deliveryProductId().value().equals(deliveryProductId.value())) {
+            throw new RemovingAttachmentToProductFailed("El adjunto no pertenece al producto.");
+        }
+
+        return deliveryProductAttachment;
     }
 
     private void deleteStorage(DeliveryProductAttachment deliveryProductAttachment) {
