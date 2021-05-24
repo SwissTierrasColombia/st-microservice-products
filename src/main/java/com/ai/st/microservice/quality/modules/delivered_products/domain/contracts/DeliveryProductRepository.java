@@ -1,5 +1,6 @@
 package com.ai.st.microservice.quality.modules.delivered_products.domain.contracts;
 
+import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductStatusId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
 import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProduct;
 import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductId;
@@ -11,14 +12,16 @@ public interface DeliveryProductRepository {
 
     List<DeliveryProduct> findByDeliveryId(DeliveryId deliveryId);
 
-    void save(DeliveryId deliveryId, DeliveryProduct deliveryProduct);
+    List<DeliveryProduct> findByProductId(ProductId productId);
 
     DeliveryProduct search(DeliveryProductId deliveryProductId);
+
+    void save(DeliveryId deliveryId, DeliveryProduct deliveryProduct);
 
     void remove(DeliveryProductId deliveryProductId);
 
     void update(DeliveryProduct deliveryProduct);
 
-    List<DeliveryProduct> findByProductId(ProductId productId);
+    void changeStatus(DeliveryProductId deliveryProductId, DeliveryProductStatusId deliveryProductStatusId);
 
 }

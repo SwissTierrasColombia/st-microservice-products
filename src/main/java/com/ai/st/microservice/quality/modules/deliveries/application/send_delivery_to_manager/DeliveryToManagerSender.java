@@ -36,7 +36,7 @@ public final class DeliveryToManagerSender implements CommandUseCase<DeliveryToM
 
         verifyPermissions(deliveryId, operatorCode);
 
-        deliveryRepository.changeState(deliveryId, DeliveryStatusId.fromValue(DeliveryStatusId.DELIVERED));
+        deliveryRepository.changeStatus(deliveryId, DeliveryStatusId.fromValue(DeliveryStatusId.DELIVERED));
     }
 
     private void verifyPermissions(DeliveryId deliveryId, OperatorCode operatorCode) {

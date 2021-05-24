@@ -28,7 +28,7 @@ public final class ReviewStarter implements CommandUseCase<ReviewStarterCommand>
 
         verifyPermissions(deliveryId, managerCode);
 
-        deliveryRepository.changeState(deliveryId, DeliveryStatusId.fromValue(DeliveryStatusId.IN_REVIEW));
+        deliveryRepository.changeStatus(deliveryId, DeliveryStatusId.fromValue(DeliveryStatusId.IN_REVIEW));
     }
 
     private void verifyPermissions(DeliveryId deliveryId, ManagerCode managerCode) {

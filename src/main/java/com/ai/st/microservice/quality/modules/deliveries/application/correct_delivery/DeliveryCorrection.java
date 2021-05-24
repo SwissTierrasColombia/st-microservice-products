@@ -38,7 +38,7 @@ public final class DeliveryCorrection implements CommandUseCase<DeliveryCorrecti
 
         // TODO: update statuses from rejected to pending
 
-        deliveryRepository.changeState(deliveryId, DeliveryStatusId.fromValue(DeliveryStatusId.IN_REVIEW));
+        deliveryRepository.changeStatus(deliveryId, DeliveryStatusId.fromValue(DeliveryStatusId.IN_REVIEW));
     }
 
     private void verifyPermissions(DeliveryId deliveryId, OperatorCode operatorCode) {

@@ -1,5 +1,6 @@
 package com.ai.st.microservice.quality.modules.delivered_products.infrastructure.persistence;
 
+import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductStatusId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
 import com.ai.st.microservice.quality.modules.delivered_products.domain.contracts.DeliveryProductRepository;
 import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProduct;
@@ -79,6 +80,17 @@ public final class PostgresDeliveryProductRepository implements DeliveryProductR
         ProductEntity productEntity = new ProductEntity();
         productEntity.setId(productId.value());
         return repository.findByProduct(productEntity).stream().map(this::mapping).collect(Collectors.toList());
+    }
+
+    @Override
+    public void changeStatus(DeliveryProductId deliveryProductId, DeliveryProductStatusId deliveryProductStatusId) {
+        DeliveredProductEntity deliveredProductEntity = repository.findById(deliveryProductId.value()).orElse(null);
+        if (deliveredProductEntity != null) {
+            DeliveryProductStatusEntity statusEntity = new DeliveryProductStatusEntity();
+            statusEntity.setId(deliveryProductStatusId.value());
+            deliveredProductEntity.setStatus(statusEntity);
+            repository.save(deliveredProductEntity);
+        }
     }
 
     private DeliveryProduct mapping(DeliveredProductEntity deliveredProductEntity) {

@@ -8,16 +8,16 @@ import com.ai.st.microservice.quality.modules.shared.domain.criteria.Criteria;
 
 public interface DeliveryRepository {
 
-    void save(Delivery delivery);
-
     Delivery search(DeliveryId deliveryId);
 
     PageableDomain<Delivery> matching(Criteria criteria);
+
+    void save(Delivery delivery);
 
     void remove(DeliveryId deliveryId);
 
     void update(Delivery delivery);
 
-    void changeState(DeliveryId deliveryId, DeliveryStatusId deliveryStatusId);
+    void changeStatus(DeliveryId deliveryId, DeliveryStatusId deliveryStatusId);
 
 }

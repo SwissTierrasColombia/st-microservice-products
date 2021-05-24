@@ -233,7 +233,7 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
     }
 
     @Override
-    public void changeState(DeliveryId deliveryId, DeliveryStatusId deliveryStatusId) {
+    public void changeStatus(DeliveryId deliveryId, DeliveryStatusId deliveryStatusId) {
         DeliveryEntity deliveryEntity = deliveryJPARepository.findById(deliveryId.value()).orElse(null);
         if (deliveryEntity != null) {
             DeliveryStatusEntity deliveryStatusEntity = new DeliveryStatusEntity();
