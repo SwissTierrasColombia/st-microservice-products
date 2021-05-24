@@ -8,6 +8,8 @@ import com.ai.st.microservice.common.exceptions.InputValidationException;
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
 import com.ai.st.microservice.quality.modules.deliveries.application.correct_delivery.DeliveryCorrection;
 import com.ai.st.microservice.quality.modules.deliveries.application.correct_delivery.DeliveryCorrectionCommand;
+import com.ai.st.microservice.quality.modules.deliveries.application.send_delivery_to_operator.DeliveryToOperatorSender;
+import com.ai.st.microservice.quality.modules.deliveries.application.send_delivery_to_operator.DeliveryToOperatorSenderCommand;
 import com.ai.st.microservice.quality.modules.shared.application.Roles;
 import com.ai.st.microservice.quality.modules.deliveries.application.send_delivery_to_manager.DeliveryToManagerSender;
 import com.ai.st.microservice.quality.modules.deliveries.application.send_delivery_to_manager.DeliveryToManagerSenderCommand;
@@ -36,14 +38,17 @@ public final class DeliveryPatchController extends ApiController {
     private final DeliveryToManagerSender deliveryToManagerSender;
     private final ReviewStarter reviewStarter;
     private final DeliveryCorrection deliveryCorrection;
+    private final DeliveryToOperatorSender deliveryToOperatorSender;
 
     public DeliveryPatchController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
                                    OperatorBusiness operatorBusiness, DeliveryToManagerSender statusToDeliveredChanger,
-                                   ReviewStarter reviewStarter, DeliveryCorrection deliveryCorrection) {
+                                   ReviewStarter reviewStarter, DeliveryCorrection deliveryCorrection,
+                                   DeliveryToOperatorSender deliveryToOperatorSender) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.deliveryToManagerSender = statusToDeliveredChanger;
         this.reviewStarter = reviewStarter;
         this.deliveryCorrection = deliveryCorrection;
+        this.deliveryToOperatorSender = deliveryToOperatorSender;
     }
 
     @PatchMapping(value = "api/quality/v1/deliveries/{deliveryId}/status/delivered", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -120,7 +125,6 @@ public final class DeliveryPatchController extends ApiController {
                         ));
             }
 
-
             httpStatus = HttpStatus.OK;
 
         } catch (InputValidationException e) {
@@ -133,6 +137,49 @@ public final class DeliveryPatchController extends ApiController {
             responseDto = new BasicResponseDto(e.errorMessage(), 2);
         } catch (Exception e) {
             log.error("Error DeliveryPatchController@changeStatusToReview#General ---> " + e.getMessage());
+            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            responseDto = new BasicResponseDto(e.getMessage(), 3);
+        }
+
+        return new ResponseEntity<>(responseDto, httpStatus);
+    }
+
+    @PatchMapping(value = "api/quality/v1/deliveries/{deliveryId}/status/remediation", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Change status to remediation")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Status changed to remediation"),
+            @ApiResponse(code = 500, message = "Error Server", response = String.class)})
+    @ResponseBody
+    public ResponseEntity<?> changeStatusToRemediation(
+            @PathVariable Long deliveryId,
+            @RequestHeader("authorization") String headerAuthorization) {
+
+        HttpStatus httpStatus;
+        Object responseDto = null;
+
+        try {
+
+            InformationSession session = this.getInformationSession(headerAuthorization);
+
+            validateDeliveryId(deliveryId);
+
+            deliveryToOperatorSender.handle(
+                    new DeliveryToOperatorSenderCommand(
+                            deliveryId, session.entityCode()
+                    ));
+
+            httpStatus = HttpStatus.OK;
+
+        } catch (InputValidationException e) {
+            log.error("Error DeliveryPatchController@changeStatusToRemediation#Validation ---> " + e.getMessage());
+            httpStatus = HttpStatus.BAD_REQUEST;
+            responseDto = new BasicResponseDto(e.getMessage(), 1);
+        } catch (DomainError e) {
+            log.error("Error DeliveryPatchController@changeStatusToRemediation#Domain ---> " + e.errorMessage());
+            httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
+            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+        } catch (Exception e) {
+            log.error("Error DeliveryPatchController@changeStatusToRemediation#General ---> " + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
             responseDto = new BasicResponseDto(e.getMessage(), 3);
         }
