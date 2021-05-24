@@ -2,6 +2,8 @@ package com.ai.st.microservice.quality.modules.feedbacks.domain;
 
 import com.ai.st.microservice.quality.modules.shared.domain.AggregateRoot;
 
+import java.util.Date;
+
 public final class Feedback extends AggregateRoot {
 
     private final FeedbackId feedbackId;
@@ -20,6 +22,15 @@ public final class Feedback extends AggregateRoot {
         return new Feedback(null, comments, urlAttachment, feedbackDate);
     }
 
+    public static Feedback fromPrimitives(Long id, String comments, String urlAttachment, Date date) {
+        return new Feedback(
+                FeedbackId.fromValue(id),
+                FeedbackComments.fromValue(comments),
+                FeedbackURLAttachment.fromValue(urlAttachment),
+                FeedbackDate.fromValue(date)
+        );
+    }
+
     public FeedbackId feedbackId() {
         return feedbackId;
     }
@@ -34,6 +45,10 @@ public final class Feedback extends AggregateRoot {
 
     public FeedbackDate date() {
         return date;
+    }
+
+    public boolean hasAttachment() {
+        return urlAttachment != null && (urlAttachment.value() != null && !urlAttachment.value().isEmpty());
     }
 
 }

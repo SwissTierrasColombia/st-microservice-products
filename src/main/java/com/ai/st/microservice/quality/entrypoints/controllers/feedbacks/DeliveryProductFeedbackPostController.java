@@ -24,14 +24,14 @@ import java.util.Objects;
 
 @Api(value = "Manage Deliveries", tags = {"Deliveries"})
 @RestController
-public final class DeliveredProductFeedbackPostController extends ApiController {
+public final class DeliveryProductFeedbackPostController extends ApiController {
 
-    private final Logger log = LoggerFactory.getLogger(DeliveredProductFeedbackPostController.class);
+    private final Logger log = LoggerFactory.getLogger(DeliveryProductFeedbackPostController.class);
 
     private final FeedbackCreator feedbackCreator;
 
-    public DeliveredProductFeedbackPostController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                                  OperatorBusiness operatorBusiness, FeedbackCreator feedbackCreator) {
+    public DeliveryProductFeedbackPostController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
+                                                 OperatorBusiness operatorBusiness, FeedbackCreator feedbackCreator) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.feedbackCreator = feedbackCreator;
     }
@@ -94,7 +94,6 @@ public final class DeliveredProductFeedbackPostController extends ApiController 
 
         return new ResponseEntity<>(responseDto, httpStatus);
     }
-
 
     private void validateDeliveryId(Long deliveryId) throws InputValidationException {
         if (deliveryId <= 0) {
