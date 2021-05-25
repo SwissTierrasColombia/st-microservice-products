@@ -10,6 +10,8 @@ import com.ai.st.microservice.quality.modules.deliveries.application.accept_deli
 import com.ai.st.microservice.quality.modules.deliveries.application.accept_delivery.DeliveryAcceptorCommand;
 import com.ai.st.microservice.quality.modules.deliveries.application.correct_delivery.DeliveryCorrection;
 import com.ai.st.microservice.quality.modules.deliveries.application.correct_delivery.DeliveryCorrectionCommand;
+import com.ai.st.microservice.quality.modules.deliveries.application.reject_delivery.DeliveryRejecting;
+import com.ai.st.microservice.quality.modules.deliveries.application.reject_delivery.DeliveryRejectingCommand;
 import com.ai.st.microservice.quality.modules.deliveries.application.send_delivery_to_operator.DeliveryToOperatorSender;
 import com.ai.st.microservice.quality.modules.deliveries.application.send_delivery_to_operator.DeliveryToOperatorSenderCommand;
 import com.ai.st.microservice.quality.modules.shared.application.Roles;
@@ -42,17 +44,19 @@ public final class DeliveryPatchController extends ApiController {
     private final DeliveryCorrection deliveryCorrection;
     private final DeliveryToOperatorSender deliveryToOperatorSender;
     private final DeliveryAcceptor deliveryAcceptor;
+    private final DeliveryRejecting deliveryRejecting;
 
     public DeliveryPatchController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
                                    OperatorBusiness operatorBusiness, DeliveryToManagerSender statusToDeliveredChanger,
                                    ReviewStarter reviewStarter, DeliveryCorrection deliveryCorrection,
-                                   DeliveryToOperatorSender deliveryToOperatorSender, DeliveryAcceptor deliveryAcceptor) {
+                                   DeliveryToOperatorSender deliveryToOperatorSender, DeliveryAcceptor deliveryAcceptor, DeliveryRejecting deliveryRejecting) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.deliveryToManagerSender = statusToDeliveredChanger;
         this.reviewStarter = reviewStarter;
         this.deliveryCorrection = deliveryCorrection;
         this.deliveryToOperatorSender = deliveryToOperatorSender;
         this.deliveryAcceptor = deliveryAcceptor;
+        this.deliveryRejecting = deliveryRejecting;
     }
 
     @PatchMapping(value = "api/quality/v1/deliveries/{deliveryId}/status/delivered", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -227,6 +231,49 @@ public final class DeliveryPatchController extends ApiController {
             responseDto = new BasicResponseDto(e.errorMessage(), 2);
         } catch (Exception e) {
             log.error("Error DeliveryPatchController@changeStatusToAccepted#General ---> " + e.getMessage());
+            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            responseDto = new BasicResponseDto(e.getMessage(), 3);
+        }
+
+        return new ResponseEntity<>(responseDto, httpStatus);
+    }
+
+    @PatchMapping(value = "api/quality/v1/deliveries/{deliveryId}/status/rejected", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Change status to rejected")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Status changed to rejected"),
+            @ApiResponse(code = 500, message = "Error Server", response = String.class)})
+    @ResponseBody
+    public ResponseEntity<?> changeStatusToRejected(
+            @PathVariable Long deliveryId,
+            @RequestHeader("authorization") String headerAuthorization) {
+
+        HttpStatus httpStatus;
+        Object responseDto = null;
+
+        try {
+
+            InformationSession session = this.getInformationSession(headerAuthorization);
+
+            validateDeliveryId(deliveryId);
+
+            deliveryRejecting.handle(
+                    new DeliveryRejectingCommand(
+                            deliveryId, session.entityCode()
+                    ));
+
+            httpStatus = HttpStatus.OK;
+
+        } catch (InputValidationException e) {
+            log.error("Error DeliveryPatchController@changeStatusToRejected#Validation ---> " + e.getMessage());
+            httpStatus = HttpStatus.BAD_REQUEST;
+            responseDto = new BasicResponseDto(e.getMessage(), 1);
+        } catch (DomainError e) {
+            log.error("Error DeliveryPatchController@changeStatusToRejected#Domain ---> " + e.errorMessage());
+            httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
+            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+        } catch (Exception e) {
+            log.error("Error DeliveryPatchController@changeStatusToRejected#General ---> " + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
             responseDto = new BasicResponseDto(e.getMessage(), 3);
         }
