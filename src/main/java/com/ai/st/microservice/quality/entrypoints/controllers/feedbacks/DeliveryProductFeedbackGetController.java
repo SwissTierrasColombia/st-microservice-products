@@ -12,7 +12,6 @@ import com.ai.st.microservice.quality.modules.feedbacks.application.find_feedbac
 import com.ai.st.microservice.quality.modules.feedbacks.application.get_feedback_url.FeedbackURLGetter;
 import com.ai.st.microservice.quality.modules.feedbacks.application.get_feedback_url.FeedbackURLGetterQuery;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
-import com.google.common.io.Files;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -20,7 +19,6 @@ import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -150,10 +148,7 @@ public final class DeliveryProductFeedbackGetController extends ApiController {
             return new ResponseEntity<>(new BasicResponseDto(e.getMessage(), 1), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + file.getName())
-                .contentType(mediaType).contentLength(file.length())
-                .header("extension", Files.getFileExtension(file.getName()))
-                .header("filename", file.getName() + Files.getFileExtension(file.getName())).body(resource);
+        return this.responseFile(file, mediaType, resource);
     }
 
     private void validateDeliveryId(Long deliveryId) throws InputValidationException {

@@ -9,8 +9,14 @@ import com.ai.st.microservice.common.dto.operators.MicroserviceOperatorDto;
 import com.ai.st.microservice.common.exceptions.DisconnectedMicroserviceException;
 import com.ai.st.microservice.quality.modules.shared.application.Roles;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
+import com.google.common.io.Files;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
+import java.io.File;
 import java.util.HashMap;
 
 public abstract class ApiController {
@@ -46,6 +52,16 @@ public abstract class ApiController {
             return new InformationSession(Roles.OPERATOR, operatorDto.getId(), userDtoSession.getId());
         }
         throw new RuntimeException("User information not found");
+    }
+
+    protected ResponseEntity<?> responseFile(File file, MediaType mediaType, InputStreamResource resource) {
+        String extension = Files.getFileExtension(file.getName());
+        return ResponseEntity.ok().header(
+                HttpHeaders.CONTENT_DISPOSITION,
+                "attachment;filename=" + file.getName())
+                .contentType(mediaType).contentLength(file.length())
+                .header("extension", extension)
+                .header("filename", file.getName() + extension).body(resource);
     }
 
     public final static class InformationSession {
