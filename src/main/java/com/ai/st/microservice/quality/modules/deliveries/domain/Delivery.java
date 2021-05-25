@@ -157,7 +157,7 @@ public final class Delivery extends AggregateRoot {
 
     public boolean isAvailableToManager() {
         DeliveryStatusId statusFound =
-                statusesAllowedToManager().stream().filter(statusId -> statusId.equals(deliveryStatusId))
+                statusesAllowedToManager().stream().filter(statusId -> statusId.value().equals(deliveryStatusId.value()))
                         .findAny().orElse(null);
         return statusFound != null;
     }

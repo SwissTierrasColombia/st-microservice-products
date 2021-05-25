@@ -56,10 +56,11 @@ public final class FeedbackCreator implements CommandUseCase<FeedbackCreatorComm
         Feedback feedback = Feedback.create(
                 feedbackComments,
                 urlAttachment,
-                feedbackDate
+                feedbackDate,
+                deliveryProductId
         );
 
-        feedbackRepository.save(deliveryProductId, feedback);
+        feedbackRepository.save(feedback);
     }
 
     private void verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId, ManagerCode managerCode) {

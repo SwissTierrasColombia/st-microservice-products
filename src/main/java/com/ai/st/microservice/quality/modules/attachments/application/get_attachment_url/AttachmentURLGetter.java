@@ -2,6 +2,7 @@ package com.ai.st.microservice.quality.modules.attachments.application.get_attac
 
 import com.ai.st.microservice.quality.modules.attachments.domain.exceptions.AttachmentNotFound;
 import com.ai.st.microservice.quality.modules.attachments.domain.exceptions.AttachmentUnsupportedToDownload;
+import com.ai.st.microservice.quality.modules.attachments.domain.exceptions.RemovingAttachmentToProductFailed;
 import com.ai.st.microservice.quality.modules.delivered_products.domain.exceptions.DeliveryProductNotFound;
 import com.ai.st.microservice.quality.modules.shared.application.Roles;
 import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
@@ -43,15 +44,14 @@ public final class AttachmentURLGetter implements QueryUseCase<AttachmentURLGett
         DeliveryProductId deliveryProductId = new DeliveryProductId(query.deliveryProductId());
         DeliveryProductAttachmentId attachmentId = new DeliveryProductAttachmentId(query.attachmentId());
 
-        verifyPermissions(deliveryId, deliveryProductId, query.role(), query.entityCode());
-
-        DeliveryProductAttachment deliveryProductAttachment = attachmentRepository.search(attachmentId);
-        checkAttachmentExits(deliveryProductAttachment);
+        DeliveryProductAttachment deliveryProductAttachment =
+                verifyPermissions(deliveryId, deliveryProductId, attachmentId, query.role(), query.entityCode());
 
         return new StringResponse(getPathFile(deliveryProductAttachment));
     }
 
-    private void verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId, Roles role, Long entityCode) {
+    private DeliveryProductAttachment verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId, DeliveryProductAttachmentId attachmentId,
+                                                        Roles role, Long entityCode) {
 
         // verify delivery exists
         Delivery delivery = deliveryRepository.search(deliveryId);
@@ -78,12 +78,17 @@ public final class AttachmentURLGetter implements QueryUseCase<AttachmentURLGett
             }
         }
 
-    }
-
-    private void checkAttachmentExits(DeliveryProductAttachment attachment) {
-        if (attachment == null) {
+        DeliveryProductAttachment deliveryProductAttachment = attachmentRepository.search(attachmentId);
+        if (deliveryProductAttachment == null) {
             throw new AttachmentNotFound();
         }
+
+        // verify attachment belong to delivery product
+        if (!deliveryProductAttachment.deliveryProductId().value().equals(deliveryProductId.value())) {
+            throw new RemovingAttachmentToProductFailed("El adjunto no pertenece al producto.");
+        }
+
+        return deliveryProductAttachment;
     }
 
     private String getPathFile(DeliveryProductAttachment deliveryProductAttachment) {

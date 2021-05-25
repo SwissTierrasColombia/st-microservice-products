@@ -2,6 +2,7 @@ package com.ai.st.microservice.quality.modules.feedbacks.infrastructure.persiste
 
 import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductId;
 import com.ai.st.microservice.quality.modules.feedbacks.domain.Feedback;
+import com.ai.st.microservice.quality.modules.feedbacks.domain.FeedbackId;
 import com.ai.st.microservice.quality.modules.feedbacks.domain.contracts.DeliveryProductFeedbackRepository;
 import com.ai.st.microservice.quality.modules.feedbacks.infrastructure.persistence.jpa.DeliveredProductFeedbackJPARepository;
 import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.entities.DeliveredProductEntity;
@@ -21,10 +22,10 @@ public final class PostgresDeliveryProductFeedbackRepository implements Delivery
     }
 
     @Override
-    public void save(DeliveryProductId deliveryProductId, Feedback feedback) {
+    public void save(Feedback feedback) {
 
         DeliveredProductEntity deliveredProductEntity = new DeliveredProductEntity();
-        deliveredProductEntity.setId(deliveryProductId.value());
+        deliveredProductEntity.setId(feedback.deliveryProductId().value());
 
         DeliveredProductFeedbackEntity feedbackEntity = new DeliveredProductFeedbackEntity();
         feedbackEntity.setFeedback(feedback.comments().value());
@@ -35,6 +36,15 @@ public final class PostgresDeliveryProductFeedbackRepository implements Delivery
         feedbackEntity.setDeliveredProduct(deliveredProductEntity);
 
         repository.save(feedbackEntity);
+    }
+
+    @Override
+    public Feedback search(FeedbackId feedbackId) {
+        DeliveredProductFeedbackEntity feedbackEntity = repository.findById(feedbackId.value()).orElse(null);
+        if (feedbackEntity != null) {
+            return mapping(feedbackEntity);
+        }
+        return null;
     }
 
     @Override
@@ -51,7 +61,8 @@ public final class PostgresDeliveryProductFeedbackRepository implements Delivery
                 entity.getId(),
                 entity.getFeedback(),
                 entity.getAttachmentUrl(),
-                entity.getCreatedAt()
+                entity.getCreatedAt(),
+                entity.getDeliveredProduct().getId()
         );
     }
 
