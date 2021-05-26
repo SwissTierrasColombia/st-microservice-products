@@ -46,10 +46,10 @@ public abstract class ApiController {
         MicroserviceUserDto userDtoSession = this.getUserSession(headerAuthorization);
         if (administrationBusiness.isManager(userDtoSession)) {
             MicroserviceManagerDto managerDto = managerBusiness.getManagerByUserCode(userDtoSession.getId());
-            return new InformationSession(Roles.MANAGER, managerDto.getId(), userDtoSession.getId());
+            return new InformationSession(Roles.MANAGER, managerDto.getId(), userDtoSession.getId(), managerDto.getName());
         } else if (administrationBusiness.isOperator(userDtoSession)) {
             MicroserviceOperatorDto operatorDto = operatorBusiness.getOperatorByUserCode(userDtoSession.getId());
-            return new InformationSession(Roles.OPERATOR, operatorDto.getId(), userDtoSession.getId());
+            return new InformationSession(Roles.OPERATOR, operatorDto.getId(), userDtoSession.getId(), operatorDto.getName());
         }
         throw new RuntimeException("User information not found");
     }
@@ -69,11 +69,13 @@ public abstract class ApiController {
         private final Roles role;
         private final Long entityCode;
         private final Long userCode;
+        private final String entityName;
 
-        public InformationSession(Roles role, Long entityCode, Long userCode) {
+        public InformationSession(Roles role, Long entityCode, Long userCode, String entityName) {
             this.role = role;
             this.entityCode = entityCode;
             this.userCode = userCode;
+            this.entityName = entityName;
         }
 
         public Roles role() {
@@ -88,6 +90,9 @@ public abstract class ApiController {
             return userCode;
         }
 
+        public String entityName() {
+            return entityName;
+        }
     }
 
 }

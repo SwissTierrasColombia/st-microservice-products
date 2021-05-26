@@ -16,9 +16,14 @@ public final class DeliveryResponse implements Response {
     private final Long operatorCode;
     private final Long userCode;
     private final Long deliveryStatusId;
+    private final String departmentName;
+    private final String municipalityName;
+    private final String managerName;
+    private final String operatorName;
 
     public DeliveryResponse(Long id, String code, Date deliveryDate, Long managerCode, String municipalityCode,
-                            String observations, Long operatorCode, Long userCode, Long deliveryStatusId) {
+                            String observations, Long operatorCode, Long userCode, Long deliveryStatusId, String departmentName,
+                            String municipalityName, String managerName, String operatorName) {
         this.id = id;
         this.code = code;
         this.deliveryDate = deliveryDate;
@@ -28,6 +33,10 @@ public final class DeliveryResponse implements Response {
         this.operatorCode = operatorCode;
         this.deliveryStatusId = deliveryStatusId;
         this.userCode = userCode;
+        this.departmentName = departmentName;
+        this.municipalityName = municipalityName;
+        this.managerName = managerName;
+        this.operatorName = operatorName;
     }
 
     public static DeliveryResponse fromAggregate(Delivery delivery) {
@@ -39,7 +48,11 @@ public final class DeliveryResponse implements Response {
                 delivery.observations().value(),
                 delivery.operator().value(),
                 delivery.user().value(),
-                delivery.deliveryStatusId().value());
+                delivery.deliveryStatusId().value(),
+                delivery.departmentName().value(),
+                delivery.municipalityName().value(),
+                delivery.managerName().value(),
+                delivery.operatorName().value());
     }
 
     public Long id() {
@@ -76,5 +89,21 @@ public final class DeliveryResponse implements Response {
 
     public Long userCode() {
         return userCode;
+    }
+
+    public String departmentName() {
+        return departmentName;
+    }
+
+    public String municipalityName() {
+        return municipalityName;
+    }
+
+    public String managerName() {
+        return managerName;
+    }
+
+    public String operatorName() {
+        return operatorName;
     }
 }

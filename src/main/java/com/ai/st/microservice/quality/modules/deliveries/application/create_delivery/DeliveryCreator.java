@@ -16,6 +16,8 @@ import com.ai.st.microservice.quality.modules.products.domain.exceptions.Product
 import com.ai.st.microservice.quality.modules.shared.application.CommandUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.*;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.DateTime;
+import com.ai.st.microservice.quality.modules.shared.domain.contracts.ManagerMicroservice;
+import com.ai.st.microservice.quality.modules.shared.domain.contracts.OperatorMicroservice;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.WorkspaceMicroservice;
 import com.ai.st.microservice.quality.modules.shared.domain.exceptions.OperatorDoesNotBelongToManager;
 import org.apache.commons.lang.RandomStringUtils;
@@ -27,13 +29,18 @@ public final class DeliveryCreator implements CommandUseCase<CreateDeliveryComma
 
     private final DeliveryRepository deliveryRepository;
     private final WorkspaceMicroservice workspaceMicroservice;
+    private final ManagerMicroservice managerMicroservice;
+    private final OperatorMicroservice operatorMicroservice;
     private final DateTime dateTime;
     private final ManagerProductsFinder managerProductsFinder;
 
     public DeliveryCreator(DeliveryRepository deliveryRepository, ProductRepository productRepository,
-                           WorkspaceMicroservice workspaceMicroservice, DateTime dateTime) {
+                           WorkspaceMicroservice workspaceMicroservice, ManagerMicroservice managerMicroservice,
+                           OperatorMicroservice operatorMicroservice, DateTime dateTime) {
         this.deliveryRepository = deliveryRepository;
         this.workspaceMicroservice = workspaceMicroservice;
+        this.managerMicroservice = managerMicroservice;
+        this.operatorMicroservice = operatorMicroservice;
         this.dateTime = dateTime;
         this.managerProductsFinder = new ManagerProductsFinder(productRepository);
     }
@@ -48,11 +55,17 @@ public final class DeliveryCreator implements CommandUseCase<CreateDeliveryComma
         verifyOperatorBelongToManager(operatorCode, managerCode, municipalityCode);
         verifyProductsBelongToManager(command.deliveryProducts(), managerCode);
 
+        DepartmentMunicipality departmentMunicipality = findDepartmentMunicipality(municipalityCode);
+
         Delivery delivery = Delivery.create(
                 new DeliveryCode(generateDeliveryCode()),
                 municipalityCode,
+                departmentMunicipality.municipality(),
+                departmentMunicipality.department(),
                 managerCode,
+                findManagerName(managerCode),
                 operatorCode,
+                findOperatorName(operatorCode),
                 new UserCode(command.userCode()),
                 new DeliveryObservations(command.observations()),
                 new DeliveryDate(dateTime.now()),
@@ -89,6 +102,18 @@ public final class DeliveryCreator implements CommandUseCase<CreateDeliveryComma
 
     private String generateDeliveryCode() {
         return RandomStringUtils.random(6, false, true);
+    }
+
+    private ManagerName findManagerName(ManagerCode managerCode) {
+        return managerMicroservice.getManagerName(managerCode);
+    }
+
+    private OperatorName findOperatorName(OperatorCode operatorCode) {
+        return operatorMicroservice.getOperatorName(operatorCode);
+    }
+
+    private DepartmentMunicipality findDepartmentMunicipality(MunicipalityCode municipalityCode) {
+        return workspaceMicroservice.getDepartmentMunicipalityName(municipalityCode);
     }
 
 }

@@ -46,7 +46,6 @@ public final class CreateDeliveryCommand implements Command {
     public List<Long> deliveryProducts() {
         return deliveryProducts;
     }
-
 }
 
 

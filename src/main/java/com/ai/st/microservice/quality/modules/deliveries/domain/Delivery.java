@@ -19,22 +19,30 @@ public final class Delivery extends AggregateRoot {
     private final DeliveryId id;
     private final DeliveryCode code;
     private final MunicipalityCode municipality;
+    private final MunicipalityName municipalityName;
+    private final DepartmentName departmentName;
     private final ManagerCode manager;
+    private final ManagerName managerName;
     private final OperatorCode operator;
+    private final OperatorName operatorName;
     private final UserCode user;
     private final DeliveryObservations observations;
     private final DeliveryDate deliveryDate;
     private final DeliveryStatusId deliveryStatusId;
     private final List<DeliveryProduct> deliveryProducts;
 
-    public Delivery(DeliveryId id, DeliveryCode code, MunicipalityCode municipalityCode, ManagerCode manager, OperatorCode operatorCode,
-                    UserCode user, DeliveryObservations observations, DeliveryDate deliveryDate, DeliveryStatusId deliveryStatusId,
-                    List<DeliveryProduct> deliveryProducts) {
+    public Delivery(DeliveryId id, DeliveryCode code, MunicipalityCode municipalityCode, MunicipalityName municipalityName, DepartmentName departmentName,
+                    ManagerCode manager, ManagerName managerName, OperatorCode operatorCode, OperatorName operatorName, UserCode user,
+                    DeliveryObservations observations, DeliveryDate deliveryDate, DeliveryStatusId deliveryStatusId, List<DeliveryProduct> deliveryProducts) {
         this.id = id;
         this.code = code;
+        this.municipalityName = municipalityName;
+        this.departmentName = departmentName;
         this.manager = manager;
+        this.managerName = managerName;
         this.operator = operatorCode;
         this.municipality = municipalityCode;
+        this.operatorName = operatorName;
         this.observations = observations;
         this.user = user;
         this.deliveryDate = deliveryDate;
@@ -42,24 +50,31 @@ public final class Delivery extends AggregateRoot {
         this.deliveryProducts = deliveryProducts;
     }
 
-    public static Delivery create(DeliveryId id, DeliveryCode code, MunicipalityCode municipalityCode, ManagerCode manager, OperatorCode operatorCode,
-                                  UserCode user, DeliveryObservations observations, DeliveryDate date, DeliveryStatusId deliveryStatus) {
-        return new Delivery(id, code, municipalityCode, manager, operatorCode, user, observations, date, deliveryStatus, new ArrayList<>());
+    public static Delivery create(DeliveryId id, DeliveryCode code, MunicipalityCode municipalityCode, MunicipalityName municipalityName,
+                                  DepartmentName departmentName, ManagerCode manager, ManagerName managerName, OperatorCode operatorCode,
+                                  OperatorName operatorName, UserCode user, DeliveryObservations observations, DeliveryDate date, DeliveryStatusId deliveryStatus) {
+        return new Delivery(id, code, municipalityCode, municipalityName, departmentName, manager, managerName, operatorCode, operatorName, user, observations, date, deliveryStatus, new ArrayList<>());
     }
 
-    public static Delivery create(DeliveryCode code, MunicipalityCode municipalityCode, ManagerCode manager, OperatorCode operatorCode,
-                                  UserCode user, DeliveryObservations observations, DeliveryDate date, DeliveryStatusId deliveryStatus) {
-        return new Delivery(null, code, municipalityCode, manager, operatorCode, user, observations, date, deliveryStatus, new ArrayList<>());
+    public static Delivery create(DeliveryCode code, MunicipalityCode municipalityCode, MunicipalityName municipalityName, DepartmentName departmentName,
+                                  ManagerCode manager, ManagerName managerName, OperatorCode operatorCode, OperatorName operatorName, UserCode user,
+                                  DeliveryObservations observations, DeliveryDate date, DeliveryStatusId deliveryStatus) {
+        return new Delivery(null, code, municipalityCode, municipalityName, departmentName, manager, managerName, operatorCode, operatorName, user, observations, date, deliveryStatus, new ArrayList<>());
     }
 
-    public static Delivery fromPrimitives(Long id, String code, String municipalityCode, Long managerCode, Long operatorCode, Long userCode,
-                                          String observations, Date createdAt, Long statusId) {
+    public static Delivery fromPrimitives(Long id, String code, String municipalityCode, String municipalityName, String departmentName,
+                                          Long managerCode, String managerName, Long operatorCode, String operatorName,
+                                          Long userCode, String observations, Date createdAt, Long statusId) {
         return new Delivery(
                 new DeliveryId(id),
                 new DeliveryCode(code),
                 new MunicipalityCode(municipalityCode),
+                MunicipalityName.fromValue(municipalityName),
+                DepartmentName.fromValue(departmentName),
                 new ManagerCode(managerCode),
+                ManagerName.fromValue(managerName),
                 new OperatorCode(operatorCode),
+                OperatorName.fromValue(operatorName),
                 new UserCode(userCode),
                 new DeliveryObservations(observations),
                 new DeliveryDate(createdAt),
@@ -116,6 +131,22 @@ public final class Delivery extends AggregateRoot {
 
     public DeliveryCode code() {
         return code;
+    }
+
+    public MunicipalityName municipalityName() {
+        return municipalityName;
+    }
+
+    public DepartmentName departmentName() {
+        return departmentName;
+    }
+
+    public ManagerName managerName() {
+        return managerName;
+    }
+
+    public OperatorName operatorName() {
+        return operatorName;
     }
 
     public boolean isDraft() {

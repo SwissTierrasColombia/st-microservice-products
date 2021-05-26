@@ -17,11 +17,23 @@ public class DeliveryEntity {
     @Column(name = "code", nullable = false, length = 20, unique = true)
     private String code;
 
+    @Column(name = "municipality_name", nullable = false)
+    private String municipalityName;
+
+    @Column(name = "department_name", nullable = false)
+    private String departmentName;
+
     @Column(name = "municipality_code", nullable = false, length = 8)
     private String municipalityCode;
 
+    @Column(name = "manager_name", nullable = false)
+    private String managerName;
+
     @Column(name = "manager_code", nullable = false)
     private Long managerCode;
+
+    @Column(name = "operator_name", nullable = false)
+    private String operatorName;
 
     @Column(name = "operator_code", nullable = false)
     private Long operatorCode;
@@ -121,5 +133,37 @@ public class DeliveryEntity {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getMunicipalityName() {
+        return municipalityName;
+    }
+
+    public void setMunicipalityName(String municipalityName) {
+        this.municipalityName = municipalityName;
+    }
+
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
+    }
+
+    public String getManagerName() {
+        return managerName;
+    }
+
+    public void setManagerName(String managerName) {
+        this.managerName = managerName;
+    }
+
+    public String getOperatorName() {
+        return operatorName;
+    }
+
+    public void setOperatorName(String operatorName) {
+        this.operatorName = operatorName;
     }
 }

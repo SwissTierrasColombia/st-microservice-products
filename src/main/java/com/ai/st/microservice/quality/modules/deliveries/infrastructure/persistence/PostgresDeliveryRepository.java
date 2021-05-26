@@ -70,6 +70,10 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
         deliveryEntity.setUserCode(delivery.user().value());
         deliveryEntity.setDeliveryStatus(deliveryStatusEntity);
         deliveryEntity.setCode(delivery.code().value());
+        deliveryEntity.setDepartmentName(delivery.departmentName().value());
+        deliveryEntity.setMunicipalityName(delivery.municipalityName().value());
+        deliveryEntity.setManagerName(delivery.managerName().value());
+        deliveryEntity.setOperatorName(delivery.operatorName().value());
 
         delivery.deliveryProducts().forEach(deliveryProduct -> {
             DeliveryProductStatusEntity deliveryProductStatusEntity =
@@ -91,17 +95,7 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
     @Override
     public Delivery search(DeliveryId id) {
         DeliveryEntity deliveryEntity = deliveryJPARepository.findById(id.value()).orElse(null);
-        return (deliveryEntity == null) ? null :
-                Delivery.fromPrimitives(
-                        deliveryEntity.getId(),
-                        deliveryEntity.getCode(),
-                        deliveryEntity.getMunicipalityCode(),
-                        deliveryEntity.getManagerCode(),
-                        deliveryEntity.getOperatorCode(),
-                        deliveryEntity.getUserCode(),
-                        deliveryEntity.getObservations(),
-                        deliveryEntity.getCreatedAt(),
-                        deliveryEntity.getDeliveryStatus().getId());
+        return (deliveryEntity == null) ? null : mapping(deliveryEntity);
     }
 
     @Override
@@ -142,11 +136,7 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
             }
         }
 
-        List<Delivery> deliveries = deliveryEntities.stream().map(deliveryEntity -> Delivery.fromPrimitives(
-                deliveryEntity.getId(), deliveryEntity.getCode(), deliveryEntity.getMunicipalityCode(),
-                deliveryEntity.getManagerCode(), deliveryEntity.getOperatorCode(), deliveryEntity.getUserCode(),
-                deliveryEntity.getObservations(), deliveryEntity.getCreatedAt(), deliveryEntity.getDeliveryStatus().getId()
-        )).collect(Collectors.toList());
+        List<Delivery> deliveries = deliveryEntities.stream().map(this::mapping).collect(Collectors.toList());
 
         return new PageableDomain<>(
                 deliveries,
@@ -242,6 +232,23 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
             deliveryEntity.setDeliveryStatus(deliveryStatusEntity);
             deliveryJPARepository.save(deliveryEntity);
         }
+    }
+
+    private Delivery mapping(DeliveryEntity deliveryEntity) {
+        return Delivery.fromPrimitives(
+                deliveryEntity.getId(),
+                deliveryEntity.getCode(),
+                deliveryEntity.getMunicipalityCode(),
+                deliveryEntity.getMunicipalityName(),
+                deliveryEntity.getDepartmentName(),
+                deliveryEntity.getManagerCode(),
+                deliveryEntity.getManagerName(),
+                deliveryEntity.getOperatorCode(),
+                deliveryEntity.getOperatorName(),
+                deliveryEntity.getUserCode(),
+                deliveryEntity.getObservations(),
+                deliveryEntity.getCreatedAt(),
+                deliveryEntity.getDeliveryStatus().getId());
     }
 
 }
