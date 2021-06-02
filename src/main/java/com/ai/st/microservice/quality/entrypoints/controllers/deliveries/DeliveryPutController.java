@@ -5,19 +5,20 @@ import com.ai.st.microservice.common.business.ManagerBusiness;
 import com.ai.st.microservice.common.business.OperatorBusiness;
 import com.ai.st.microservice.common.dto.general.BasicResponseDto;
 import com.ai.st.microservice.common.exceptions.InputValidationException;
+
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
 import com.ai.st.microservice.quality.modules.deliveries.application.update_delivery.DeliveryUpdater;
 import com.ai.st.microservice.quality.modules.deliveries.application.update_delivery.DeliveryUpdaterCommand;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
+
 import io.swagger.annotations.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
 
 @Api(value = "Manage Deliveries", tags = {"Deliveries"})
 @RestController
@@ -90,10 +91,6 @@ public final class DeliveryPutController extends ApiController {
             throw new InputValidationException("Las observaciones son requeridas.");
     }
 
-    @Override
-    public HashMap<Class<? extends DomainError>, HttpStatus> errorMapping() {
-        return null;
-    }
 }
 
 @ApiModel(value = "UpdateDeliveryRequest")

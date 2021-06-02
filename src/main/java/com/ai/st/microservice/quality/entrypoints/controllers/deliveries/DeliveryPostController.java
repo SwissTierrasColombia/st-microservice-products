@@ -12,6 +12,7 @@ import com.ai.st.microservice.quality.modules.deliveries.application.create_deli
 import com.ai.st.microservice.quality.modules.shared.domain.*;
 
 import io.swagger.annotations.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -88,13 +89,7 @@ public final class DeliveryPostController extends ApiController {
             responseDto = new BasicResponseDto(e.getMessage(), 3);
         }
 
-
         return new ResponseEntity<>(responseDto, httpStatus);
-    }
-
-    @Override
-    public HashMap<Class<? extends DomainError>, HttpStatus> errorMapping() {
-        return null;
     }
 
     private void validateMunicipality(String municipalityCode) throws InputValidationException {

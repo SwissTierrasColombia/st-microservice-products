@@ -5,13 +5,16 @@ import com.ai.st.microservice.common.business.ManagerBusiness;
 import com.ai.st.microservice.common.business.OperatorBusiness;
 import com.ai.st.microservice.common.dto.general.BasicResponseDto;
 import com.ai.st.microservice.common.exceptions.InputValidationException;
+
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
 import com.ai.st.microservice.quality.modules.attachments.application.add_attachment_to_product.AttachmentAssigner;
 import com.ai.st.microservice.quality.modules.attachments.application.add_attachment_to_product.AttachmentAssignerCommand;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.CompressorFile;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.StoreFile;
+
 import io.swagger.annotations.*;
+
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Objects;
 
 @Api(value = "Manage Deliveries", tags = {"Deliveries"})
@@ -180,10 +182,6 @@ public final class DeliveryProductAttachmentPostController extends ApiController
         );
     }
 
-    @Override
-    public HashMap<Class<? extends DomainError>, HttpStatus> errorMapping() {
-        return null;
-    }
 }
 
 @ApiModel(value = "AddAttachmentToProductRequest")

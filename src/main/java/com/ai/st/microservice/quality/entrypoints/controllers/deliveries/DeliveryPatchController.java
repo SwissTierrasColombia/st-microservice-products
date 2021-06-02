@@ -5,6 +5,7 @@ import com.ai.st.microservice.common.business.ManagerBusiness;
 import com.ai.st.microservice.common.business.OperatorBusiness;
 import com.ai.st.microservice.common.dto.general.BasicResponseDto;
 import com.ai.st.microservice.common.exceptions.InputValidationException;
+
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
 import com.ai.st.microservice.quality.modules.deliveries.application.accept_delivery.DeliveryAcceptor;
 import com.ai.st.microservice.quality.modules.deliveries.application.accept_delivery.DeliveryAcceptorCommand;
@@ -14,24 +15,24 @@ import com.ai.st.microservice.quality.modules.deliveries.application.reject_deli
 import com.ai.st.microservice.quality.modules.deliveries.application.reject_delivery.DeliveryRejectingCommand;
 import com.ai.st.microservice.quality.modules.deliveries.application.send_delivery_to_operator.DeliveryToOperatorSender;
 import com.ai.st.microservice.quality.modules.deliveries.application.send_delivery_to_operator.DeliveryToOperatorSenderCommand;
-import com.ai.st.microservice.quality.modules.shared.application.Roles;
 import com.ai.st.microservice.quality.modules.deliveries.application.send_delivery_to_manager.DeliveryToManagerSender;
 import com.ai.st.microservice.quality.modules.deliveries.application.send_delivery_to_manager.DeliveryToManagerSenderCommand;
 import com.ai.st.microservice.quality.modules.deliveries.application.start_review.ReviewStarter;
 import com.ai.st.microservice.quality.modules.deliveries.application.start_review.ReviewStarterCommand;
+import com.ai.st.microservice.quality.modules.shared.application.Roles;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
 
 @Api(value = "Manage Deliveries", tags = {"Deliveries"})
 @RestController
@@ -284,11 +285,6 @@ public final class DeliveryPatchController extends ApiController {
     private void validateDeliveryId(Long deliveryId) throws InputValidationException {
         if (deliveryId <= 0)
             throw new InputValidationException("La entrega no es válida");
-    }
-
-    @Override
-    public HashMap<Class<? extends DomainError>, HttpStatus> errorMapping() {
-        return null;
     }
 
 }

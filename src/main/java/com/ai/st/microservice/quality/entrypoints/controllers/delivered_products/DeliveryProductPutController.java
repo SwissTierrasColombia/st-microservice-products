@@ -5,19 +5,20 @@ import com.ai.st.microservice.common.business.ManagerBusiness;
 import com.ai.st.microservice.common.business.OperatorBusiness;
 import com.ai.st.microservice.common.dto.general.BasicResponseDto;
 import com.ai.st.microservice.common.exceptions.InputValidationException;
+
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
 import com.ai.st.microservice.quality.modules.delivered_products.application.update_product_from_delivery.DeliveryProductUpdater;
 import com.ai.st.microservice.quality.modules.delivered_products.application.update_product_from_delivery.DeliveryProductUpdaterCommand;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
+
 import io.swagger.annotations.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
 
 @Api(value = "Manage Deliveries", tags = {"Deliveries"})
 @RestController
@@ -81,11 +82,6 @@ public final class DeliveryProductPutController extends ApiController {
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);
-    }
-
-    @Override
-    public HashMap<Class<? extends DomainError>, HttpStatus> errorMapping() {
-        return null;
     }
 
     private void validateDeliveryId(Long deliveryId) throws InputValidationException {

@@ -5,11 +5,14 @@ import com.ai.st.microservice.common.business.ManagerBusiness;
 import com.ai.st.microservice.common.business.OperatorBusiness;
 import com.ai.st.microservice.common.dto.general.BasicResponseDto;
 import com.ai.st.microservice.common.exceptions.InputValidationException;
+
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
 import com.ai.st.microservice.quality.modules.feedbacks.application.create_feedback.FeedbackCreator;
 import com.ai.st.microservice.quality.modules.feedbacks.application.create_feedback.FeedbackCreatorCommand;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
+
 import io.swagger.annotations.*;
+
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +22,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
 import java.util.Objects;
 
 @Api(value = "Manage Deliveries", tags = {"Deliveries"})
@@ -126,11 +128,6 @@ public final class DeliveryProductFeedbackPostController extends ApiController {
     private String getExtensionFile(MultipartFile file) {
         return (file == null) ? null :
                 Objects.requireNonNull(FilenameUtils.getExtension(file.getOriginalFilename()));
-    }
-
-    @Override
-    public HashMap<Class<? extends DomainError>, HttpStatus> errorMapping() {
-        return null;
     }
 
 }

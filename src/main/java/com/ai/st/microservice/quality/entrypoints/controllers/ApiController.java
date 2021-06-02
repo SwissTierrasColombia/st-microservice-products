@@ -8,24 +8,21 @@ import com.ai.st.microservice.common.dto.managers.MicroserviceManagerDto;
 import com.ai.st.microservice.common.dto.operators.MicroserviceOperatorDto;
 import com.ai.st.microservice.common.exceptions.DisconnectedMicroserviceException;
 import com.ai.st.microservice.quality.modules.shared.application.Roles;
-import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
+
 import com.google.common.io.Files;
+
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.io.File;
-import java.util.HashMap;
 
 public abstract class ApiController {
 
     protected final AdministrationBusiness administrationBusiness;
     protected final ManagerBusiness managerBusiness;
     protected final OperatorBusiness operatorBusiness;
-
-    abstract public HashMap<Class<? extends DomainError>, HttpStatus> errorMapping();
 
     public ApiController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness, OperatorBusiness operatorBusiness) {
         this.administrationBusiness = administrationBusiness;
