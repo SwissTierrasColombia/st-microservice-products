@@ -13,7 +13,7 @@
 
     <groupId>com.ai.st.microservice.quality</groupId>
     <artifactId>st-microservice-quality</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>st-microservice-quality</name>
     <description>Products BPM</description>
 
