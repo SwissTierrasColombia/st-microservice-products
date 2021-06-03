@@ -136,7 +136,7 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
                 deliveredProductAttachmentXTFJPARepository.findByDeliveredProductAttachment(deliveredProductAttachmentEntity);
         if (xtfEntity != null) {
             return DeliveryProductXTFAttachment.fromPrimitives(
-                    xtfEntity.getId(), deliveredProductAttachmentEntity.getUuid(), deliveredProductAttachmentEntity.getObservations(),
+                    deliveredProductAttachmentEntity.getId(), deliveredProductAttachmentEntity.getUuid(), deliveredProductAttachmentEntity.getObservations(),
                     deliveredProductAttachmentEntity.getDeliveredProduct().getId(), deliveredProductAttachmentEntity.getCreatedAt(),
                     xtfEntity.getValid(), xtfEntity.getUrl(), xtfEntity.getVersion(), xtfEntity.getStatus().name()
             );
@@ -146,7 +146,7 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
                 deliveredProductAttachmentFTPJPARepository.findByDeliveredProductAttachment(deliveredProductAttachmentEntity);
         if (ftpEntity != null) {
             return DeliveryProductFTPAttachment.fromPrimitives(
-                    ftpEntity.getId(), deliveredProductAttachmentEntity.getUuid(), deliveredProductAttachmentEntity.getObservations(),
+                    deliveredProductAttachmentEntity.getId(), deliveredProductAttachmentEntity.getUuid(), deliveredProductAttachmentEntity.getObservations(),
                     deliveredProductAttachmentEntity.getDeliveredProduct().getId(), deliveredProductAttachmentEntity.getCreatedAt(),
                     ftpEntity.getDomain(), ftpEntity.getPort(), ftpEntity.getUsername(), ftpEntity.getPassword()
             );
@@ -156,7 +156,7 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
                 deliveredProductAttachmentDocumentJPARepository.findByDeliveredProductAttachment(deliveredProductAttachmentEntity);
         if (documentEntity != null) {
             return DeliveryProductDocumentAttachment.fromPrimitives(
-                    documentEntity.getId(), deliveredProductAttachmentEntity.getUuid(), deliveredProductAttachmentEntity.getObservations(),
+                    deliveredProductAttachmentEntity.getId(), deliveredProductAttachmentEntity.getUuid(), deliveredProductAttachmentEntity.getObservations(),
                     deliveredProductAttachmentEntity.getDeliveredProduct().getId(), deliveredProductAttachmentEntity.getCreatedAt(),
                     documentEntity.getUrl()
             );
