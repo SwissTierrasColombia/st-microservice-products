@@ -22,6 +22,10 @@ public final class OperatorCode {
         if (value == null || value <= 0) throw new OperatorInvalid();
     }
 
+    public static OperatorCode fromValue(Long value) {
+        return new OperatorCode(value);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -14,6 +14,10 @@ public final class ProductDescription {
         return value;
     }
 
+    public static ProductDescription fromValue(String value) {
+        return new ProductDescription(value);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

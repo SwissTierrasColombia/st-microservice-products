@@ -17,6 +17,10 @@ public class MunicipalityCode {
         if (value == null || value.length() != 5) throw new MunicipalityInvalid();
     }
 
+    public static MunicipalityCode fromValue(String value) {
+        return new MunicipalityCode(value);
+    }
+
     public String value() {
         return value;
     }

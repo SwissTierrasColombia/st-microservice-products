@@ -3,7 +3,6 @@ package com.ai.st.microservice.quality.modules.products.domain;
 import com.ai.st.microservice.quality.modules.shared.domain.ManagerCode;
 
 import java.util.Date;
-import java.util.Objects;
 
 public final class Product {
 
@@ -11,26 +10,38 @@ public final class Product {
     private final ProductName name;
     private final ProductDescription description;
     private final ManagerCode managerCode;
-    private final ProductDeliveryMethod method;
-    private final Date createdAt;
+    private final ProductXTF productXTF;
+    private final ProductDate productDate;
 
-    public Product(ProductId id, ProductName name, ProductDescription description, ManagerCode managerCode, ProductDeliveryMethod method, Date createdAt) {
+    public Product(ProductId id, ProductName name, ProductDescription description, ManagerCode managerCode,
+                   ProductXTF productXTF, ProductDate createdAt) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.managerCode = managerCode;
-        this.method = method;
-        this.createdAt = createdAt;
+        this.productXTF = productXTF;
+        this.productDate = createdAt;
     }
 
-    public static Product fromPrimitives(Long id, String name, String description, Long managerCode, String method, Date createdAt) {
+    public static Product create(ProductId productId, ProductName name, ProductDescription description, ManagerCode managerCode,
+                                 ProductXTF productXTF, ProductDate createdAt) {
+        return new Product(productId, name, description, managerCode, productXTF, createdAt);
+    }
+
+    public static Product create(ProductName name, ProductDescription description, ManagerCode managerCode,
+                                 ProductXTF productXTF, ProductDate createdAt) {
+        return new Product(null, name, description, managerCode, productXTF, createdAt);
+    }
+
+    public static Product fromPrimitives(Long id, String name, String description, Long managerCode,
+                                         boolean productXTF, Date createdAt) {
         return new Product(
                 new ProductId(id),
                 new ProductName(name),
                 new ProductDescription(description),
                 new ManagerCode(managerCode),
-                new ProductDeliveryMethod(method),
-                createdAt);
+                new ProductXTF(productXTF),
+                new ProductDate(createdAt));
     }
 
     public ProductId id() {
@@ -49,27 +60,21 @@ public final class Product {
         return managerCode;
     }
 
-    public ProductDeliveryMethod method() {
-        return method;
+    public ProductXTF productXTF() {
+        return productXTF;
     }
 
-    public Date createdAt() {
-        return createdAt;
+    public ProductDate productDate() {
+        return productDate;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Product product = (Product) o;
-        return id.equals(product.id) && name.equals(product.name)
-                && description.equals(product.description)
-                && managerCode.equals(product.managerCode)
-                && method.equals(product.method) && createdAt.equals(product.createdAt);
+    public boolean isConfiguredAsXTF() {
+        return productXTF().value();
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, managerCode, method, createdAt);
+    public boolean belongToManager(ManagerCode managerCode) {
+        return managerCode.value().equals(this.managerCode.value());
     }
+
+
 }

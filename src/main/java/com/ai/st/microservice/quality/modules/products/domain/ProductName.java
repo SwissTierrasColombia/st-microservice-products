@@ -17,6 +17,10 @@ public final class ProductName {
         if (value == null || value.length() <= 0) throw new ProductNameInvalid();
     }
 
+    public static ProductName fromValue(String value) {
+        return new ProductName(value);
+    }
+
     public String value() {
         return value;
     }
