@@ -9,19 +9,26 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.Delive
 import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.DeliveryNotFound;
 import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.UnauthorizedToModifyDelivery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.UnauthorizedToSearchDelivery;
+import com.ai.st.microservice.quality.modules.feedbacks.domain.contracts.DeliveryProductFeedbackRepository;
 import com.ai.st.microservice.quality.modules.shared.application.CommandUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.ManagerCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public final class DeliveryToOperatorSender implements CommandUseCase<DeliveryToOperatorSenderCommand> {
 
     private final DeliveryRepository deliveryRepository;
     private final DeliveryProductRepository deliveryProductRepository;
+    private final DeliveryProductFeedbackRepository feedbackRepository;
 
-    public DeliveryToOperatorSender(DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository) {
+    public DeliveryToOperatorSender(DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository,
+                                    DeliveryProductFeedbackRepository feedbackRepository) {
         this.deliveryRepository = deliveryRepository;
         this.deliveryProductRepository = deliveryProductRepository;
+        this.feedbackRepository = feedbackRepository;
     }
 
     @Override
@@ -53,13 +60,34 @@ public final class DeliveryToOperatorSender implements CommandUseCase<DeliveryTo
             throw new UnauthorizedToModifyDelivery("No se puede enviar la entrega, porque el estado de la misma no lo permite.");
         }
 
-        verifyThereAreNoUncheckedProducts(deliveryId);
+        List<DeliveryProduct> deliveryProducts = deliveryProductRepository.findByDeliveryId(deliveryId);
+
+        verifyThereAreNoUncheckedProducts(deliveryProducts);
+        verifyIfAllProductsAreAccepted(deliveryProducts);
+        verifyFeedbacksForProductsRejected(deliveryProducts);
     }
 
-    private void verifyThereAreNoUncheckedProducts(DeliveryId deliveryId) {
-        long count = deliveryProductRepository.findByDeliveryId(deliveryId).stream().filter(DeliveryProduct::isPending).count();
+    private void verifyThereAreNoUncheckedProducts(List<DeliveryProduct> deliveryProducts) {
+        long count = deliveryProducts.stream().filter(DeliveryProduct::isPending).count();
         if (count > 0)
             throw new UnauthorizedToModifyDelivery("No se puede enviar la entrega, porque aún hay productos sin revisar.");
+    }
+
+    private void verifyIfAllProductsAreAccepted(List<DeliveryProduct> deliveryProducts) {
+        long countTotal = deliveryProducts.size();
+        long countAccepted = deliveryProducts.stream().filter(DeliveryProduct::isAccepted).count();
+
+        if (countTotal == countAccepted)
+            throw new UnauthorizedToModifyDelivery("No se puede enviar la entrega, porque todos los productos fueron aceptados.");
+    }
+
+    private void verifyFeedbacksForProductsRejected(List<DeliveryProduct> deliveryProducts) {
+        long countProductsWrong = deliveryProducts.stream().filter(DeliveryProduct::isRejected).collect(Collectors.toList()).
+                stream().filter(deliveryProduct ->
+                feedbackRepository.findByDeliveryProductId(deliveryProduct.deliveryProductId()).size() == 0).count();
+
+        if (countProductsWrong > 0)
+            throw new UnauthorizedToModifyDelivery("Existen productos rechazados a los cuales no se les ha creado un feedback.");
     }
 
 }
