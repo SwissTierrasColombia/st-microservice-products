@@ -146,8 +146,12 @@ public final class DeliveryProductAttachmentPostController extends ApiController
 
         storeFile.deleteFile(temporalFilePath);
 
+        if (!request.getVersion().equalsIgnoreCase("1.0") && !request.getVersion().equalsIgnoreCase("1.1")) {
+            throw new InputValidationException("La versión del submodelo de levantamiento debe ser 1.0 o 1.1");
+        }
+
         return new AttachmentAssignerCommand.XTFAttachment(
-                observations, file.getBytes(), extension);
+                observations, file.getBytes(), extension, request.getVersion());
     }
 
     private AttachmentAssignerCommand.FTPAttachment validateFTPAttachment(String observations, AddFTPAttachmentRequest request)
@@ -232,12 +236,23 @@ final class AddXTFAttachmentRequest {
     @ApiModelProperty(required = true, notes = "Attachment")
     private MultipartFile attachment;
 
+    @ApiModelProperty(required = true, notes = "Attachment")
+    private String version;
+
     public MultipartFile getAttachment() {
         return attachment;
     }
 
     public void setAttachment(MultipartFile attachment) {
         this.attachment = attachment;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }
 

@@ -53,11 +53,13 @@ public final class AttachmentAssignerCommand implements Command {
 
         private final byte[] bytes;
         private final String extension;
+        private final String version;
 
-        public XTFAttachment(String observations, byte[] bytes, String extension) {
+        public XTFAttachment(String observations, byte[] bytes, String extension, String version) {
             super(observations);
             this.bytes = bytes;
             this.extension = extension;
+            this.version = version;
         }
 
         public byte[] bytes() {
@@ -66,6 +68,10 @@ public final class AttachmentAssignerCommand implements Command {
 
         public String extension() {
             return extension;
+        }
+
+        public String version() {
+            return version;
         }
     }
 

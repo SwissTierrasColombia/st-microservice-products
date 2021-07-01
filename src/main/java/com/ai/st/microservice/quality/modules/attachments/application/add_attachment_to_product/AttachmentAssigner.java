@@ -3,16 +3,7 @@ package com.ai.st.microservice.quality.modules.attachments.application.add_attac
 import com.ai.st.microservice.quality.modules.attachments.domain.exceptions.AttachmentTypeNotSupportedToProduct;
 import com.ai.st.microservice.quality.modules.attachments.domain.exceptions.AttachmentUnsupported;
 import com.ai.st.microservice.quality.modules.attachments.domain.exceptions.NumberAttachmentsExceeded;
-import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductStatusId;
-import com.ai.st.microservice.quality.modules.delivered_products.domain.exceptions.DeliveryProductNotFound;
-import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
-import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
 import com.ai.st.microservice.quality.modules.attachments.domain.contracts.DeliveryProductAttachmentRepository;
-import com.ai.st.microservice.quality.modules.delivered_products.domain.contracts.DeliveryProductRepository;
-import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryRepository;
-import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.*;
-import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProduct;
-import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductId;
 import com.ai.st.microservice.quality.modules.attachments.domain.DeliveryProductAttachment;
 import com.ai.st.microservice.quality.modules.attachments.domain.DeliveryProductAttachmentDate;
 import com.ai.st.microservice.quality.modules.attachments.domain.DeliveryProductAttachmentObservations;
@@ -21,15 +12,27 @@ import com.ai.st.microservice.quality.modules.attachments.domain.document.Delive
 import com.ai.st.microservice.quality.modules.attachments.domain.document.DocumentUrl;
 import com.ai.st.microservice.quality.modules.attachments.domain.ftp.*;
 import com.ai.st.microservice.quality.modules.attachments.domain.xtf.*;
+
+import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductStatusId;
+import com.ai.st.microservice.quality.modules.delivered_products.domain.exceptions.DeliveryProductNotFound;
+import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
+import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
+import com.ai.st.microservice.quality.modules.delivered_products.domain.contracts.DeliveryProductRepository;
+import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryRepository;
+import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.*;
+import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProduct;
+import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductId;
+
 import com.ai.st.microservice.quality.modules.products.domain.Product;
 import com.ai.st.microservice.quality.modules.products.domain.ProductId;
 import com.ai.st.microservice.quality.modules.products.domain.contracts.ProductRepository;
+
 import com.ai.st.microservice.quality.modules.shared.application.CommandUseCase;
 import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.DateTime;
-
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.ILIMicroservice;
+import com.ai.st.microservice.quality.modules.shared.domain.contracts.ILIOldMicroservice;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.StoreFile;
 
 import java.util.UUID;
@@ -44,12 +47,14 @@ public final class AttachmentAssigner implements CommandUseCase<AttachmentAssign
     private final DateTime dateTime;
     private final StoreFile storeFile;
     private final ILIMicroservice iliMicroservice;
+    private final ILIOldMicroservice iliOldMicroservice;
 
     private final static int MAXIMUM_ATTACHMENTS_PER_PRODUCT = 5;
 
     public AttachmentAssigner(DeliveryProductAttachmentRepository attachmentRepository, DeliveryRepository deliveryRepository,
                               DeliveryProductRepository deliveryProductRepository, ProductRepository productRepository,
-                              DateTime dateTime, StoreFile storeFile, ILIMicroservice iliMicroservice) {
+                              DateTime dateTime, StoreFile storeFile, ILIMicroservice iliMicroservice,
+                              ILIOldMicroservice iliOldMicroservice) {
         this.attachmentRepository = attachmentRepository;
         this.productRepository = productRepository;
         this.dateTime = dateTime;
@@ -57,6 +62,7 @@ public final class AttachmentAssigner implements CommandUseCase<AttachmentAssign
         this.iliMicroservice = iliMicroservice;
         this.deliveryRepository = deliveryRepository;
         this.deliveryProductRepository = deliveryProductRepository;
+        this.iliOldMicroservice = iliOldMicroservice;
     }
 
     @Override
@@ -143,12 +149,18 @@ public final class AttachmentAssigner implements CommandUseCase<AttachmentAssign
                                                              DeliveryId deliveryId,
                                                              DeliveryProductId deliveryProductId, DeliveryProductAttachmentDate attachmentDate) {
 
+        XTFVersion version = new XTFVersion(attachment.version());
+
         String namespace = buildNamespace(deliveryId);
         String pathUrl = storeFile.storeFilePermanently(attachment.bytes(), attachment.extension(), namespace);
 
         DeliveryProductAttachmentUUID identifierUUID = new DeliveryProductAttachmentUUID(UUID.randomUUID().toString());
 
-        iliMicroservice.sendToValidation(identifierUUID, pathUrl, false, false);
+        if (version.isOldVersion()) {
+            iliOldMicroservice.sendToValidation(identifierUUID, pathUrl, false, false);
+        } else {
+            iliMicroservice.sendToValidation(identifierUUID, pathUrl, false, false);
+        }
 
         return DeliveryProductXTFAttachment.create(
                 identifierUUID,
@@ -157,7 +169,7 @@ public final class AttachmentAssigner implements CommandUseCase<AttachmentAssign
                 attachmentDate,
                 new XTFValid(null),
                 new XTFUrl(pathUrl),
-                new XTFVersion("1.0"),
+                version,
                 new XTFStatus(XTFStatus.Status.IN_VALIDATION)
         );
     }

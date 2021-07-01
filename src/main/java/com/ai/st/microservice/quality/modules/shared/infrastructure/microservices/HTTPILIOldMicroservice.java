@@ -1,22 +1,22 @@
 package com.ai.st.microservice.quality.modules.shared.infrastructure.microservices;
 
-import com.ai.st.microservice.common.clients.IliFeignClient;
+import com.ai.st.microservice.common.clients.IliOldFeignClient;
 import com.ai.st.microservice.common.dto.ili.MicroserviceIlivalidatorBackgroundDto;
 import com.ai.st.microservice.quality.modules.attachments.domain.DeliveryProductAttachmentUUID;
+import com.ai.st.microservice.quality.modules.shared.domain.contracts.ILIOldMicroservice;
 import com.ai.st.microservice.quality.modules.shared.domain.exceptions.MicroserviceUnreachable;
-import com.ai.st.microservice.quality.modules.shared.domain.contracts.ILIMicroservice;
 import org.springframework.stereotype.Service;
 
 @Service
-public final class HTTPILIMicroservice implements ILIMicroservice {
+public final class HTTPILIOldMicroservice implements ILIOldMicroservice {
 
-    private static final String MODEL_VERSION = "1.1";
+    private static final String MODEL_VERSION = "1.0";
     private static final Long CONCEPT_ID = (long) 3;
     private static final String QUEUE_RESPONSE = "QUEUE_UPDATE_STATE_XTF_PRODUCTS";
 
-    private final IliFeignClient iliFeignClient;
+    private final IliOldFeignClient iliFeignClient;
 
-    public HTTPILIMicroservice(IliFeignClient iliFeignClient) {
+    public HTTPILIOldMicroservice(IliOldFeignClient iliFeignClient) {
         this.iliFeignClient = iliFeignClient;
     }
 
