@@ -45,8 +45,8 @@ public final class HTTPWorkspaceMicroservice implements WorkspaceMicroservice {
             throw new MunicipalityInvalid();
         }
         return new DepartmentMunicipality(
-                DepartmentName.fromValue(municipalityDto.getName()),
-                MunicipalityName.fromValue(municipalityDto.getDepartment().getName()));
+                DepartmentName.fromValue(municipalityDto.getDepartment().getName()),
+                MunicipalityName.fromValue(municipalityDto.getName()));
     }
 
 }
