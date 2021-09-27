@@ -4,10 +4,11 @@ import com.ai.st.microservice.quality.modules.attachments.domain.DeliveryProduct
 import com.ai.st.microservice.quality.modules.attachments.domain.document.DeliveryProductDocumentAttachment;
 import com.ai.st.microservice.quality.modules.attachments.domain.ftp.DeliveryProductFTPAttachment;
 import com.ai.st.microservice.quality.modules.attachments.domain.xtf.DeliveryProductXTFAttachment;
+import com.ai.st.microservice.quality.modules.shared.application.Response;
 
 import java.util.Date;
 
-public final class AttachmentProductResponse {
+public final class AttachmentProductResponse implements Response {
 
     private enum Types {XTF, FTP, DOCUMENT}
 
@@ -28,7 +29,7 @@ public final class AttachmentProductResponse {
     }
 
     public static AttachmentProductResponse fromAggregate(DeliveryProductXTFAttachment attachment) {
-        XTF xtf = new XTF(attachment.valid().value(), attachment.status().value().name(), attachment.version().value());
+        XTF xtf = new XTF(attachment.valid().value(), attachment.status().value().name(), attachment.version().value(), attachment.hasReportRevisionURL());
         return fromAggregate(attachment, Types.XTF, xtf);
     }
 
@@ -85,11 +86,13 @@ public final class AttachmentProductResponse {
         private final Boolean isValid;
         private final String status;
         private final String version;
+        private final boolean hasReportRevision;
 
-        public XTF(Boolean isValid, String status, String version) {
+        public XTF(Boolean isValid, String status, String version, boolean hasReportRevision) {
             this.isValid = isValid;
             this.status = status;
             this.version = version;
+            this.hasReportRevision = hasReportRevision;
         }
 
         public Boolean valid() {
@@ -102,6 +105,10 @@ public final class AttachmentProductResponse {
 
         public String version() {
             return version;
+        }
+
+        public boolean hasReportRevision() {
+            return hasReportRevision;
         }
     }
 

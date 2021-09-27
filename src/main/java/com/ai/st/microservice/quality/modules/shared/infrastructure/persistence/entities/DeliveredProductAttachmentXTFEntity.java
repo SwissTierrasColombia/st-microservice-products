@@ -14,6 +14,9 @@ public final class DeliveredProductAttachmentXTFEntity {
     @Column(name = "url", nullable = false, length = 1000)
     private String url;
 
+    @Column(name = "report_revision", length = 1000)
+    private String reportRevision;
+
     @Column(name = "version", length = 50)
     private String version;
 
@@ -75,4 +78,13 @@ public final class DeliveredProductAttachmentXTFEntity {
     public void setStatus(StatusXTFEnum status) {
         this.status = status;
     }
+
+    public String getReportRevision() {
+        return reportRevision;
+    }
+
+    public void setReportRevision(String reportRevision) {
+        this.reportRevision = reportRevision;
+    }
+
 }

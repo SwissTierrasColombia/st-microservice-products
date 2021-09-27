@@ -1,6 +1,7 @@
 package com.ai.st.microservice.quality.modules.attachments.infrastructure.persistence;
 
 import com.ai.st.microservice.quality.modules.attachments.domain.contracts.DeliveryProductAttachmentRepository;
+import com.ai.st.microservice.quality.modules.attachments.domain.xtf.XTFReportRevisionUrl;
 import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductId;
 import com.ai.st.microservice.quality.modules.attachments.domain.DeliveryProductAttachment;
 import com.ai.st.microservice.quality.modules.attachments.domain.DeliveryProductAttachmentId;
@@ -77,6 +78,7 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
         xtfEntity.setValid(xtfAttachment.valid().value());
         xtfEntity.setVersion(xtfAttachment.version().value());
         xtfEntity.setStatus(mappingEnum(xtfAttachment.status()));
+        xtfEntity.setReportRevision(null);
 
         deliveredProductAttachmentXTFJPARepository.save(xtfEntity);
     }
@@ -138,7 +140,7 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
             return DeliveryProductXTFAttachment.fromPrimitives(
                     deliveredProductAttachmentEntity.getId(), deliveredProductAttachmentEntity.getUuid(), deliveredProductAttachmentEntity.getObservations(),
                     deliveredProductAttachmentEntity.getDeliveredProduct().getId(), deliveredProductAttachmentEntity.getCreatedAt(),
-                    xtfEntity.getValid(), xtfEntity.getUrl(), xtfEntity.getVersion(), xtfEntity.getStatus().name()
+                    xtfEntity.getValid(), xtfEntity.getUrl(), xtfEntity.getReportRevision(), xtfEntity.getVersion(), xtfEntity.getStatus().name()
             );
         }
 
@@ -179,17 +181,13 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
             StatusXTFEnum statusEntity = mappingEnum(status);
             xtfEntity.setStatus(statusEntity);
 
-
-            Boolean isValid = null;
             if (status.value().equals(XTFStatus.Status.ACCEPTED)) {
-                isValid = true;
+                xtfEntity.setValid(true);
             } else if (status.value().equals(XTFStatus.Status.REJECTED)) {
-                isValid = false;
+                xtfEntity.setValid(false);
             }
-            xtfEntity.setValid(isValid);
 
             deliveredProductAttachmentXTFJPARepository.save(xtfEntity);
-
         }
 
     }
@@ -200,6 +198,10 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
                 return StatusXTFEnum.ACCEPTED;
             case REJECTED:
                 return StatusXTFEnum.REJECTED;
+            case QUALITY_PROCESS_IN_VALIDATION:
+                return StatusXTFEnum.QUALITY_PROCESS_IN_VALIDATION;
+            case QUALITY_PROCESS_FINISHED:
+                return StatusXTFEnum.QUALITY_PROCESS_FINISHED;
             case IN_VALIDATION:
             default:
                 return StatusXTFEnum.IN_VALIDATION;
@@ -227,6 +229,24 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
         deliveredProductAttachmentFTPJPARepository.deleteByDeliveredProductAttachment(deliveredProductAttachmentEntity);
         deliveredProductAttachmentDocumentJPARepository.deleteByDeliveredProductAttachment(deliveredProductAttachmentEntity);
         deliveredProductAttachmentJPARepository.deleteById(id.value());
+    }
+
+    @Override
+    public void updateReportRevisionXTF(DeliveryProductAttachmentUUID uuid, XTFReportRevisionUrl reportRevisionUrl) {
+
+        DeliveredProductAttachmentEntity deliveredProductAttachmentEntity =
+                deliveredProductAttachmentJPARepository.findByUuid(uuid.value());
+
+        if (deliveredProductAttachmentEntity != null) {
+
+            DeliveredProductAttachmentXTFEntity xtfEntity =
+                    deliveredProductAttachmentXTFJPARepository.findByDeliveredProductAttachment(deliveredProductAttachmentEntity);
+
+            xtfEntity.setReportRevision(reportRevisionUrl.value());
+
+            deliveredProductAttachmentXTFJPARepository.save(xtfEntity);
+        }
+
     }
 
 }

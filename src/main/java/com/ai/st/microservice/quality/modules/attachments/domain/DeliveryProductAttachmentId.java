@@ -14,6 +14,10 @@ public final class DeliveryProductAttachmentId {
         return value;
     }
 
+    public static DeliveryProductAttachmentId fromValue(Long value) {
+        return new DeliveryProductAttachmentId(value);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

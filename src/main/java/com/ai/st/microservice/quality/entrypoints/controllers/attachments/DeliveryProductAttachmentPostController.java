@@ -5,16 +5,15 @@ import com.ai.st.microservice.common.business.ManagerBusiness;
 import com.ai.st.microservice.common.business.OperatorBusiness;
 import com.ai.st.microservice.common.dto.general.BasicResponseDto;
 import com.ai.st.microservice.common.exceptions.InputValidationException;
-
 import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
 import com.ai.st.microservice.quality.modules.attachments.application.add_attachment_to_product.AttachmentAssigner;
 import com.ai.st.microservice.quality.modules.attachments.application.add_attachment_to_product.AttachmentAssignerCommand;
+import com.ai.st.microservice.quality.modules.attachments.application.start_quality_process.QualityProcessStarter;
+import com.ai.st.microservice.quality.modules.attachments.application.start_quality_process.QualityProcessStarterCommand;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.CompressorFile;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.StoreFile;
-
 import io.swagger.annotations.*;
-
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,21 +26,24 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Objects;
 
-@Api(value = "Manage Deliveries", tags = {"Deliveries"})
+@Api(value = "Manage Attachments", tags = {"Attachments"})
 @RestController
 public final class DeliveryProductAttachmentPostController extends ApiController {
 
     private final Logger log = LoggerFactory.getLogger(DeliveryProductAttachmentPostController.class);
 
     private final AttachmentAssigner attachmentAssigner;
+    private final QualityProcessStarter qualityProcessStarter;
     private final StoreFile storeFile;
     private final CompressorFile compressorFile;
 
     public DeliveryProductAttachmentPostController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
                                                    OperatorBusiness operatorBusiness, AttachmentAssigner attachmentAssigner,
-                                                   StoreFile storeFile, CompressorFile compressorFile) {
+                                                   QualityProcessStarter qualityProcessStarter, StoreFile storeFile,
+                                                   CompressorFile compressorFile) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.attachmentAssigner = attachmentAssigner;
+        this.qualityProcessStarter = qualityProcessStarter;
         this.storeFile = storeFile;
         this.compressorFile = compressorFile;
     }
@@ -66,7 +68,7 @@ public final class DeliveryProductAttachmentPostController extends ApiController
             InformationSession session = this.getInformationSession(headerAuthorization);
 
             validateDeliveryId(deliveryId);
-            validateProduct(deliveryProductId);
+            validateProductId(deliveryProductId);
 
             String observations = request.getObservations();
 
@@ -109,15 +111,67 @@ public final class DeliveryProductAttachmentPostController extends ApiController
         return new ResponseEntity<>(responseDto, httpStatus);
     }
 
+    @PostMapping(value = "api/quality/v1/deliveries/{deliveryId}/products/{deliveryProductId}/attachments/{attachmentId}/start-quality", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Start quality process for attachment")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Quality process started"),
+            @ApiResponse(code = 500, message = "Error Server", response = String.class)})
+    @ResponseBody
+    public ResponseEntity<?> startQualityProcess(
+            @PathVariable Long deliveryId,
+            @PathVariable Long deliveryProductId,
+            @PathVariable Long attachmentId,
+            @RequestHeader("authorization") String headerAuthorization) {
+
+        HttpStatus httpStatus;
+        Object responseDto = null;
+
+        try {
+
+            InformationSession session = this.getInformationSession(headerAuthorization);
+
+            validateDeliveryId(deliveryId);
+            validateProductId(deliveryProductId);
+            validateAttachmentId(attachmentId);
+
+            qualityProcessStarter.handle(new QualityProcessStarterCommand(
+                    deliveryId, deliveryProductId, attachmentId, session.entityCode()
+            ));
+
+            httpStatus = HttpStatus.OK;
+
+        } catch (InputValidationException e) {
+            log.error("Error DeliveryProductAttachmentPostController@startQualityProcess#Validation ---> " + e.getMessage());
+            httpStatus = HttpStatus.BAD_REQUEST;
+            responseDto = new BasicResponseDto(e.getMessage(), 1);
+        } catch (DomainError e) {
+            log.error("Error DeliveryProductAttachmentPostController@startQualityProcess#Domain ---> " + e.errorMessage());
+            httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
+            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+        } catch (Exception e) {
+            log.error("Error DeliveryProductAttachmentPostController@startQualityProcess#General ---> " + e.getMessage());
+            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            responseDto = new BasicResponseDto(e.getMessage(), 4);
+        }
+
+        return new ResponseEntity<>(responseDto, httpStatus);
+    }
+
     private void validateDeliveryId(Long deliveryId) throws InputValidationException {
         if (deliveryId <= 0) {
             throw new InputValidationException("La entrega no es válida");
         }
     }
 
-    private void validateProduct(Long productId) throws InputValidationException {
+    private void validateProductId(Long productId) throws InputValidationException {
         if (productId <= 0) {
             throw new InputValidationException("El producto no es válido");
+        }
+    }
+
+    private void validateAttachmentId(Long attachmentId) throws InputValidationException {
+        if (attachmentId <= 0) {
+            throw new InputValidationException("El adjunto no es válido");
         }
     }
 

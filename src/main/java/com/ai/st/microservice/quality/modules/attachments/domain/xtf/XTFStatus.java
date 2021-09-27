@@ -9,7 +9,9 @@ public final class XTFStatus {
     public enum Status {
         IN_VALIDATION,
         ACCEPTED,
-        REJECTED
+        REJECTED,
+        QUALITY_PROCESS_IN_VALIDATION,
+        QUALITY_PROCESS_FINISHED,
     }
 
     public XTFStatus(Status value) {
@@ -23,6 +25,10 @@ public final class XTFStatus {
                 return Status.ACCEPTED;
             case "REJECTED":
                 return Status.REJECTED;
+            case "QUALITY_PROCESS_IN_VALIDATION":
+                return Status.QUALITY_PROCESS_IN_VALIDATION;
+            case "QUALITY_PROCESS_FINISHED":
+                return Status.QUALITY_PROCESS_FINISHED;
             case "IN_VALIDATION":
             default:
                 return Status.IN_VALIDATION;

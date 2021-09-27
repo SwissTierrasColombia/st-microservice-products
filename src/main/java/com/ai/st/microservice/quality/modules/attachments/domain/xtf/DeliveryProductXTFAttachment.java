@@ -11,26 +11,28 @@ public final class DeliveryProductXTFAttachment extends DeliveryProductAttachmen
     private final XTFUrl url;
     private final XTFVersion version;
     private final XTFStatus status;
+    private final XTFReportRevisionUrl reportRevisionUrl;
 
     public DeliveryProductXTFAttachment(DeliveryProductAttachmentId id, DeliveryProductAttachmentUUID uuid,
                                         DeliveryProductAttachmentObservations observations,
                                         DeliveryProductId deliveryProductId, DeliveryProductAttachmentDate deliveryProductAttachmentDate,
-                                        XTFValid valid, XTFUrl url, XTFVersion version, XTFStatus status) {
+                                        XTFValid valid, XTFUrl url, XTFVersion version, XTFStatus status, XTFReportRevisionUrl reportRevisionUrl) {
         super(id, uuid, observations, deliveryProductId, deliveryProductAttachmentDate);
         this.isValid = valid;
         this.url = url;
         this.version = version;
         this.status = status;
+        this.reportRevisionUrl = reportRevisionUrl;
     }
 
     public static DeliveryProductXTFAttachment create(DeliveryProductAttachmentUUID uuid, DeliveryProductAttachmentObservations observations,
                                                       DeliveryProductId deliveryProductId, DeliveryProductAttachmentDate deliveryProductAttachmentDate,
                                                       XTFValid valid, XTFUrl url, XTFVersion version, XTFStatus status) {
-        return new DeliveryProductXTFAttachment(null, uuid, observations, deliveryProductId, deliveryProductAttachmentDate, valid, url, version, status);
+        return new DeliveryProductXTFAttachment(null, uuid, observations, deliveryProductId, deliveryProductAttachmentDate, valid, url, version, status, null);
     }
 
     public static DeliveryProductXTFAttachment fromPrimitives(Long id, String uuid, String observations, Long deliveryProductId,
-                                                              Date date, Boolean isValid, String url, String version, String status) {
+                                                              Date date, Boolean isValid, String url, String reportUrl, String version, String status) {
 
         return new DeliveryProductXTFAttachment(
                 new DeliveryProductAttachmentId(id),
@@ -41,8 +43,8 @@ public final class DeliveryProductXTFAttachment extends DeliveryProductAttachmen
                 new XTFValid(isValid),
                 new XTFUrl(url),
                 new XTFVersion(version),
-                new XTFStatus(XTFStatus.valueOf(status))
-        );
+                new XTFStatus(XTFStatus.valueOf(status)),
+                new XTFReportRevisionUrl(reportUrl, true));
     }
 
     public XTFValid valid() {
@@ -61,8 +63,20 @@ public final class DeliveryProductXTFAttachment extends DeliveryProductAttachmen
         return status;
     }
 
+    public XTFReportRevisionUrl reportRevisionUrl() {
+        return reportRevisionUrl;
+    }
+
     public boolean accepted() {
         return (status.value().equals(XTFStatus.Status.ACCEPTED));
+    }
+
+    public boolean qualityInValidation() {
+        return (status.value().equals(XTFStatus.Status.QUALITY_PROCESS_IN_VALIDATION));
+    }
+
+    public boolean hasReportRevisionURL() {
+        return reportRevisionUrl.value() != null;
     }
 
 }
