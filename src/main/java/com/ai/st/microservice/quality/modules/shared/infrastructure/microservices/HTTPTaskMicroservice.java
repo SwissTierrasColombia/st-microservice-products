@@ -25,6 +25,7 @@ public final class HTTPTaskMicroservice implements TaskMicroservice {
     }
 
     private static final Long TASK_CATEGORY_XTF_QUALITY_RULES = (long) 3;
+    private static final Long TASK_STATE_ASSIGN = (long) 1;
     private static final Long TASK_STATE_STARTED = (long) 4;
     private static final int TASK_CATEGORY_XTF_QUALITY_RULES_DAYS_DEADLINE = 15;
 
@@ -81,7 +82,7 @@ public final class HTTPTaskMicroservice implements TaskMicroservice {
 
         try {
 
-            List<Long> taskStates = new ArrayList<>(List.of(TASK_STATE_STARTED));
+            List<Long> taskStates = new ArrayList<>(List.of(TASK_STATE_STARTED, TASK_STATE_ASSIGN));
             List<Long> taskCategories = new ArrayList<>(List.of(TASK_CATEGORY_XTF_QUALITY_RULES));
 
             List<MicroserviceTaskDto> responseTasksDto = taskClient.findByStateAndCategory(taskStates, taskCategories);

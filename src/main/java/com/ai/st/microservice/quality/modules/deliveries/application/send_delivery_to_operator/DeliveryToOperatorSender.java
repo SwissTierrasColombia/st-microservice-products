@@ -62,12 +62,12 @@ public final class DeliveryToOperatorSender implements CommandUseCase<DeliveryTo
 
         List<DeliveryProduct> deliveryProducts = deliveryProductRepository.findByDeliveryId(deliveryId);
 
-        verifyThereAreNoUncheckedProducts(deliveryProducts);
+        verifyIfThereAreNoUncheckedProducts(deliveryProducts);
         verifyIfAllProductsAreAccepted(deliveryProducts);
         verifyFeedbacksForProductsRejected(deliveryProducts);
     }
 
-    private void verifyThereAreNoUncheckedProducts(List<DeliveryProduct> deliveryProducts) {
+    private void verifyIfThereAreNoUncheckedProducts(List<DeliveryProduct> deliveryProducts) {
         long count = deliveryProducts.stream().filter(DeliveryProduct::isPending).count();
         if (count > 0)
             throw new UnauthorizedToModifyDelivery("No se puede enviar la entrega, porque aún hay productos sin revisar.");
@@ -84,7 +84,7 @@ public final class DeliveryToOperatorSender implements CommandUseCase<DeliveryTo
     private void verifyFeedbacksForProductsRejected(List<DeliveryProduct> deliveryProducts) {
         long countProductsWrong = deliveryProducts.stream().filter(DeliveryProduct::isRejected).collect(Collectors.toList()).
                 stream().filter(deliveryProduct ->
-                feedbackRepository.findByDeliveryProductId(deliveryProduct.deliveryProductId()).size() == 0).count();
+                        feedbackRepository.findByDeliveryProductId(deliveryProduct.deliveryProductId()).size() == 0).count();
 
         if (countProductsWrong > 0)
             throw new UnauthorizedToModifyDelivery("Existen productos rechazados a los cuales no se les ha creado un feedback.");

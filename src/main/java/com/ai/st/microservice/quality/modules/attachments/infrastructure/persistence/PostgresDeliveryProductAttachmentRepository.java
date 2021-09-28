@@ -242,7 +242,11 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
             DeliveredProductAttachmentXTFEntity xtfEntity =
                     deliveredProductAttachmentXTFJPARepository.findByDeliveredProductAttachment(deliveredProductAttachmentEntity);
 
-            xtfEntity.setReportRevision(reportRevisionUrl.value());
+            if (reportRevisionUrl == null) {
+                xtfEntity.setReportRevision(null);
+            } else {
+                xtfEntity.setReportRevision(reportRevisionUrl.value());
+            }
 
             deliveredProductAttachmentXTFJPARepository.save(xtfEntity);
         }
