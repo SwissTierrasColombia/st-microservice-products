@@ -10,17 +10,20 @@ public final class ReportAggregatorCommand implements Command {
     private final Long managerCode;
     private final Long userCode;
     private final boolean overwrite;
+    private final String observations;
     private final byte[] bytesFile;
     private final String extensionFile;
 
     public ReportAggregatorCommand(Long deliveryId, Long deliveryProductId, Long attachmentId, Long managerCode,
-                                   Long userCode, boolean overwrite, byte[] bytesFile, String extensionFile) {
+                                   Long userCode, boolean overwrite, String observations,
+                                   byte[] bytesFile, String extensionFile) {
         this.deliveryId = deliveryId;
         this.deliveryProductId = deliveryProductId;
         this.attachmentId = attachmentId;
         this.managerCode = managerCode;
         this.userCode = userCode;
         this.overwrite = overwrite;
+        this.observations = observations;
         this.bytesFile = bytesFile;
         this.extensionFile = extensionFile;
     }
@@ -55,5 +58,9 @@ public final class ReportAggregatorCommand implements Command {
 
     public Long userCode() {
         return userCode;
+    }
+
+    public String observations() {
+        return observations;
     }
 }

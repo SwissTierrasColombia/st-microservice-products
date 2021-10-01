@@ -1,6 +1,7 @@
 package com.ai.st.microservice.quality.modules.attachments.infrastructure.persistence;
 
 import com.ai.st.microservice.quality.modules.attachments.domain.contracts.DeliveryProductAttachmentRepository;
+import com.ai.st.microservice.quality.modules.attachments.domain.xtf.XTFReportObservations;
 import com.ai.st.microservice.quality.modules.attachments.domain.xtf.XTFReportRevisionUrl;
 import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductId;
 import com.ai.st.microservice.quality.modules.attachments.domain.DeliveryProductAttachment;
@@ -79,6 +80,7 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
         xtfEntity.setVersion(xtfAttachment.version().value());
         xtfEntity.setStatus(mappingEnum(xtfAttachment.status()));
         xtfEntity.setReportRevision(null);
+        xtfEntity.setReportObservations(null);
 
         deliveredProductAttachmentXTFJPARepository.save(xtfEntity);
     }
@@ -140,7 +142,8 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
             return DeliveryProductXTFAttachment.fromPrimitives(
                     deliveredProductAttachmentEntity.getId(), deliveredProductAttachmentEntity.getUuid(), deliveredProductAttachmentEntity.getObservations(),
                     deliveredProductAttachmentEntity.getDeliveredProduct().getId(), deliveredProductAttachmentEntity.getCreatedAt(),
-                    xtfEntity.getValid(), xtfEntity.getUrl(), xtfEntity.getReportRevision(), xtfEntity.getVersion(), xtfEntity.getStatus().name()
+                    xtfEntity.getValid(), xtfEntity.getUrl(), xtfEntity.getReportRevision(), xtfEntity.getReportObservations(),
+                    xtfEntity.getVersion(), xtfEntity.getStatus().name()
             );
         }
 
@@ -232,7 +235,8 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
     }
 
     @Override
-    public void updateReportRevisionXTF(DeliveryProductAttachmentUUID uuid, XTFReportRevisionUrl reportRevisionUrl) {
+    public void updateReportRevisionXTF(DeliveryProductAttachmentUUID uuid, XTFReportRevisionUrl reportRevisionUrl,
+                                        XTFReportObservations observations) {
 
         DeliveredProductAttachmentEntity deliveredProductAttachmentEntity =
                 deliveredProductAttachmentJPARepository.findByUuid(uuid.value());
@@ -244,8 +248,10 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
 
             if (reportRevisionUrl == null) {
                 xtfEntity.setReportRevision(null);
+                xtfEntity.setReportObservations(null);
             } else {
                 xtfEntity.setReportRevision(reportRevisionUrl.value());
+                xtfEntity.setReportObservations(observations.value());
             }
 
             deliveredProductAttachmentXTFJPARepository.save(xtfEntity);

@@ -1,5 +1,6 @@
 package com.ai.st.microservice.quality.modules.attachments.domain.contracts;
 
+import com.ai.st.microservice.quality.modules.attachments.domain.xtf.XTFReportObservations;
 import com.ai.st.microservice.quality.modules.attachments.domain.xtf.XTFReportRevisionUrl;
 import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductId;
 import com.ai.st.microservice.quality.modules.attachments.domain.DeliveryProductAttachment;
@@ -23,6 +24,6 @@ public interface DeliveryProductAttachmentRepository {
 
     void remove(DeliveryProductAttachmentId id);
 
-    void updateReportRevisionXTF(DeliveryProductAttachmentUUID uuid, XTFReportRevisionUrl reportRevisionUrl);
+    void updateReportRevisionXTF(DeliveryProductAttachmentUUID uuid, XTFReportRevisionUrl reportRevisionUrl, XTFReportObservations observations);
 
 }

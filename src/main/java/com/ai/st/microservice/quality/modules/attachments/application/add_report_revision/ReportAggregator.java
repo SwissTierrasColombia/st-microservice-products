@@ -5,6 +5,7 @@ import com.ai.st.microservice.quality.modules.attachments.domain.DeliveryProduct
 import com.ai.st.microservice.quality.modules.attachments.domain.contracts.DeliveryProductAttachmentRepository;
 import com.ai.st.microservice.quality.modules.attachments.domain.exceptions.AttachmentNotFound;
 import com.ai.st.microservice.quality.modules.attachments.domain.xtf.DeliveryProductXTFAttachment;
+import com.ai.st.microservice.quality.modules.attachments.domain.xtf.XTFReportObservations;
 import com.ai.st.microservice.quality.modules.attachments.domain.xtf.XTFReportRevisionUrl;
 import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProduct;
 import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductId;
@@ -58,7 +59,10 @@ public final class ReportAggregator implements CommandUseCase<ReportAggregatorCo
         String namespace = buildNamespace(deliveryId);
         String pathUrl = storeFile.storeFilePermanently(command.bytesFile(), command.extensionFile(), namespace);
 
-        attachmentRepository.updateReportRevisionXTF(attachment.uuid(), new XTFReportRevisionUrl(pathUrl, false));
+        attachmentRepository.updateReportRevisionXTF(attachment.uuid(),
+                new XTFReportRevisionUrl(pathUrl, false),
+                new XTFReportObservations(command.observations())
+        );
     }
 
     private DeliveryProductXTFAttachment verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId,

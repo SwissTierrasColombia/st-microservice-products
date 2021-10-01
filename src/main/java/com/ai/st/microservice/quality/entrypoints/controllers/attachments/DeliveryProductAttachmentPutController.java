@@ -69,10 +69,12 @@ public final class DeliveryProductAttachmentPutController extends ApiController 
             validateAttachmentId(attachmentId);
 
             validateReportXTFAttachment(request);
+            validateObservations(request.getObservations());
 
             reportAggregator.handle(new ReportAggregatorCommand(
                     deliveryId, deliveryProductId, attachmentId, session.entityCode(),
-                    session.userCode(), request.isOverwriteReport(), request.getAttachment().getBytes(), "zip"));
+                    session.userCode(), request.isOverwriteReport(), request.getObservations(),
+                    request.getAttachment().getBytes(), "zip"));
 
             httpStatus = HttpStatus.OK;
 
@@ -111,6 +113,12 @@ public final class DeliveryProductAttachmentPutController extends ApiController 
         }
     }
 
+    private void validateObservations(String observations) throws InputValidationException {
+        if (observations == null || observations.isEmpty()) {
+            throw new InputValidationException("Las observaciones son requeridas.");
+        }
+    }
+
     private void validateReportXTFAttachment(RevisionXTFAttachmentRequest request)
             throws InputValidationException, IOException {
         MultipartFile file = request.getAttachment();
@@ -131,7 +139,7 @@ public final class DeliveryProductAttachmentPutController extends ApiController 
 
         boolean filePresent = compressorFile.checkIfFileIsPresent(temporalFilePath, "pdf");
         if (!filePresent) {
-            throw new InputValidationException("El comprimido no contiene un archivo en formato XTF correspondiente al reporte de revisión.");
+            throw new InputValidationException("El comprimido no contiene un archivo en formato PDF correspondiente al reporte de revisión.");
         }
 
         if (countEntries == 2) {
@@ -155,6 +163,9 @@ final class RevisionXTFAttachmentRequest {
     @ApiModelProperty(notes = "Overwrite report?")
     private boolean overwriteReport;
 
+    @ApiModelProperty(notes = "Observations")
+    private String observations;
+
     public RevisionXTFAttachmentRequest() {
         this.overwriteReport = false;
     }
@@ -173,6 +184,14 @@ final class RevisionXTFAttachmentRequest {
 
     public void setOverwriteReport(boolean overwriteReport) {
         this.overwriteReport = overwriteReport;
+    }
+
+    public String getObservations() {
+        return observations;
+    }
+
+    public void setObservations(String observations) {
+        this.observations = observations;
     }
 }
 

@@ -42,7 +42,7 @@ public final class XTFStatusUpdater implements CommandUseCase<XTFStatusUpdaterCo
     }
 
     private void removeReportRevision(DeliveryProductAttachmentUUID uuid) {
-        this.attachmentRepository.updateReportRevisionXTF(uuid, null);
+        this.attachmentRepository.updateReportRevisionXTF(uuid, null, null);
     }
 
 }

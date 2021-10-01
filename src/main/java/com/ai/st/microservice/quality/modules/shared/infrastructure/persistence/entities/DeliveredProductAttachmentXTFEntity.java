@@ -17,6 +17,9 @@ public final class DeliveredProductAttachmentXTFEntity {
     @Column(name = "report_revision", length = 1000)
     private String reportRevision;
 
+    @Column(name = "report_observations", length = 1000)
+    private String reportObservations;
+
     @Column(name = "version", length = 50)
     private String version;
 
@@ -87,4 +90,11 @@ public final class DeliveredProductAttachmentXTFEntity {
         this.reportRevision = reportRevision;
     }
 
+    public String getReportObservations() {
+        return reportObservations;
+    }
+
+    public void setReportObservations(String reportObservations) {
+        this.reportObservations = reportObservations;
+    }
 }

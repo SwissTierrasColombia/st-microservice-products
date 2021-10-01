@@ -29,7 +29,13 @@ public final class AttachmentProductResponse implements Response {
     }
 
     public static AttachmentProductResponse fromAggregate(DeliveryProductXTFAttachment attachment) {
-        XTF xtf = new XTF(attachment.valid().value(), attachment.status().value().name(), attachment.version().value(), attachment.hasReportRevisionURL());
+        XTF xtf = new XTF(
+                attachment.valid().value(),
+                attachment.status().value().name(),
+                attachment.version().value(),
+                attachment.hasReportRevisionURL(),
+                attachment.hasReportRevisionURL() ? attachment.reportObservations().value() : null
+        );
         return fromAggregate(attachment, Types.XTF, xtf);
     }
 
@@ -87,12 +93,14 @@ public final class AttachmentProductResponse implements Response {
         private final String status;
         private final String version;
         private final boolean hasReportRevision;
+        private final String reportObservations;
 
-        public XTF(Boolean isValid, String status, String version, boolean hasReportRevision) {
+        public XTF(Boolean isValid, String status, String version, boolean hasReportRevision, String reportObservations) {
             this.isValid = isValid;
             this.status = status;
             this.version = version;
             this.hasReportRevision = hasReportRevision;
+            this.reportObservations = reportObservations;
         }
 
         public Boolean valid() {
@@ -109,6 +117,10 @@ public final class AttachmentProductResponse implements Response {
 
         public boolean hasReportRevision() {
             return hasReportRevision;
+        }
+
+        public String reportObservations() {
+            return reportObservations;
         }
     }
 
