@@ -22,10 +22,7 @@ import com.ai.st.microservice.quality.modules.deliveries.application.start_revie
 import com.ai.st.microservice.quality.modules.shared.application.Roles;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -204,6 +201,7 @@ public final class DeliveryPatchController extends ApiController {
     @ResponseBody
     public ResponseEntity<?> changeStatusToAccepted(
             @PathVariable Long deliveryId,
+            @RequestBody UpdateDeliveryStatusRequest request,
             @RequestHeader("authorization") String headerAuthorization) {
 
         HttpStatus httpStatus;
@@ -214,11 +212,11 @@ public final class DeliveryPatchController extends ApiController {
             InformationSession session = this.getInformationSession(headerAuthorization);
 
             validateDeliveryId(deliveryId);
+            validateJustification(request.getJustification());
 
             deliveryAcceptor.handle(
                     new DeliveryAcceptorCommand(
-                            deliveryId, session.entityCode()
-                    ));
+                            deliveryId, session.entityCode(), request.getJustification()));
 
             httpStatus = HttpStatus.OK;
 
@@ -247,6 +245,7 @@ public final class DeliveryPatchController extends ApiController {
     @ResponseBody
     public ResponseEntity<?> changeStatusToRejected(
             @PathVariable Long deliveryId,
+            @RequestBody UpdateDeliveryStatusRequest request,
             @RequestHeader("authorization") String headerAuthorization) {
 
         HttpStatus httpStatus;
@@ -257,11 +256,11 @@ public final class DeliveryPatchController extends ApiController {
             InformationSession session = this.getInformationSession(headerAuthorization);
 
             validateDeliveryId(deliveryId);
+            validateJustification(request.getJustification());
 
             deliveryRejecting.handle(
                     new DeliveryRejectingCommand(
-                            deliveryId, session.entityCode()
-                    ));
+                            deliveryId, session.entityCode(), request.getJustification()));
 
             httpStatus = HttpStatus.OK;
 
@@ -287,4 +286,28 @@ public final class DeliveryPatchController extends ApiController {
             throw new InputValidationException("La entrega no es válida");
     }
 
+    private void validateJustification(String justification) throws InputValidationException {
+        if (justification == null || justification.isEmpty()) {
+            throw new InputValidationException("La justificación es requerida.");
+        }
+        if (justification.length() > 500) {
+            throw new InputValidationException("La justificación máximo debe tener 500 caracteres.");
+        }
+    }
+
+}
+
+@ApiModel(value = "UpdateDeliveryStatusRequest")
+final class UpdateDeliveryStatusRequest {
+
+    @ApiModelProperty(required = true, notes = "Justification")
+    private String justification;
+
+    public String getJustification() {
+        return justification;
+    }
+
+    public void setJustification(String justification) {
+        this.justification = justification;
+    }
 }

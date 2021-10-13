@@ -52,6 +52,13 @@ public class DeliveryEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
+    @Column(name = "status_at", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date statusAt;
+
+    @Column(name = "final_comments", length = 1000)
+    private String finalComments;
+
     @OneToMany(mappedBy = "delivery", cascade = CascadeType.ALL)
     private List<DeliveredProductEntity> products = new ArrayList<>();
 
@@ -165,5 +172,21 @@ public class DeliveryEntity {
 
     public void setOperatorName(String operatorName) {
         this.operatorName = operatorName;
+    }
+
+    public Date getStatusAt() {
+        return statusAt;
+    }
+
+    public void setStatusAt(Date statusAt) {
+        this.statusAt = statusAt;
+    }
+
+    public String getFinalComments() {
+        return finalComments;
+    }
+
+    public void setFinalComments(String finalComments) {
+        this.finalComments = finalComments;
     }
 }

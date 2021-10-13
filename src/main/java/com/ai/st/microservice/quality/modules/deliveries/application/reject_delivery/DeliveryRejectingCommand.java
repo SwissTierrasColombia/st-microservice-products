@@ -6,10 +6,12 @@ public final class DeliveryRejectingCommand implements Command {
 
     private final Long deliveryId;
     private final Long managerCode;
+    private final String justification;
 
-    public DeliveryRejectingCommand(Long deliveryId, Long managerCode) {
+    public DeliveryRejectingCommand(Long deliveryId, Long managerCode, String justification) {
         this.deliveryId = deliveryId;
         this.managerCode = managerCode;
+        this.justification = justification;
     }
 
     public Long deliveryId() {
@@ -20,4 +22,7 @@ public final class DeliveryRejectingCommand implements Command {
         return managerCode;
     }
 
+    public String justification() {
+        return justification;
+    }
 }

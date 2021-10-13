@@ -5,6 +5,7 @@ import com.ai.st.microservice.common.dto.tasks.*;
 import com.ai.st.microservice.quality.modules.attachments.domain.xtf.DeliveryProductXTFAttachment;
 import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
+import com.ai.st.microservice.quality.modules.shared.domain.DepartmentMunicipality;
 import com.ai.st.microservice.quality.modules.shared.domain.TaskXTFQualityControl;
 import com.ai.st.microservice.quality.modules.shared.domain.UserCode;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.TaskMicroservice;
@@ -31,7 +32,8 @@ public final class HTTPTaskMicroservice implements TaskMicroservice {
 
     @Override
     public void createQualityRulesTask(DeliveryId deliveryId, DeliveryProductId deliveryProductId,
-                                       DeliveryProductXTFAttachment attachment, List<UserCode> users) {
+                                       DeliveryProductXTFAttachment attachment, DepartmentMunicipality departmentMunicipality,
+                                       List<UserCode> users) {
 
         List<Long> categories = new ArrayList<>();
         categories.add(TASK_CATEGORY_XTF_QUALITY_RULES);
@@ -41,8 +43,8 @@ public final class HTTPTaskMicroservice implements TaskMicroservice {
         cal.add(Calendar.DAY_OF_MONTH, TASK_CATEGORY_XTF_QUALITY_RULES_DAYS_DEADLINE);
         String deadline = sdf.format(cal.getTime());
 
-        String name = "Control de calidad";
-        String description = "Realizar control de calidad ";
+        String name = String.format("%s (%s)", departmentMunicipality.municipality(), departmentMunicipality.department());
+        String description = "Realizar control de calidad XTF (LevCAT)";
 
         List<MicroserviceCreateTaskMetadataDto> metadata = new ArrayList<>();
         MicroserviceCreateTaskMetadataDto metadataRequest = new MicroserviceCreateTaskMetadataDto();

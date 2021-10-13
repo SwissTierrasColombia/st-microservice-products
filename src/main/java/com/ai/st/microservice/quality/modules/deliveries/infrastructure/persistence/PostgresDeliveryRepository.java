@@ -1,6 +1,7 @@
 package com.ai.st.microservice.quality.modules.deliveries.infrastructure.persistence;
 
 import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
+import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryFinalComments;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryStatusId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.contracts.DeliveryRepository;
@@ -74,6 +75,7 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
         deliveryEntity.setMunicipalityName(delivery.municipalityName().value());
         deliveryEntity.setManagerName(delivery.managerName().value());
         deliveryEntity.setOperatorName(delivery.operatorName().value());
+        deliveryEntity.setStatusAt(delivery.deliveryStatusDate().value());
 
         delivery.deliveryProducts().forEach(deliveryProduct -> {
             DeliveryProductStatusEntity deliveryProductStatusEntity =
@@ -223,13 +225,18 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
     }
 
     @Override
-    public void changeStatus(DeliveryId deliveryId, DeliveryStatusId deliveryStatusId) {
+    public void changeStatus(DeliveryId deliveryId, DeliveryStatusId deliveryStatusId, DeliveryFinalComments comments) {
         DeliveryEntity deliveryEntity = deliveryJPARepository.findById(deliveryId.value()).orElse(null);
         if (deliveryEntity != null) {
             DeliveryStatusEntity deliveryStatusEntity = new DeliveryStatusEntity();
             deliveryStatusEntity.setId(deliveryStatusId.value());
 
+            if (comments != null) {
+                deliveryEntity.setFinalComments(comments.value());
+            }
+
             deliveryEntity.setDeliveryStatus(deliveryStatusEntity);
+            deliveryEntity.setStatusAt(new Date());
             deliveryJPARepository.save(deliveryEntity);
         }
     }
@@ -248,7 +255,10 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
                 deliveryEntity.getUserCode(),
                 deliveryEntity.getObservations(),
                 deliveryEntity.getCreatedAt(),
-                deliveryEntity.getDeliveryStatus().getId());
+                deliveryEntity.getDeliveryStatus().getId(),
+                deliveryEntity.getFinalComments(),
+                deliveryEntity.getStatusAt()
+        );
     }
 
 }

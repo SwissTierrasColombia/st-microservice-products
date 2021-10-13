@@ -14,6 +14,7 @@ import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.
 import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.entities.ProductEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,6 +52,7 @@ public final class PostgresDeliveryProductRepository implements DeliveryProductR
         deliveredProductEntity.setDelivery(deliveryEntity);
         deliveredProductEntity.setStatus(statusEntity);
         deliveredProductEntity.setObservations(deliveryProduct.deliveryProductObservations().value());
+        deliveredProductEntity.setStatusAt(deliveryProduct.deliveryProductStatusDate().value());
 
         repository.save(deliveredProductEntity);
     }
@@ -89,6 +91,7 @@ public final class PostgresDeliveryProductRepository implements DeliveryProductR
             DeliveryProductStatusEntity statusEntity = new DeliveryProductStatusEntity();
             statusEntity.setId(deliveryProductStatusId.value());
             deliveredProductEntity.setStatus(statusEntity);
+            deliveredProductEntity.setStatusAt(new Date());
             repository.save(deliveredProductEntity);
         }
     }
@@ -99,7 +102,9 @@ public final class PostgresDeliveryProductRepository implements DeliveryProductR
                 deliveredProductEntity.getCreatedAt(),
                 deliveredProductEntity.getObservations(),
                 deliveredProductEntity.getProduct().getId(),
-                deliveredProductEntity.getStatus().getId());
+                deliveredProductEntity.getStatus().getId(),
+                deliveredProductEntity.getStatusAt()
+        );
     }
 
 }

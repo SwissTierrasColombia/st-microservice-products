@@ -15,28 +15,31 @@ public final class DeliveryProduct extends AggregateRoot {
     private final DeliveryProductObservations deliveryProductObservations;
     private final ProductId productId;
     private final DeliveryProductStatusId deliveryProductStatusId;
+    private final DeliveryProductStatusDate deliveryProductStatusDate;
     private final List<DeliveryProductAttachment> attachments;
 
     public DeliveryProduct(DeliveryProductId deliveryProductId, DeliveryProductDate deliveryProductDate,
                            DeliveryProductObservations deliveryProductObservations,
                            ProductId productId, DeliveryProductStatusId deliveryProductStatusId,
-                           List<DeliveryProductAttachment> attachments) {
+                           DeliveryProductStatusDate deliveryProductStatusDate, List<DeliveryProductAttachment> attachments) {
         this.deliveryProductId = deliveryProductId;
         this.deliveryProductDate = deliveryProductDate;
         this.deliveryProductObservations = deliveryProductObservations;
         this.productId = productId;
         this.deliveryProductStatusId = deliveryProductStatusId;
         this.attachments = attachments;
+        this.deliveryProductStatusDate = deliveryProductStatusDate;
     }
 
     public static DeliveryProduct fromPrimitives(Long deliveryProductId, Date deliveryProductDate, String observations, Long productId,
-                                                 Long deliveryProductStatusId) {
+                                                 Long deliveryProductStatusId, Date deliveryProductStatusDate) {
         return new DeliveryProduct(
                 new DeliveryProductId(deliveryProductId),
                 new DeliveryProductDate(deliveryProductDate),
                 new DeliveryProductObservations(observations),
                 new ProductId(productId),
                 new DeliveryProductStatusId(deliveryProductStatusId),
+                new DeliveryProductStatusDate(deliveryProductStatusDate),
                 new ArrayList<>()
         );
     }
@@ -45,7 +48,9 @@ public final class DeliveryProduct extends AggregateRoot {
                                          DeliveryProductObservations deliveryProductObservations,
                                          ProductId productId, DeliveryProductStatusId deliveryProductStatusId) {
         return new DeliveryProduct(null, deliveryProductDate, deliveryProductObservations,
-                productId, deliveryProductStatusId, new ArrayList<>());
+                productId, deliveryProductStatusId,
+                new DeliveryProductStatusDate(new Date()),
+                new ArrayList<>());
     }
 
     public boolean isPending() {
@@ -84,4 +89,7 @@ public final class DeliveryProduct extends AggregateRoot {
         return attachments;
     }
 
+    public DeliveryProductStatusDate deliveryProductStatusDate() {
+        return deliveryProductStatusDate;
+    }
 }

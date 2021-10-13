@@ -18,6 +18,7 @@ import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.Deliv
 import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.UnauthorizedToModifyDelivery;
 import com.ai.st.microservice.quality.modules.deliveries.domain.exceptions.UnauthorizedToSearchDelivery;
 import com.ai.st.microservice.quality.modules.shared.application.CommandUseCase;
+import com.ai.st.microservice.quality.modules.shared.domain.DepartmentMunicipality;
 import com.ai.st.microservice.quality.modules.shared.domain.ManagerCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 import com.ai.st.microservice.quality.modules.shared.domain.UserCode;
@@ -53,20 +54,23 @@ public final class QualityProcessStarter implements CommandUseCase<QualityProces
         DeliveryProductAttachmentId attachmentId = DeliveryProductAttachmentId.fromValue(command.attachmentId());
         ManagerCode managerCode = ManagerCode.fromValue(command.managerCode());
 
-        DeliveryProductXTFAttachment attachment = verifyPermissions(deliveryId, deliveryProductId, attachmentId, managerCode);
+        Delivery delivery = deliveryRepository.search(deliveryId);
+
+        DeliveryProductXTFAttachment attachment = verifyPermissions(delivery, deliveryProductId, attachmentId, managerCode);
 
         List<UserCode> usersCodeList = managerMicroservice.getUsersByManager(managerCode);
 
-        taskMicroservice.createQualityRulesTask(deliveryId, deliveryProductId, attachment, usersCodeList);
+
+        taskMicroservice.createQualityRulesTask(deliveryId, deliveryProductId, attachment,
+                new DepartmentMunicipality(delivery.departmentName(), delivery.municipalityName()), usersCodeList);
 
         attachmentRepository.updateXTFStatus(attachment.uuid(), new XTFStatus(XTFStatus.Status.QUALITY_PROCESS_IN_VALIDATION));
     }
 
-    private DeliveryProductXTFAttachment verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId,
+    private DeliveryProductXTFAttachment verifyPermissions(Delivery delivery, DeliveryProductId deliveryProductId,
                                                            DeliveryProductAttachmentId attachmentId, ManagerCode managerCode) {
 
         // verify delivery exists
-        Delivery delivery = deliveryRepository.search(deliveryId);
         if (delivery == null) {
             throw new DeliveryNotFound();
         }

@@ -47,7 +47,8 @@ public final class DeliveryProductUpdater implements CommandUseCase<DeliveryProd
                 deliveryProduct.deliveryProductDate().value(),
                 observations.value(),
                 deliveryProduct.productId().value(),
-                deliveryProduct.deliveryProductStatusId().value()
+                deliveryProduct.deliveryProductStatusId().value(),
+                deliveryProduct.deliveryProductStatusDate().value()
         ));
     }
 

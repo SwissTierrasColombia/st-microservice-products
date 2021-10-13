@@ -1,9 +1,6 @@
 package com.ai.st.microservice.quality.modules.deliveries.domain;
 
-import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProduct;
-import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductDate;
-import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductObservations;
-import com.ai.st.microservice.quality.modules.delivered_products.domain.DeliveryProductStatusId;
+import com.ai.st.microservice.quality.modules.delivered_products.domain.*;
 
 import com.ai.st.microservice.quality.modules.products.domain.ProductId;
 
@@ -29,11 +26,14 @@ public final class Delivery extends AggregateRoot {
     private final DeliveryObservations observations;
     private final DeliveryDate deliveryDate;
     private final DeliveryStatusId deliveryStatusId;
+    private final DeliveryStatusDate deliveryStatusDate;
     private final List<DeliveryProduct> deliveryProducts;
+    private final DeliveryFinalComments deliveryFinalComments;
 
-    public Delivery(DeliveryId id, DeliveryCode code, MunicipalityCode municipalityCode, MunicipalityName municipalityName, DepartmentName departmentName,
-                    ManagerCode manager, ManagerName managerName, OperatorCode operatorCode, OperatorName operatorName, UserCode user,
-                    DeliveryObservations observations, DeliveryDate deliveryDate, DeliveryStatusId deliveryStatusId, List<DeliveryProduct> deliveryProducts) {
+    private Delivery(DeliveryId id, DeliveryCode code, MunicipalityCode municipalityCode, MunicipalityName municipalityName, DepartmentName departmentName,
+                     ManagerCode manager, ManagerName managerName, OperatorCode operatorCode, OperatorName operatorName, UserCode user,
+                     DeliveryObservations observations, DeliveryDate deliveryDate, DeliveryStatusId deliveryStatusId,
+                     DeliveryStatusDate deliveryStatusDate, DeliveryFinalComments deliveryFinalComments, List<DeliveryProduct> deliveryProducts) {
         this.id = id;
         this.code = code;
         this.municipalityName = municipalityName;
@@ -48,23 +48,28 @@ public final class Delivery extends AggregateRoot {
         this.deliveryDate = deliveryDate;
         this.deliveryStatusId = deliveryStatusId;
         this.deliveryProducts = deliveryProducts;
+        this.deliveryStatusDate = deliveryStatusDate;
+        this.deliveryFinalComments = deliveryFinalComments;
     }
 
     public static Delivery create(DeliveryId id, DeliveryCode code, MunicipalityCode municipalityCode, MunicipalityName municipalityName,
                                   DepartmentName departmentName, ManagerCode manager, ManagerName managerName, OperatorCode operatorCode,
                                   OperatorName operatorName, UserCode user, DeliveryObservations observations, DeliveryDate date, DeliveryStatusId deliveryStatus) {
-        return new Delivery(id, code, municipalityCode, municipalityName, departmentName, manager, managerName, operatorCode, operatorName, user, observations, date, deliveryStatus, new ArrayList<>());
+        return new Delivery(id, code, municipalityCode, municipalityName, departmentName, manager,
+                managerName, operatorCode, operatorName, user, observations, date, deliveryStatus, new DeliveryStatusDate(new Date()),
+                null, new ArrayList<>());
     }
 
     public static Delivery create(DeliveryCode code, MunicipalityCode municipalityCode, MunicipalityName municipalityName, DepartmentName departmentName,
                                   ManagerCode manager, ManagerName managerName, OperatorCode operatorCode, OperatorName operatorName, UserCode user,
                                   DeliveryObservations observations, DeliveryDate date, DeliveryStatusId deliveryStatus) {
-        return new Delivery(null, code, municipalityCode, municipalityName, departmentName, manager, managerName, operatorCode, operatorName, user, observations, date, deliveryStatus, new ArrayList<>());
+        return new Delivery(null, code, municipalityCode, municipalityName, departmentName, manager, managerName, operatorCode, operatorName,
+                user, observations, date, deliveryStatus, new DeliveryStatusDate(new Date()), null, new ArrayList<>());
     }
 
     public static Delivery fromPrimitives(Long id, String code, String municipalityCode, String municipalityName, String departmentName,
                                           Long managerCode, String managerName, Long operatorCode, String operatorName,
-                                          Long userCode, String observations, Date createdAt, Long statusId) {
+                                          Long userCode, String observations, Date createdAt, Long statusId, String comments, Date statusDate) {
         return new Delivery(
                 new DeliveryId(id),
                 new DeliveryCode(code),
@@ -79,6 +84,8 @@ public final class Delivery extends AggregateRoot {
                 new DeliveryObservations(observations),
                 new DeliveryDate(createdAt),
                 new DeliveryStatusId(statusId),
+                new DeliveryStatusDate(statusDate),
+                (comments != null) ? DeliveryFinalComments.fromValue(comments) : null,
                 new ArrayList<>());
     }
 
@@ -90,6 +97,7 @@ public final class Delivery extends AggregateRoot {
                 deliveryProductObservations,
                 productId,
                 deliveryProductStatusId,
+                new DeliveryProductStatusDate(new Date()),
                 new ArrayList<>()));
     }
 
@@ -163,6 +171,14 @@ public final class Delivery extends AggregateRoot {
 
     public boolean isInRemediation() {
         return deliveryStatusId.value().equals(DeliveryStatusId.IN_REMEDIATION);
+    }
+
+    public DeliveryStatusDate deliveryStatusDate() {
+        return deliveryStatusDate;
+    }
+
+    public DeliveryFinalComments deliveryFinalComments() {
+        return deliveryFinalComments;
     }
 
     public static List<DeliveryStatusId> statusesAllowedToManager() {

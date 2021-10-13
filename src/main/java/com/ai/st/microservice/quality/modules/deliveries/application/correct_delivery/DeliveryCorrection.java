@@ -40,7 +40,7 @@ public final class DeliveryCorrection implements CommandUseCase<DeliveryCorrecti
 
         verifyPermissions(deliveryId, operatorCode);
 
-        deliveryRepository.changeStatus(deliveryId, DeliveryStatusId.fromValue(DeliveryStatusId.IN_REVIEW));
+        deliveryRepository.changeStatus(deliveryId, DeliveryStatusId.fromValue(DeliveryStatusId.IN_REVIEW), null);
     }
 
     private void verifyPermissions(DeliveryId deliveryId, OperatorCode operatorCode) {

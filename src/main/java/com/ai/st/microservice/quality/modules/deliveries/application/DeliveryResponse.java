@@ -16,14 +16,16 @@ public final class DeliveryResponse implements Response {
     private final Long operatorCode;
     private final Long userCode;
     private final Long deliveryStatusId;
+    private final Date deliveryStatusDate;
     private final String departmentName;
     private final String municipalityName;
     private final String managerName;
     private final String operatorName;
+    private final String finalComments;
 
     public DeliveryResponse(Long id, String code, Date deliveryDate, Long managerCode, String municipalityCode,
-                            String observations, Long operatorCode, Long userCode, Long deliveryStatusId, String departmentName,
-                            String municipalityName, String managerName, String operatorName) {
+                            String observations, Long operatorCode, Long userCode, Long deliveryStatusId, Date deliveryStatusDate, String departmentName,
+                            String municipalityName, String managerName, String operatorName, String finalComments) {
         this.id = id;
         this.code = code;
         this.deliveryDate = deliveryDate;
@@ -33,10 +35,12 @@ public final class DeliveryResponse implements Response {
         this.operatorCode = operatorCode;
         this.deliveryStatusId = deliveryStatusId;
         this.userCode = userCode;
+        this.deliveryStatusDate = deliveryStatusDate;
         this.departmentName = departmentName;
         this.municipalityName = municipalityName;
         this.managerName = managerName;
         this.operatorName = operatorName;
+        this.finalComments = finalComments;
     }
 
     public static DeliveryResponse fromAggregate(Delivery delivery) {
@@ -49,10 +53,12 @@ public final class DeliveryResponse implements Response {
                 delivery.operator().value(),
                 delivery.user().value(),
                 delivery.deliveryStatusId().value(),
+                delivery.deliveryStatusDate().value(),
                 delivery.departmentName().value(),
                 delivery.municipalityName().value(),
                 delivery.managerName().value(),
-                delivery.operatorName().value());
+                delivery.operatorName().value(),
+                (delivery.deliveryFinalComments() != null) ? delivery.deliveryFinalComments().value() : null);
     }
 
     public Long id() {
@@ -105,5 +111,13 @@ public final class DeliveryResponse implements Response {
 
     public String operatorName() {
         return operatorName;
+    }
+
+    public Date deliveryStatusDate() {
+        return deliveryStatusDate;
+    }
+
+    public String finalComments() {
+        return finalComments;
     }
 }

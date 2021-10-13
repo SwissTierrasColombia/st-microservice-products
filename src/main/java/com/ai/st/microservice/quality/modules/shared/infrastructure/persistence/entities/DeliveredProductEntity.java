@@ -31,6 +31,10 @@ public class DeliveredProductEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
+    @Column(name = "status_at", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date statusAt;
+
     public Long getId() {
         return id;
     }
@@ -77,5 +81,13 @@ public class DeliveredProductEntity {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Date getStatusAt() {
+        return statusAt;
+    }
+
+    public void setStatusAt(Date statusAt) {
+        this.statusAt = statusAt;
     }
 }

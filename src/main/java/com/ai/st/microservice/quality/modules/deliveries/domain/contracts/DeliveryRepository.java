@@ -1,6 +1,7 @@
 package com.ai.st.microservice.quality.modules.deliveries.domain.contracts;
 
 import com.ai.st.microservice.quality.modules.deliveries.domain.Delivery;
+import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryFinalComments;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryId;
 import com.ai.st.microservice.quality.modules.deliveries.domain.DeliveryStatusId;
 import com.ai.st.microservice.quality.modules.shared.domain.PageableDomain;
@@ -18,6 +19,6 @@ public interface DeliveryRepository {
 
     void update(Delivery delivery);
 
-    void changeStatus(DeliveryId deliveryId, DeliveryStatusId deliveryStatusId);
+    void changeStatus(DeliveryId deliveryId, DeliveryStatusId deliveryStatusId, DeliveryFinalComments comments);
 
 }
