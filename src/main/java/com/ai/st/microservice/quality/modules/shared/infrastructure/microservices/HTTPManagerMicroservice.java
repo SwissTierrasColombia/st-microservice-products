@@ -45,7 +45,7 @@ public final class HTTPManagerMicroservice implements ManagerMicroservice {
         try {
 
             List<MicroserviceManagerUserDto> users = managerFeignClient.findUsersByManager(managerCode.value(),
-                    new ArrayList<>(Collections.singletonList(RoleBusiness.SUB_ROLE_DIRECTOR)));
+                    new ArrayList<>(Collections.singletonList(RoleBusiness.SUB_ROLE_DIRECTOR_MANAGER)));
 
             usersCodes = users.stream().map(
                     managerUserDto -> new UserCode(managerUserDto.getUserCode())).collect(Collectors.toList());
