@@ -10,6 +10,9 @@ import com.ai.st.microservice.quality.modules.shared.domain.TaskXTFQualityContro
 import com.ai.st.microservice.quality.modules.shared.domain.UserCode;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.TaskMicroservice;
 import com.ai.st.microservice.quality.modules.shared.domain.exceptions.MicroserviceUnreachable;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -18,6 +21,8 @@ import java.util.stream.Collectors;
 
 @Service
 public final class HTTPTaskMicroservice implements TaskMicroservice {
+
+    private final Logger log = LoggerFactory.getLogger(HTTPTaskMicroservice.class);
 
     private final TaskFeignClient taskClient;
 
@@ -77,6 +82,9 @@ public final class HTTPTaskMicroservice implements TaskMicroservice {
             taskClient.createTask(createTask);
 
         } catch (Exception e) {
+            String messageError = String.format("Error creando tarea de levantamiento catastral: %s", e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
             throw new MicroserviceUnreachable("tasks");
         }
 
@@ -116,6 +124,11 @@ public final class HTTPTaskMicroservice implements TaskMicroservice {
             }
 
         } catch (Exception e) {
+            String messageError = String.format(
+                    "Error consultando la tarea de levantamiento catastral del adjunto %s: %s",
+                    attachment.uuid().value(), e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
             return null;
         }
 

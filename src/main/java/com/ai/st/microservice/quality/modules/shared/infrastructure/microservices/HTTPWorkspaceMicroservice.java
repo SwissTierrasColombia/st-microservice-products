@@ -7,6 +7,9 @@ import com.ai.st.microservice.quality.modules.shared.domain.*;
 import com.ai.st.microservice.quality.modules.shared.domain.exceptions.MicroserviceUnreachable;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.WorkspaceMicroservice;
 import com.ai.st.microservice.quality.modules.shared.domain.exceptions.MunicipalityInvalid;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +17,8 @@ import java.util.stream.Collectors;
 
 @Service
 public final class HTTPWorkspaceMicroservice implements WorkspaceMicroservice {
+
+    private final Logger log = LoggerFactory.getLogger(HTTPWorkspaceMicroservice.class);
 
     private final WorkspaceFeignClient workspaceFeignClient;
 
@@ -39,6 +44,10 @@ public final class HTTPWorkspaceMicroservice implements WorkspaceMicroservice {
 
             return (size > 0);
         } catch (Exception e) {
+            String messageError = String.format("Error verificando si el operador %d pertenece al gestor %d: %s",
+                    operatorCode.value(), managerCode.value(), e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
             throw new MicroserviceUnreachable("workspaces");
         }
     }

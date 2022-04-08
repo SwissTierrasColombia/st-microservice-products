@@ -2,7 +2,10 @@ package com.ai.st.microservice.quality.modules.shared.infrastructure.compressor;
 
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.CompressorFile;
 import com.ai.st.microservice.quality.modules.shared.domain.exceptions.CompressError;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
 import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -17,6 +20,8 @@ import java.util.zip.ZipOutputStream;
 @Service
 public final class ZIPCompressorFile implements CompressorFile {
 
+    private final Logger log = LoggerFactory.getLogger(ZIPCompressorFile.class);
+
     @Override
     public int countEntries(String filePath) throws CompressError {
         int count = 0;
@@ -29,6 +34,10 @@ public final class ZIPCompressorFile implements CompressorFile {
             }
             zipFile.close();
         } catch (IOException e) {
+            String messageError = String
+                    .format("Error leyendo el archivo zip para obtener la cantidad de archivos : %s", e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
             throw new CompressError("Ha ocurrido un error leyendo el archivo zip.");
         }
         return count;
@@ -47,6 +56,10 @@ public final class ZIPCompressorFile implements CompressorFile {
             }
             zipFile.close();
         } catch (IOException e) {
+            String messageError = String
+                    .format("Error leyendo el archivo zip para verificar si contiene un archivo : %s", e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
             throw new CompressError("Ha ocurrido un error leyendo el archivo zip.");
         }
         return false;
@@ -96,6 +109,9 @@ public final class ZIPCompressorFile implements CompressorFile {
         } catch (CompressError e) {
             throw new CompressError(e.errorMessage());
         } catch (IOException e) {
+            String messageError = String.format("Error comprimiendo y creando el archivo zip : %s", e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
             throw new CompressError("Ha ocurrido un error creando el archivo zip.");
         }
     }
