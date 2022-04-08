@@ -3,6 +3,7 @@ package com.ai.st.microservice.quality.entrypoints.events.attachments;
 import com.ai.st.microservice.common.dto.ili.MicroserviceValidationDto;
 import com.ai.st.microservice.quality.modules.attachments.application.update_xtf_status.XTFStatusUpdater;
 import com.ai.st.microservice.quality.modules.attachments.application.update_xtf_status.XTFStatusUpdaterCommand;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -37,7 +38,11 @@ public final class UpdateStateXTFOnValidationDone {
             }
 
         } catch (Exception e) {
-            log.error("Error updating state xtf: " + e.getMessage());
+            String messageError = String.format(
+                    "Error actualizando el estado del archivo XTF %s después de la validación: %s",
+                    validationDto.getReferenceId(), e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
         }
 
     }

@@ -12,6 +12,8 @@ import com.ai.st.microservice.quality.modules.products.application.update_produc
 import com.ai.st.microservice.quality.modules.products.application.update_product.ProductUpdaterCommand;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.TracingKeyword;
 import io.swagger.annotations.*;
 
 import org.slf4j.Logger;
@@ -48,6 +50,10 @@ public final class ProductPutController extends ApiController {
 
         try {
 
+            SCMTracing.setTransactionName("updateProduct");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
+            SCMTracing.addCustomParameter(TracingKeyword.BODY_REQUEST, request.toString());
+
             InformationSession session = this.getInformationSession(headerAuthorization);
 
             validateProductId(productId);
@@ -66,15 +72,18 @@ public final class ProductPutController extends ApiController {
         } catch (InputValidationException e) {
             log.error("Error ProductPutController@updateProduct#Validation ---> " + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
-            responseDto = new BasicResponseDto(e.getMessage(), 3);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (DomainError e) {
             log.error("Error ProductPutController@updateProduct#Domain ---> " + e.getMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+            responseDto = new BasicResponseDto(e.errorMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (Exception e) {
             log.error("Error ProductPutController@updateProduct#General ---> " + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 1);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);
@@ -131,5 +140,11 @@ final class UpdateProductRequest {
 
     public void setXTF(boolean XTF) {
         isXTF = XTF;
+    }
+
+    @Override
+    public String toString() {
+        return "UpdateProductRequest{" + "name='" + name + '\'' + ", description='" + description + '\'' + ", isXTF="
+                + isXTF + '}';
     }
 }
