@@ -11,6 +11,8 @@ import com.ai.st.microservice.quality.modules.feedbacks.application.create_feedb
 import com.ai.st.microservice.quality.modules.feedbacks.application.create_feedback.FeedbackCreatorCommand;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.TracingKeyword;
 import io.swagger.annotations.*;
 
 import org.apache.commons.io.FilenameUtils;
@@ -51,6 +53,10 @@ public final class DeliveryProductFeedbackPostController extends ApiController {
 
         try {
 
+            SCMTracing.setTransactionName("createFeedback");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
+            SCMTracing.addCustomParameter(TracingKeyword.BODY_REQUEST, request.toString());
+
             InformationSession session = this.getInformationSession(headerAuthorization);
 
             validateDeliveryId(deliveryId);
@@ -70,15 +76,18 @@ public final class DeliveryProductFeedbackPostController extends ApiController {
         } catch (InputValidationException e) {
             log.error("Error DeliveredProductFeedbackPostController@createFeedback#Validation ---> " + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
-            responseDto = new BasicResponseDto(e.getMessage(), 1);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (DomainError e) {
             log.error("Error DeliveredProductFeedbackPostController@createFeedback#Domain ---> " + e.errorMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+            responseDto = new BasicResponseDto(e.errorMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (Exception e) {
             log.error("Error DeliveredProductFeedbackPostController@createFeedback#General ---> " + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 3);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);
@@ -141,5 +150,11 @@ final class CreateFeedbackRequest {
 
     public void setAttachment(MultipartFile attachment) {
         this.attachment = attachment;
+    }
+
+    @Override
+    public String toString() {
+        return "CreateFeedbackRequest{" + "feedback='" + feedback + '\'' + ", attachment=" + attachment.toString()
+                + '}';
     }
 }

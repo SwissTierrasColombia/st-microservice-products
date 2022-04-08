@@ -14,6 +14,8 @@ import com.ai.st.microservice.quality.modules.feedbacks.application.get_feedback
 import com.ai.st.microservice.quality.modules.feedbacks.application.get_feedback_url.FeedbackURLGetterQuery;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.TracingKeyword;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -67,6 +69,9 @@ public final class DeliveryProductFeedbackGetController extends ApiController {
 
         try {
 
+            SCMTracing.setTransactionName("findFeedbacks");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
+
             InformationSession session = this.getInformationSession(headerAuthorization);
 
             validateDeliveryId(deliveryId);
@@ -81,15 +86,18 @@ public final class DeliveryProductFeedbackGetController extends ApiController {
         } catch (InputValidationException e) {
             log.error("Error DeliveryProductFeedbackGetController@findFeedbacks#Validation ---> " + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
-            responseDto = new BasicResponseDto(e.getMessage(), 3);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (DomainError e) {
             log.error("Error DeliveryProductFeedbackGetController@findFeedbacks#Domain ---> " + e.getMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+            responseDto = new BasicResponseDto(e.errorMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (Exception e) {
             log.error("Error DeliveryProductFeedbackGetController@findFeedbacks#General ---> " + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 1);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);
@@ -108,6 +116,9 @@ public final class DeliveryProductFeedbackGetController extends ApiController {
         InputStreamResource resource;
 
         try {
+
+            SCMTracing.setTransactionName("downloadFeedback");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
 
             InformationSession session = this.getInformationSession(headerAuthorization);
 
@@ -133,14 +144,17 @@ public final class DeliveryProductFeedbackGetController extends ApiController {
             resource = new InputStreamResource(new FileInputStream(file));
 
         } catch (InputValidationException e) {
+            SCMTracing.sendError(e.getMessage());
             log.error("Error DeliveryProductFeedbackGetController@downloadFeedback#Validation ---> " + e.getMessage());
-            return new ResponseEntity<>(new BasicResponseDto(e.getMessage(), 3), HttpStatus.UNPROCESSABLE_ENTITY);
+            return new ResponseEntity<>(new BasicResponseDto(e.getMessage()), HttpStatus.UNPROCESSABLE_ENTITY);
         } catch (DomainError e) {
+            SCMTracing.sendError(e.getMessage());
             log.error("Error DeliveryProductFeedbackGetController@downloadFeedback#Domain ---> " + e.getMessage());
-            return new ResponseEntity<>(new BasicResponseDto(e.errorMessage(), 2), HttpStatus.UNPROCESSABLE_ENTITY);
+            return new ResponseEntity<>(new BasicResponseDto(e.errorMessage()), HttpStatus.UNPROCESSABLE_ENTITY);
         } catch (Exception e) {
+            SCMTracing.sendError(e.getMessage());
             log.error("Error DeliveryProductFeedbackGetController@downloadFeedback#General ---> " + e.getMessage());
-            return new ResponseEntity<>(new BasicResponseDto(e.getMessage(), 1), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new BasicResponseDto(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return this.responseFile(file, mediaType, resource);
