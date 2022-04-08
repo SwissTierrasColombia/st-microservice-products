@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public final class ManagerProductsFinder implements QueryUseCase<ManagerProductsFinderQuery, ListResponse<ProductResponse>> {
+public final class ManagerProductsFinder
+        implements QueryUseCase<ManagerProductsFinderQuery, ListResponse<ProductResponse>> {
 
     private final ProductRepository repository;
 

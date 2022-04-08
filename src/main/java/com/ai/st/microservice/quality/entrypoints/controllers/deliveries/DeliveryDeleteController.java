@@ -22,7 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api(value = "Manage Deliveries", tags = {"Deliveries"})
+@Api(value = "Manage Deliveries", tags = { "Deliveries" })
 @RestController
 public final class DeliveryDeleteController extends ApiController {
 
@@ -31,21 +31,18 @@ public final class DeliveryDeleteController extends ApiController {
     private final DeliveryRemover deliveryRemover;
 
     public DeliveryDeleteController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                    OperatorBusiness operatorBusiness, DeliveryRemover deliveryRemover) {
+            OperatorBusiness operatorBusiness, DeliveryRemover deliveryRemover) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.deliveryRemover = deliveryRemover;
     }
 
     @DeleteMapping(value = "api/quality/v1/deliveries/{deliveryId}")
     @ApiOperation(value = "Remove delivery")
-    @ApiResponses(value = {
-            @ApiResponse(code = 204, message = "Delivery removed"),
-            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class)})
+    @ApiResponses(value = { @ApiResponse(code = 204, message = "Delivery removed"),
+            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class) })
     @ResponseBody
-    public ResponseEntity<?> removeDelivery(
-            @PathVariable Long deliveryId,
+    public ResponseEntity<?> removeDelivery(@PathVariable Long deliveryId,
             @RequestHeader("authorization") String headerAuthorization) {
-
 
         HttpStatus httpStatus;
         Object responseDto = null;
@@ -56,10 +53,7 @@ public final class DeliveryDeleteController extends ApiController {
 
             validateDeliveryId(deliveryId);
 
-            deliveryRemover.handle(
-                    new DeliveryRemoverCommand(
-                            deliveryId, session.entityCode()
-                    ));
+            deliveryRemover.handle(new DeliveryRemoverCommand(deliveryId, session.entityCode()));
 
             httpStatus = HttpStatus.NO_CONTENT;
 

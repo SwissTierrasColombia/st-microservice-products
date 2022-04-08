@@ -23,8 +23,7 @@ public final class PostgresProductRepository implements ProductRepository {
     @Override
     public List<Product> findProductsByManager(ManagerCode managerCode) {
         List<ProductEntity> entities = repository.findByManagerCode(managerCode.value());
-        return entities.stream().map(this::mappingProduct)
-                .collect(Collectors.toList());
+        return entities.stream().map(this::mappingProduct).collect(Collectors.toList());
     }
 
     @Override
@@ -62,8 +61,8 @@ public final class PostgresProductRepository implements ProductRepository {
     }
 
     private Product mappingProduct(ProductEntity entity) {
-        return Product.fromPrimitives(entity.getId(), entity.getName(),
-                entity.getDescription(), entity.getManagerCode(), entity.getXTF(), entity.getCreatedAt());
+        return Product.fromPrimitives(entity.getId(), entity.getName(), entity.getDescription(),
+                entity.getManagerCode(), entity.getXTF(), entity.getCreatedAt());
     }
 
 }

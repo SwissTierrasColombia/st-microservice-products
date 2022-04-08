@@ -51,10 +51,10 @@ public final class AttachmentAssigner implements CommandUseCase<AttachmentAssign
 
     private final static int MAXIMUM_ATTACHMENTS_PER_PRODUCT = 5;
 
-    public AttachmentAssigner(DeliveryProductAttachmentRepository attachmentRepository, DeliveryRepository deliveryRepository,
-                              DeliveryProductRepository deliveryProductRepository, ProductRepository productRepository,
-                              DateTime dateTime, StoreFile storeFile, ILIMicroservice iliMicroservice,
-                              ILIOldMicroservice iliOldMicroservice) {
+    public AttachmentAssigner(DeliveryProductAttachmentRepository attachmentRepository,
+            DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository,
+            ProductRepository productRepository, DateTime dateTime, StoreFile storeFile,
+            ILIMicroservice iliMicroservice, ILIOldMicroservice iliOldMicroservice) {
         this.attachmentRepository = attachmentRepository;
         this.productRepository = productRepository;
         this.dateTime = dateTime;
@@ -74,14 +74,16 @@ public final class AttachmentAssigner implements CommandUseCase<AttachmentAssign
 
         DeliveryProduct deliveryProduct = verifyPermissions(deliveryId, deliveryProductId, operatorCode);
 
-        DeliveryProductAttachment attachment = handleAttachment(command.attachment(), deliveryId, deliveryProductId, deliveryProduct.productId());
+        DeliveryProductAttachment attachment = handleAttachment(command.attachment(), deliveryId, deliveryProductId,
+                deliveryProduct.productId());
 
         attachmentRepository.save(attachment);
 
         changeProductStatusToPending(deliveryProductId);
     }
 
-    private DeliveryProduct verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId, OperatorCode operatorCode) {
+    private DeliveryProduct verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId,
+            OperatorCode operatorCode) {
 
         // verify delivery exists
         Delivery delivery = deliveryRepository.search(deliveryId);
@@ -102,7 +104,8 @@ public final class AttachmentAssigner implements CommandUseCase<AttachmentAssign
 
         // verify status of the delivery
         if (!delivery.isDraft() && !delivery.isInRemediation()) {
-            throw new UnauthorizedToModifyDelivery("No se puede agregar adjuntos, porque el estado de la entrega no lo permite.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede agregar adjuntos, porque el estado de la entrega no lo permite.");
         }
 
         // verify status of the delivery product
@@ -120,9 +123,7 @@ public final class AttachmentAssigner implements CommandUseCase<AttachmentAssign
     }
 
     private DeliveryProductAttachment handleAttachment(AttachmentAssignerCommand.Attachment attachment,
-                                                       DeliveryId deliveryId,
-                                                       DeliveryProductId deliveryProductId,
-                                                       ProductId productId) {
+            DeliveryId deliveryId, DeliveryProductId deliveryProductId, ProductId productId) {
 
         if (!productIsXTF(productId) && attachment.isXTF()) {
             throw new AttachmentTypeNotSupportedToProduct();
@@ -131,23 +132,25 @@ public final class AttachmentAssigner implements CommandUseCase<AttachmentAssign
         DeliveryProductAttachmentDate attachmentDate = new DeliveryProductAttachmentDate(dateTime.now());
 
         if (attachment instanceof AttachmentAssignerCommand.XTFAttachment) {
-            return handleXTFAttachment((AttachmentAssignerCommand.XTFAttachment) attachment, deliveryId, deliveryProductId, attachmentDate);
+            return handleXTFAttachment((AttachmentAssignerCommand.XTFAttachment) attachment, deliveryId,
+                    deliveryProductId, attachmentDate);
         }
 
         if (attachment instanceof AttachmentAssignerCommand.FTPAttachment) {
-            return handleFTPAttachment((AttachmentAssignerCommand.FTPAttachment) attachment, deliveryProductId, attachmentDate);
+            return handleFTPAttachment((AttachmentAssignerCommand.FTPAttachment) attachment, deliveryProductId,
+                    attachmentDate);
         }
 
         if (attachment instanceof AttachmentAssignerCommand.DocumentAttachment) {
-            return handleDocumentAttachment((AttachmentAssignerCommand.DocumentAttachment) attachment, deliveryId, deliveryProductId, attachmentDate);
+            return handleDocumentAttachment((AttachmentAssignerCommand.DocumentAttachment) attachment, deliveryId,
+                    deliveryProductId, attachmentDate);
         }
 
         throw new AttachmentUnsupported();
     }
 
     private DeliveryProductXTFAttachment handleXTFAttachment(AttachmentAssignerCommand.XTFAttachment attachment,
-                                                             DeliveryId deliveryId,
-                                                             DeliveryProductId deliveryProductId, DeliveryProductAttachmentDate attachmentDate) {
+            DeliveryId deliveryId, DeliveryProductId deliveryProductId, DeliveryProductAttachmentDate attachmentDate) {
 
         XTFVersion version = new XTFVersion(attachment.version());
 
@@ -162,46 +165,29 @@ public final class AttachmentAssigner implements CommandUseCase<AttachmentAssign
             iliMicroservice.sendToValidation(identifierUUID, pathUrl, false, false);
         }
 
-        return DeliveryProductXTFAttachment.create(
-                identifierUUID,
-                new DeliveryProductAttachmentObservations(attachment.observations()),
-                deliveryProductId,
-                attachmentDate,
-                new XTFValid(null),
-                new XTFUrl(pathUrl),
-                version,
-                new XTFStatus(XTFStatus.Status.IN_VALIDATION)
-        );
+        return DeliveryProductXTFAttachment.create(identifierUUID,
+                new DeliveryProductAttachmentObservations(attachment.observations()), deliveryProductId, attachmentDate,
+                new XTFValid(null), new XTFUrl(pathUrl), version, new XTFStatus(XTFStatus.Status.IN_VALIDATION));
     }
 
     private DeliveryProductFTPAttachment handleFTPAttachment(AttachmentAssignerCommand.FTPAttachment attachment,
-                                                             DeliveryProductId deliveryProductId, DeliveryProductAttachmentDate attachmentDate) {
-        return DeliveryProductFTPAttachment.create(
-                new DeliveryProductAttachmentUUID(UUID.randomUUID().toString()),
-                new DeliveryProductAttachmentObservations(attachment.observations()),
-                deliveryProductId,
-                attachmentDate,
-                new FTPDomain(attachment.domain()),
-                new FTPPort(attachment.port()),
-                new FTPUsername(attachment.username()),
-                new FTPPassword(attachment.password())
-        );
+            DeliveryProductId deliveryProductId, DeliveryProductAttachmentDate attachmentDate) {
+        return DeliveryProductFTPAttachment.create(new DeliveryProductAttachmentUUID(UUID.randomUUID().toString()),
+                new DeliveryProductAttachmentObservations(attachment.observations()), deliveryProductId, attachmentDate,
+                new FTPDomain(attachment.domain()), new FTPPort(attachment.port()),
+                new FTPUsername(attachment.username()), new FTPPassword(attachment.password()));
     }
 
-    private DeliveryProductDocumentAttachment handleDocumentAttachment(AttachmentAssignerCommand.DocumentAttachment attachment,
-                                                                       DeliveryId deliveryId,
-                                                                       DeliveryProductId deliveryProductId, DeliveryProductAttachmentDate attachmentDate) {
+    private DeliveryProductDocumentAttachment handleDocumentAttachment(
+            AttachmentAssignerCommand.DocumentAttachment attachment, DeliveryId deliveryId,
+            DeliveryProductId deliveryProductId, DeliveryProductAttachmentDate attachmentDate) {
 
         String namespace = buildNamespace(deliveryId);
         String pathUrl = storeFile.storeFilePermanently(attachment.bytes(), attachment.extension(), namespace);
 
-        return DeliveryProductDocumentAttachment.create(
-                new DeliveryProductAttachmentUUID(UUID.randomUUID().toString()),
-                new DeliveryProductAttachmentObservations(attachment.observations()),
-                deliveryProductId,
-                attachmentDate,
-                new DocumentUrl(pathUrl)
-        );
+        return DeliveryProductDocumentAttachment.create(new DeliveryProductAttachmentUUID(UUID.randomUUID().toString()),
+                new DeliveryProductAttachmentObservations(attachment.observations()), deliveryProductId, attachmentDate,
+                new DocumentUrl(pathUrl));
     }
 
     private String buildNamespace(DeliveryId deliveryId) {

@@ -24,14 +24,14 @@ public abstract class ApiController {
     protected final ManagerBusiness managerBusiness;
     protected final OperatorBusiness operatorBusiness;
 
-    public ApiController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness, OperatorBusiness operatorBusiness) {
+    public ApiController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
+            OperatorBusiness operatorBusiness) {
         this.administrationBusiness = administrationBusiness;
         this.managerBusiness = managerBusiness;
         this.operatorBusiness = operatorBusiness;
     }
 
-    protected MicroserviceUserDto getUserSession(String headerAuthorization)
-            throws DisconnectedMicroserviceException {
+    protected MicroserviceUserDto getUserSession(String headerAuthorization) throws DisconnectedMicroserviceException {
         MicroserviceUserDto userDtoSession = administrationBusiness.getUserByToken(headerAuthorization);
         if (userDtoSession == null) {
             throw new DisconnectedMicroserviceException("Ha ocurrido un error consultando el usuario");
@@ -39,25 +39,25 @@ public abstract class ApiController {
         return userDtoSession;
     }
 
-    protected InformationSession getInformationSession(String headerAuthorization) throws DisconnectedMicroserviceException {
+    protected InformationSession getInformationSession(String headerAuthorization)
+            throws DisconnectedMicroserviceException {
         MicroserviceUserDto userDtoSession = this.getUserSession(headerAuthorization);
         if (administrationBusiness.isManager(userDtoSession)) {
             MicroserviceManagerDto managerDto = managerBusiness.getManagerByUserCode(userDtoSession.getId());
-            return new InformationSession(Roles.MANAGER, managerDto.getId(), userDtoSession.getId(), managerDto.getName());
+            return new InformationSession(Roles.MANAGER, managerDto.getId(), userDtoSession.getId(),
+                    managerDto.getName());
         } else if (administrationBusiness.isOperator(userDtoSession)) {
             MicroserviceOperatorDto operatorDto = operatorBusiness.getOperatorByUserCode(userDtoSession.getId());
-            return new InformationSession(Roles.OPERATOR, operatorDto.getId(), userDtoSession.getId(), operatorDto.getName());
+            return new InformationSession(Roles.OPERATOR, operatorDto.getId(), userDtoSession.getId(),
+                    operatorDto.getName());
         }
         throw new RuntimeException("User information not found");
     }
 
     protected ResponseEntity<?> responseFile(File file, MediaType mediaType, InputStreamResource resource) {
         String extension = Files.getFileExtension(file.getName());
-        return ResponseEntity.ok().header(
-                HttpHeaders.CONTENT_DISPOSITION,
-                "attachment;filename=" + file.getName())
-                .contentType(mediaType).contentLength(file.length())
-                .header("extension", extension)
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + file.getName())
+                .contentType(mediaType).contentLength(file.length()).header("extension", extension)
                 .header("filename", file.getName() + extension).body(resource);
     }
 

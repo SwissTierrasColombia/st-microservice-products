@@ -30,8 +30,8 @@ public final class FeedbackCreator implements CommandUseCase<FeedbackCreatorComm
     private final DateTime dateTime;
     private final StoreFile storeFile;
 
-
-    public FeedbackCreator(DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository, DeliveryProductFeedbackRepository feedbackRepository, DateTime dateTime, StoreFile storeFile) {
+    public FeedbackCreator(DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository,
+            DeliveryProductFeedbackRepository feedbackRepository, DateTime dateTime, StoreFile storeFile) {
         this.deliveryRepository = deliveryRepository;
         this.deliveryProductRepository = deliveryProductRepository;
         this.feedbackRepository = feedbackRepository;
@@ -51,19 +51,16 @@ public final class FeedbackCreator implements CommandUseCase<FeedbackCreatorComm
 
         verifyPermissions(deliveryId, deliveryProductId, managerCode);
 
-        FeedbackURLAttachment urlAttachment = handleAttachment(deliveryId, command.attachment(), command.attachmentExtension());
+        FeedbackURLAttachment urlAttachment = handleAttachment(deliveryId, command.attachment(),
+                command.attachmentExtension());
 
-        Feedback feedback = Feedback.create(
-                feedbackComments,
-                urlAttachment,
-                feedbackDate,
-                deliveryProductId
-        );
+        Feedback feedback = Feedback.create(feedbackComments, urlAttachment, feedbackDate, deliveryProductId);
 
         feedbackRepository.save(feedback);
     }
 
-    private void verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId, ManagerCode managerCode) {
+    private void verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId,
+            ManagerCode managerCode) {
 
         // verify delivery exists
         Delivery delivery = deliveryRepository.search(deliveryId);
@@ -84,12 +81,14 @@ public final class FeedbackCreator implements CommandUseCase<FeedbackCreatorComm
 
         // verify status of the delivery
         if (!delivery.isInReview()) {
-            throw new UnauthorizedToModifyDelivery("No se puede crear la retroalimentación, porque el estado de la entrega no lo permite.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede crear la retroalimentación, porque el estado de la entrega no lo permite.");
         }
 
         // verify status of the delivery product
         if (deliveryProduct.isPending()) {
-            throw new UnauthorizedToModifyDelivery("No se puede crear la retroalimentación, porque el producto no ha sido aceptado o rechazado.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede crear la retroalimentación, porque el producto no ha sido aceptado o rechazado.");
         }
 
     }

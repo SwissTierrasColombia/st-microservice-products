@@ -12,7 +12,8 @@ public final class FTPDomain {
     }
 
     private void ensureDomain(String value) {
-        if (value == null || value.isEmpty()) throw new FTPDomainInvalid();
+        if (value == null || value.isEmpty())
+            throw new FTPDomainInvalid();
     }
 
     public String value() {

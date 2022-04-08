@@ -23,12 +23,9 @@ public final class DeliveryStatusId {
     }
 
     private void ensureStatus(Long value) {
-        if (!value.equals(DeliveryStatusId.DRAFT)
-                && !value.equals(DeliveryStatusId.DELIVERED)
-                && !value.equals(DeliveryStatusId.IN_REVIEW)
-                && !value.equals(DeliveryStatusId.IN_REMEDIATION)
-                && !value.equals(DeliveryStatusId.ACCEPTED)
-                && !value.equals(DeliveryStatusId.REJECTED))
+        if (!value.equals(DeliveryStatusId.DRAFT) && !value.equals(DeliveryStatusId.DELIVERED)
+                && !value.equals(DeliveryStatusId.IN_REVIEW) && !value.equals(DeliveryStatusId.IN_REMEDIATION)
+                && !value.equals(DeliveryStatusId.ACCEPTED) && !value.equals(DeliveryStatusId.REJECTED))
             throw new DeliveryStatusInvalid();
     }
 

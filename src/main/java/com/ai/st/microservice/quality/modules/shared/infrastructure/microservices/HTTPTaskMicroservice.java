@@ -32,8 +32,8 @@ public final class HTTPTaskMicroservice implements TaskMicroservice {
 
     @Override
     public void createQualityRulesTask(DeliveryId deliveryId, DeliveryProductId deliveryProductId,
-                                       DeliveryProductXTFAttachment attachment, DepartmentMunicipality departmentMunicipality,
-                                       List<UserCode> users) {
+            DeliveryProductXTFAttachment attachment, DepartmentMunicipality departmentMunicipality,
+            List<UserCode> users) {
 
         List<Long> categories = new ArrayList<>();
         categories.add(TASK_CATEGORY_XTF_QUALITY_RULES);
@@ -43,7 +43,8 @@ public final class HTTPTaskMicroservice implements TaskMicroservice {
         cal.add(Calendar.DAY_OF_MONTH, TASK_CATEGORY_XTF_QUALITY_RULES_DAYS_DEADLINE);
         String deadline = sdf.format(cal.getTime());
 
-        String name = String.format("%s (%s)", departmentMunicipality.municipality(), departmentMunicipality.department());
+        String name = String.format("%s (%s)", departmentMunicipality.municipality(),
+                departmentMunicipality.department());
         String description = "Realizar control de calidad XTF (LevCAT)";
 
         List<MicroserviceCreateTaskMetadataDto> metadata = new ArrayList<>();
@@ -52,8 +53,10 @@ public final class HTTPTaskMicroservice implements TaskMicroservice {
         List<MicroserviceCreateTaskPropertyDto> listPropertiesRequest = new ArrayList<>();
         listPropertiesRequest.add(new MicroserviceCreateTaskPropertyDto("version", attachment.version().value()));
         listPropertiesRequest.add(new MicroserviceCreateTaskPropertyDto("deliveryId", deliveryId.value().toString()));
-        listPropertiesRequest.add(new MicroserviceCreateTaskPropertyDto("deliveryProductId", deliveryProductId.value().toString()));
-        listPropertiesRequest.add(new MicroserviceCreateTaskPropertyDto("attachmentId", attachment.deliveryProductAttachmentId().value().toString()));
+        listPropertiesRequest
+                .add(new MicroserviceCreateTaskPropertyDto("deliveryProductId", deliveryProductId.value().toString()));
+        listPropertiesRequest.add(new MicroserviceCreateTaskPropertyDto("attachmentId",
+                attachment.deliveryProductAttachmentId().value().toString()));
         metadataRequest.setProperties(listPropertiesRequest);
         metadata.add(metadataRequest);
 
@@ -96,16 +99,16 @@ public final class HTTPTaskMicroservice implements TaskMicroservice {
 
                 if (metadataRequest != null) {
 
-                    MicroserviceTaskMetadataPropertyDto propertyAttachmentId = metadataRequest.getProperties()
-                            .stream().filter(p -> p.getKey().equalsIgnoreCase("attachmentId")).findAny()
-                            .orElse(null);
+                    MicroserviceTaskMetadataPropertyDto propertyAttachmentId = metadataRequest.getProperties().stream()
+                            .filter(p -> p.getKey().equalsIgnoreCase("attachmentId")).findAny().orElse(null);
 
                     if (propertyAttachmentId != null) {
                         Long taskAttachmentId = Long.parseLong(propertyAttachmentId.getValue());
                         if (taskAttachmentId.equals(attachment.deliveryProductAttachmentId().value())) {
                             MicroserviceTaskMemberDto userDto = taskDto.getMembers().stream().findFirst().orElse(null);
                             if (userDto != null) {
-                                return new TaskXTFQualityControl(taskDto.getId(), TASK_CATEGORY_XTF_QUALITY_RULES, userDto.getMemberCode());
+                                return new TaskXTFQualityControl(taskDto.getId(), TASK_CATEGORY_XTF_QUALITY_RULES,
+                                        userDto.getMemberCode());
                             }
                         }
                     }

@@ -14,7 +14,8 @@ public class MunicipalityCode {
     }
 
     private void ensureMunicipalityCode(String value) {
-        if (value == null || value.length() != 5) throw new MunicipalityInvalid();
+        if (value == null || value.length() != 5)
+            throw new MunicipalityInvalid();
     }
 
     public static MunicipalityCode fromValue(String value) {
@@ -27,8 +28,10 @@ public class MunicipalityCode {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         MunicipalityCode that = (MunicipalityCode) o;
         return Objects.equals(value, that.value);
     }

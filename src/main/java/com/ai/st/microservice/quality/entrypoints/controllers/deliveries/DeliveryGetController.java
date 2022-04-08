@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Api(value = "Manage Deliveries", tags = {"Deliveries"})
+@Api(value = "Manage Deliveries", tags = { "Deliveries" })
 @RestController
 public final class DeliveryGetController extends ApiController {
 
@@ -39,7 +39,7 @@ public final class DeliveryGetController extends ApiController {
     private final DeliverySearcher deliverySearcher;
 
     public DeliveryGetController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                 OperatorBusiness operatorBusiness, DeliveriesFinder deliveriesFinder, DeliverySearcher deliverySearcher) {
+            OperatorBusiness operatorBusiness, DeliveriesFinder deliveriesFinder, DeliverySearcher deliverySearcher) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.deliveriesFinder = deliveriesFinder;
         this.deliverySearcher = deliverySearcher;
@@ -47,14 +47,11 @@ public final class DeliveryGetController extends ApiController {
 
     @GetMapping(value = "api/quality/v1/deliveries", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get deliveries")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Deliveries got", response = PageableResponse.class),
-            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class)})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Deliveries got", response = PageableResponse.class),
+            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class) })
     @ResponseBody
-    public ResponseEntity<?> findDeliveries(
-            @RequestParam(name = "page") int page,
-            @RequestParam(name = "limit") int limit,
-            @RequestParam(name = "states", required = false) List<Long> states,
+    public ResponseEntity<?> findDeliveries(@RequestParam(name = "page") int page,
+            @RequestParam(name = "limit") int limit, @RequestParam(name = "states", required = false) List<Long> states,
             @RequestParam(name = "code", required = false) String code,
             @RequestParam(name = "municipality", required = false) String municipality,
             @RequestParam(name = "operator", required = false) Long operator,
@@ -68,17 +65,8 @@ public final class DeliveryGetController extends ApiController {
 
             InformationSession session = this.getInformationSession(headerAuthorization);
 
-            responseDto = deliveriesFinder.handle(
-                    new DeliveriesFinderQuery(
-                            page,
-                            limit,
-                            states,
-                            code,
-                            municipality,
-                            operator,
-                            manager,
-                            session.role(),
-                            session.entityCode()));
+            responseDto = deliveriesFinder.handle(new DeliveriesFinderQuery(page, limit, states, code, municipality,
+                    operator, manager, session.role(), session.entityCode()));
 
             httpStatus = HttpStatus.OK;
 
@@ -97,12 +85,10 @@ public final class DeliveryGetController extends ApiController {
 
     @GetMapping(value = "api/quality/v1/deliveries/{deliveryId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Search delivery")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Delivery got", response = DeliveryResponse.class),
-            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class)})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Delivery got", response = DeliveryResponse.class),
+            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class) })
     @ResponseBody
-    public ResponseEntity<?> searchDelivery(
-            @PathVariable Long deliveryId,
+    public ResponseEntity<?> searchDelivery(@PathVariable Long deliveryId,
             @RequestHeader("authorization") String headerAuthorization) {
 
         HttpStatus httpStatus;
@@ -116,9 +102,8 @@ public final class DeliveryGetController extends ApiController {
 
             InformationSession session = this.getInformationSession(headerAuthorization);
 
-            responseDto = deliverySearcher.handle(
-                    new DeliverySearcherQuery(deliveryId, session.role(), session.entityCode())
-            );
+            responseDto = deliverySearcher
+                    .handle(new DeliverySearcherQuery(deliveryId, session.role(), session.entityCode()));
 
             httpStatus = HttpStatus.OK;
 

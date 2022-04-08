@@ -22,7 +22,8 @@ public final class DeliveryRejecting implements CommandUseCase<DeliveryRejecting
     private final DeliveryRepository deliveryRepository;
     private final DeliveryProductRepository deliveryProductRepository;
 
-    public DeliveryRejecting(DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository) {
+    public DeliveryRejecting(DeliveryRepository deliveryRepository,
+            DeliveryProductRepository deliveryProductRepository) {
         this.deliveryRepository = deliveryRepository;
         this.deliveryProductRepository = deliveryProductRepository;
     }
@@ -54,7 +55,8 @@ public final class DeliveryRejecting implements CommandUseCase<DeliveryRejecting
 
         // verify status of the delivery
         if (!delivery.isInReview()) {
-            throw new UnauthorizedToModifyDelivery("No se puede rechazar la entrega, porque el estado de la misma no lo permite.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede rechazar la entrega, porque el estado de la misma no lo permite.");
         }
 
         List<DeliveryProduct> productList = deliveryProductRepository.findByDeliveryId(deliveryId);
@@ -66,13 +68,15 @@ public final class DeliveryRejecting implements CommandUseCase<DeliveryRejecting
     private void verifyThereAreNoUncheckedProducts(List<DeliveryProduct> productList) {
         long count = productList.stream().filter(DeliveryProduct::isPending).count();
         if (count > 0)
-            throw new UnauthorizedToModifyDelivery("No se puede rechazar la entrega, porque aún hay productos sin revisar.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede rechazar la entrega, porque aún hay productos sin revisar.");
     }
 
     private void verifyIfAllProductsAreAccepted(List<DeliveryProduct> productList) {
         long countAccepted = productList.stream().filter(DeliveryProduct::isAccepted).count();
         if (countAccepted == productList.size())
-            throw new UnauthorizedToModifyDelivery("No se puede rechazar la entrega, porque todos los productos han sido aceptados.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede rechazar la entrega, porque todos los productos han sido aceptados.");
     }
 
 }

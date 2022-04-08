@@ -4,7 +4,8 @@ import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.
 import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.entities.DeliveredProductAttachmentXTFEntity;
 import org.springframework.data.repository.CrudRepository;
 
-public interface DeliveredProductAttachmentXTFJPARepository extends CrudRepository<DeliveredProductAttachmentXTFEntity, Long> {
+public interface DeliveredProductAttachmentXTFJPARepository
+        extends CrudRepository<DeliveredProductAttachmentXTFEntity, Long> {
 
     DeliveredProductAttachmentXTFEntity findByDeliveredProductAttachment(DeliveredProductAttachmentEntity attachment);
 

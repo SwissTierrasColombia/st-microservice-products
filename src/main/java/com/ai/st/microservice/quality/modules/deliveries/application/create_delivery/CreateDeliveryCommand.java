@@ -14,7 +14,7 @@ public final class CreateDeliveryCommand implements Command {
     private final List<Long> deliveryProducts;
 
     public CreateDeliveryCommand(String municipalityCode, Long managerCode, Long operatorCode, Long userCode,
-                                 String observations, List<Long> deliveryProducts) {
+            String observations, List<Long> deliveryProducts) {
         this.municipalityCode = municipalityCode;
         this.managerCode = managerCode;
         this.operatorCode = operatorCode;
@@ -47,7 +47,3 @@ public final class CreateDeliveryCommand implements Command {
         return deliveryProducts;
     }
 }
-
-
-
-

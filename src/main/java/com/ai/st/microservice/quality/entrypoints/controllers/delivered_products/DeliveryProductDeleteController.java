@@ -22,7 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api(value = "Manage Deliveries", tags = {"Deliveries"})
+@Api(value = "Manage Deliveries", tags = { "Deliveries" })
 @RestController
 public final class DeliveryProductDeleteController extends ApiController {
 
@@ -30,22 +30,20 @@ public final class DeliveryProductDeleteController extends ApiController {
 
     private final DeliveryProductRemover deliveryProductRemover;
 
-    public DeliveryProductDeleteController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                           OperatorBusiness operatorBusiness, DeliveryProductRemover deliveryProductRemover) {
+    public DeliveryProductDeleteController(AdministrationBusiness administrationBusiness,
+            ManagerBusiness managerBusiness, OperatorBusiness operatorBusiness,
+            DeliveryProductRemover deliveryProductRemover) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.deliveryProductRemover = deliveryProductRemover;
     }
 
     @DeleteMapping(value = "api/quality/v1/deliveries/{deliveryId}/products/{deliveryProductId}")
     @ApiOperation(value = "Remove product from delivery")
-    @ApiResponses(value = {
-            @ApiResponse(code = 204, message = "Product removed"),
-            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class)})
+    @ApiResponses(value = { @ApiResponse(code = 204, message = "Product removed"),
+            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class) })
     @ResponseBody
-    public ResponseEntity<?> removeProductFromDelivery(
-            @PathVariable Long deliveryId,
-            @PathVariable Long deliveryProductId,
-            @RequestHeader("authorization") String headerAuthorization) {
+    public ResponseEntity<?> removeProductFromDelivery(@PathVariable Long deliveryId,
+            @PathVariable Long deliveryProductId, @RequestHeader("authorization") String headerAuthorization) {
 
         HttpStatus httpStatus;
         Object responseDto = null;
@@ -57,15 +55,14 @@ public final class DeliveryProductDeleteController extends ApiController {
             validateDeliveryId(deliveryId);
             validateDeliveryProductId(deliveryProductId);
 
-            deliveryProductRemover.handle(
-                    new DeliveryProductRemoverCommand(
-                            deliveryId, deliveryProductId, session.entityCode()
-                    ));
+            deliveryProductRemover
+                    .handle(new DeliveryProductRemoverCommand(deliveryId, deliveryProductId, session.entityCode()));
 
             httpStatus = HttpStatus.NO_CONTENT;
 
         } catch (InputValidationException e) {
-            log.error("Error DeliveryProductDeleteController@removeProductFromDelivery#Validation ---> " + e.getMessage());
+            log.error("Error DeliveryProductDeleteController@removeProductFromDelivery#Validation ---> "
+                    + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
             responseDto = new BasicResponseDto(e.getMessage(), 3);
         } catch (DomainError e) {

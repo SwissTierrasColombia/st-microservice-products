@@ -19,9 +19,9 @@ public final class DeliveryProduct extends AggregateRoot {
     private final List<DeliveryProductAttachment> attachments;
 
     public DeliveryProduct(DeliveryProductId deliveryProductId, DeliveryProductDate deliveryProductDate,
-                           DeliveryProductObservations deliveryProductObservations,
-                           ProductId productId, DeliveryProductStatusId deliveryProductStatusId,
-                           DeliveryProductStatusDate deliveryProductStatusDate, List<DeliveryProductAttachment> attachments) {
+            DeliveryProductObservations deliveryProductObservations, ProductId productId,
+            DeliveryProductStatusId deliveryProductStatusId, DeliveryProductStatusDate deliveryProductStatusDate,
+            List<DeliveryProductAttachment> attachments) {
         this.deliveryProductId = deliveryProductId;
         this.deliveryProductDate = deliveryProductDate;
         this.deliveryProductObservations = deliveryProductObservations;
@@ -31,26 +31,19 @@ public final class DeliveryProduct extends AggregateRoot {
         this.deliveryProductStatusDate = deliveryProductStatusDate;
     }
 
-    public static DeliveryProduct fromPrimitives(Long deliveryProductId, Date deliveryProductDate, String observations, Long productId,
-                                                 Long deliveryProductStatusId, Date deliveryProductStatusDate) {
-        return new DeliveryProduct(
-                new DeliveryProductId(deliveryProductId),
-                new DeliveryProductDate(deliveryProductDate),
-                new DeliveryProductObservations(observations),
-                new ProductId(productId),
-                new DeliveryProductStatusId(deliveryProductStatusId),
-                new DeliveryProductStatusDate(deliveryProductStatusDate),
-                new ArrayList<>()
-        );
+    public static DeliveryProduct fromPrimitives(Long deliveryProductId, Date deliveryProductDate, String observations,
+            Long productId, Long deliveryProductStatusId, Date deliveryProductStatusDate) {
+        return new DeliveryProduct(new DeliveryProductId(deliveryProductId),
+                new DeliveryProductDate(deliveryProductDate), new DeliveryProductObservations(observations),
+                new ProductId(productId), new DeliveryProductStatusId(deliveryProductStatusId),
+                new DeliveryProductStatusDate(deliveryProductStatusDate), new ArrayList<>());
     }
 
     public static DeliveryProduct create(DeliveryProductDate deliveryProductDate,
-                                         DeliveryProductObservations deliveryProductObservations,
-                                         ProductId productId, DeliveryProductStatusId deliveryProductStatusId) {
-        return new DeliveryProduct(null, deliveryProductDate, deliveryProductObservations,
-                productId, deliveryProductStatusId,
-                new DeliveryProductStatusDate(new Date()),
-                new ArrayList<>());
+            DeliveryProductObservations deliveryProductObservations, ProductId productId,
+            DeliveryProductStatusId deliveryProductStatusId) {
+        return new DeliveryProduct(null, deliveryProductDate, deliveryProductObservations, productId,
+                deliveryProductStatusId, new DeliveryProductStatusDate(new Date()), new ArrayList<>());
     }
 
     public boolean isPending() {

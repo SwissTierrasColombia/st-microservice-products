@@ -24,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Objects;
 
-@Api(value = "Manage Deliveries", tags = {"Deliveries"})
+@Api(value = "Manage Deliveries", tags = { "Deliveries" })
 @RestController
 public final class DeliveryProductFeedbackPostController extends ApiController {
 
@@ -32,24 +32,19 @@ public final class DeliveryProductFeedbackPostController extends ApiController {
 
     private final FeedbackCreator feedbackCreator;
 
-    public DeliveryProductFeedbackPostController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                                 OperatorBusiness operatorBusiness, FeedbackCreator feedbackCreator) {
+    public DeliveryProductFeedbackPostController(AdministrationBusiness administrationBusiness,
+            ManagerBusiness managerBusiness, OperatorBusiness operatorBusiness, FeedbackCreator feedbackCreator) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.feedbackCreator = feedbackCreator;
     }
 
-
     @PostMapping(value = "api/quality/v1/deliveries/{deliveryId}/products/{deliveryProductId}/feedbacks", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Create feedback")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Feedback created"),
-            @ApiResponse(code = 500, message = "Error Server", response = String.class)})
+    @ApiResponses(value = { @ApiResponse(code = 201, message = "Feedback created"),
+            @ApiResponse(code = 500, message = "Error Server", response = String.class) })
     @ResponseBody
-    public ResponseEntity<?> createFeedback(
-            @PathVariable Long deliveryId,
-            @PathVariable Long deliveryProductId,
-            @ModelAttribute CreateFeedbackRequest request,
-            @RequestHeader("authorization") String headerAuthorization) {
+    public ResponseEntity<?> createFeedback(@PathVariable Long deliveryId, @PathVariable Long deliveryProductId,
+            @ModelAttribute CreateFeedbackRequest request, @RequestHeader("authorization") String headerAuthorization) {
 
         HttpStatus httpStatus;
         Object responseDto = null;
@@ -67,16 +62,8 @@ public final class DeliveryProductFeedbackPostController extends ApiController {
             String feedback = request.getFeedback();
             validateFeedback(feedback);
 
-            feedbackCreator.handle(
-                    new FeedbackCreatorCommand(
-                            deliveryId,
-                            deliveryProductId,
-                            session.entityCode(),
-                            feedback,
-                            (attachment != null) ? attachment.getBytes() : null,
-                            getExtensionFile(attachment)
-                    )
-            );
+            feedbackCreator.handle(new FeedbackCreatorCommand(deliveryId, deliveryProductId, session.entityCode(),
+                    feedback, (attachment != null) ? attachment.getBytes() : null, getExtensionFile(attachment)));
 
             httpStatus = HttpStatus.CREATED;
 
@@ -126,12 +113,10 @@ public final class DeliveryProductFeedbackPostController extends ApiController {
     }
 
     private String getExtensionFile(MultipartFile file) {
-        return (file == null) ? null :
-                Objects.requireNonNull(FilenameUtils.getExtension(file.getOriginalFilename()));
+        return (file == null) ? null : Objects.requireNonNull(FilenameUtils.getExtension(file.getOriginalFilename()));
     }
 
 }
-
 
 @ApiModel(value = "CreateFeedbackRequest")
 final class CreateFeedbackRequest {

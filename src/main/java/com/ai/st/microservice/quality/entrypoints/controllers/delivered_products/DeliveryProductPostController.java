@@ -20,7 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api(value = "Manage Deliveries", tags = {"Deliveries"})
+@Api(value = "Manage Deliveries", tags = { "Deliveries" })
 @RestController
 public final class DeliveryProductPostController extends ApiController {
 
@@ -29,20 +29,19 @@ public final class DeliveryProductPostController extends ApiController {
     private final DeliveryProductAssigner deliveryProductAssigner;
 
     public DeliveryProductPostController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                         OperatorBusiness operatorBusiness, DeliveryProductAssigner assignProduct) {
+            OperatorBusiness operatorBusiness, DeliveryProductAssigner assignProduct) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.deliveryProductAssigner = assignProduct;
     }
 
     @PostMapping(value = "api/quality/v1/deliveries/{deliveryId}/products", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Add product to delivery")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Product added"),
-            @ApiResponse(code = 500, message = "Error Server", response = String.class)})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Product added"),
+            @ApiResponse(code = 500, message = "Error Server", response = String.class) })
     @ResponseBody
     public ResponseEntity<?> addProductToDelivery(@PathVariable Long deliveryId,
-                                                  @RequestBody AddProductToDeliveryRequest request,
-                                                  @RequestHeader("authorization") String headerAuthorization) {
+            @RequestBody AddProductToDeliveryRequest request,
+            @RequestHeader("authorization") String headerAuthorization) {
 
         HttpStatus httpStatus;
         Object responseDto = null;
@@ -56,11 +55,8 @@ public final class DeliveryProductPostController extends ApiController {
             Long productId = request.getProductId();
             validateProduct(productId);
 
-            deliveryProductAssigner.handle(
-                    new DeliveryProductAssignerCommand(
-                            deliveryId,
-                            productId,
-                            session.entityCode()));
+            deliveryProductAssigner
+                    .handle(new DeliveryProductAssignerCommand(deliveryId, productId, session.entityCode()));
 
             httpStatus = HttpStatus.OK;
 
@@ -109,4 +105,3 @@ final class AddProductToDeliveryRequest {
         this.productId = productId;
     }
 }
-

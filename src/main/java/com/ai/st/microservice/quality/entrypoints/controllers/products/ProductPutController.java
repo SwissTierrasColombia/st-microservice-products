@@ -21,7 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api(value = "Manage products", tags = {"Products"})
+@Api(value = "Manage products", tags = { "Products" })
 @RestController
 public final class ProductPutController extends ApiController {
 
@@ -30,22 +30,18 @@ public final class ProductPutController extends ApiController {
     private final ProductUpdater productUpdater;
 
     public ProductPutController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                OperatorBusiness operatorBusiness, ProductUpdater productUpdater) {
+            OperatorBusiness operatorBusiness, ProductUpdater productUpdater) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.productUpdater = productUpdater;
     }
 
     @PutMapping(value = "api/quality/v1/products/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Update product")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Product updated", response = ProductResponse.class),
-            @ApiResponse(code = 500, message = "Error Server")})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Product updated", response = ProductResponse.class),
+            @ApiResponse(code = 500, message = "Error Server") })
     @ResponseBody
-    public ResponseEntity<?> updateProduct(
-            @PathVariable Long productId,
-            @RequestBody UpdateProductRequest request,
+    public ResponseEntity<?> updateProduct(@PathVariable Long productId, @RequestBody UpdateProductRequest request,
             @RequestHeader("authorization") String headerAuthorization) {
-
 
         HttpStatus httpStatus;
         Object responseDto = null;
@@ -63,10 +59,7 @@ public final class ProductPutController extends ApiController {
             validateDescription(description);
 
             productUpdater.handle(
-                    new ProductUpdaterCommand(
-                            productId, name, description, request.isXTF(), session.entityCode()
-                    )
-            );
+                    new ProductUpdaterCommand(productId, name, description, request.isXTF(), session.entityCode()));
 
             httpStatus = HttpStatus.OK;
 

@@ -20,7 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api(value = "Manage Deliveries", tags = {"Deliveries"})
+@Api(value = "Manage Deliveries", tags = { "Deliveries" })
 @RestController
 public final class DeliveryPutController extends ApiController {
 
@@ -29,20 +29,17 @@ public final class DeliveryPutController extends ApiController {
     private final DeliveryUpdater deliveryUpdater;
 
     public DeliveryPutController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                 OperatorBusiness operatorBusiness, DeliveryUpdater deliveryUpdater) {
+            OperatorBusiness operatorBusiness, DeliveryUpdater deliveryUpdater) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.deliveryUpdater = deliveryUpdater;
     }
 
     @PutMapping(value = "api/quality/v1/deliveries/{deliveryId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Update product from delivery")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Product updated"),
-            @ApiResponse(code = 500, message = "Error Server", response = String.class)})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Product updated"),
+            @ApiResponse(code = 500, message = "Error Server", response = String.class) })
     @ResponseBody
-    public ResponseEntity<?> updateDelivery(
-            @PathVariable Long deliveryId,
-            @RequestBody UpdateDeliveryRequest request,
+    public ResponseEntity<?> updateDelivery(@PathVariable Long deliveryId, @RequestBody UpdateDeliveryRequest request,
             @RequestHeader("authorization") String headerAuthorization) {
 
         HttpStatus httpStatus;
@@ -57,10 +54,7 @@ public final class DeliveryPutController extends ApiController {
             String observations = request.getObservations();
             validateObservations(observations);
 
-            deliveryUpdater.handle(
-                    new DeliveryUpdaterCommand(
-                            deliveryId, observations, session.entityCode()
-                    ));
+            deliveryUpdater.handle(new DeliveryUpdaterCommand(deliveryId, observations, session.entityCode()));
 
             httpStatus = HttpStatus.OK;
 

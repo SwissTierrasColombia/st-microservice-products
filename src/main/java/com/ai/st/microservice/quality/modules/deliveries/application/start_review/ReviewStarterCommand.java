@@ -19,5 +19,5 @@ public final class ReviewStarterCommand implements Command {
     public Long managerCode() {
         return managerCode;
     }
-    
+
 }

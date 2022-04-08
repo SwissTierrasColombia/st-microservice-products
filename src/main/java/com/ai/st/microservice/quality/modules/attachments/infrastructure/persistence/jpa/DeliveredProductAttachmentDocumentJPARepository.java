@@ -4,9 +4,11 @@ import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.
 import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.entities.DeliveredProductAttachmentEntity;
 import org.springframework.data.repository.CrudRepository;
 
-public interface DeliveredProductAttachmentDocumentJPARepository extends CrudRepository<DeliveredProductAttachmentDocumentEntity, Long> {
+public interface DeliveredProductAttachmentDocumentJPARepository
+        extends CrudRepository<DeliveredProductAttachmentDocumentEntity, Long> {
 
-    DeliveredProductAttachmentDocumentEntity findByDeliveredProductAttachment(DeliveredProductAttachmentEntity attachment);
+    DeliveredProductAttachmentDocumentEntity findByDeliveredProductAttachment(
+            DeliveredProductAttachmentEntity attachment);
 
     long deleteByDeliveredProductAttachment(DeliveredProductAttachmentEntity attachment);
 

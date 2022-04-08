@@ -22,15 +22,20 @@ public final class HTTPWorkspaceMicroservice implements WorkspaceMicroservice {
     }
 
     @Override
-    public boolean verifyOperatorBelongToManager(OperatorCode operatorCode, ManagerCode managerCode, MunicipalityCode municipalityCode) {
+    public boolean verifyOperatorBelongToManager(OperatorCode operatorCode, ManagerCode managerCode,
+            MunicipalityCode municipalityCode) {
 
         List<MicroserviceWorkspaceOperatorDto> workspacesOperators;
         try {
             workspacesOperators = workspaceFeignClient.findWorkspacesByOperator(operatorCode.value());
 
-            int size = (int) workspacesOperators.stream().filter(microserviceWorkspaceDto ->
-                    microserviceWorkspaceDto.getMunicipality().getCode().equals(municipalityCode.value())).collect(Collectors.toList())
-                    .stream().filter(microserviceWorkspaceOperator -> microserviceWorkspaceOperator.getManagerCode().equals(managerCode.value())).count();
+            int size = (int) workspacesOperators.stream()
+                    .filter(microserviceWorkspaceDto -> microserviceWorkspaceDto.getMunicipality().getCode()
+                            .equals(municipalityCode.value()))
+                    .collect(Collectors.toList()).stream()
+                    .filter(microserviceWorkspaceOperator -> microserviceWorkspaceOperator.getManagerCode()
+                            .equals(managerCode.value()))
+                    .count();
 
             return (size > 0);
         } catch (Exception e) {
@@ -40,12 +45,12 @@ public final class HTTPWorkspaceMicroservice implements WorkspaceMicroservice {
 
     @Override
     public DepartmentMunicipality getDepartmentMunicipalityName(MunicipalityCode municipalityCode) {
-        MicroserviceMunicipalityDto municipalityDto = workspaceFeignClient.findMunicipalityByCode(municipalityCode.value());
+        MicroserviceMunicipalityDto municipalityDto = workspaceFeignClient
+                .findMunicipalityByCode(municipalityCode.value());
         if (municipalityDto == null) {
             throw new MunicipalityInvalid();
         }
-        return new DepartmentMunicipality(
-                DepartmentName.fromValue(municipalityDto.getDepartment().getName()),
+        return new DepartmentMunicipality(DepartmentName.fromValue(municipalityDto.getDepartment().getName()),
                 MunicipalityName.fromValue(municipalityDto.getName()));
     }
 

@@ -31,7 +31,7 @@ public final class AttachmentFinder implements QueryUseCase<AttachmentFinderQuer
     private final DeliveryProductAttachmentRepository attachmentRepository;
 
     public AttachmentFinder(DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository,
-                            DeliveryProductAttachmentRepository attachmentRepository) {
+            DeliveryProductAttachmentRepository attachmentRepository) {
         this.deliveryRepository = deliveryRepository;
         this.deliveryProductRepository = deliveryProductRepository;
         this.attachmentRepository = attachmentRepository;
@@ -44,13 +44,14 @@ public final class AttachmentFinder implements QueryUseCase<AttachmentFinderQuer
         DeliveryProductId deliveryProductId = DeliveryProductId.fromValue(query.deliveryProductId());
         DeliveryProductAttachmentId attachmentId = DeliveryProductAttachmentId.fromValue(query.attachmentId());
 
-        DeliveryProductAttachment attachment = verifyPermissions(deliveryId, deliveryProductId, attachmentId, query.isOnlyXTF());
+        DeliveryProductAttachment attachment = verifyPermissions(deliveryId, deliveryProductId, attachmentId,
+                query.isOnlyXTF());
 
         return mappingResponse(attachment);
     }
 
     private DeliveryProductAttachment verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId,
-                                                        DeliveryProductAttachmentId attachmentId, boolean onlyXTF) {
+            DeliveryProductAttachmentId attachmentId, boolean onlyXTF) {
 
         // verify delivery exists
         Delivery delivery = deliveryRepository.search(deliveryId);

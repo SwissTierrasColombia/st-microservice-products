@@ -22,7 +22,6 @@ public final class UpdateStateXTFOnValidationDone {
     @RabbitListener(queues = "${st.rabbitmq.queueResultValidationProducts.queue}", concurrency = "${st.rabbitmq.queueResultValidationProducts.concurrency}")
     public void resultValidation(MicroserviceValidationDto validationDto) {
 
-
         try {
 
             log.info("Updating state xtf with result: " + validationDto.getIsValid());
@@ -34,16 +33,12 @@ public final class UpdateStateXTFOnValidationDone {
                 XTFStatusUpdaterCommand.Status status = (validationDto.getIsValid())
                         ? XTFStatusUpdaterCommand.Status.ACCEPTED : XTFStatusUpdaterCommand.Status.REJECTED;
 
-                xtfStatusUpdater.handle(new XTFStatusUpdaterCommand(
-                        status,
-                        validationDto.getReferenceId()
-                ));
+                xtfStatusUpdater.handle(new XTFStatusUpdaterCommand(status, validationDto.getReferenceId()));
             }
 
         } catch (Exception e) {
             log.error("Error updating state xtf: " + e.getMessage());
         }
-
 
     }
 

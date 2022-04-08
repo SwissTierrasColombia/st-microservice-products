@@ -13,8 +13,8 @@ public final class Feedback extends AggregateRoot {
     private final FeedbackDate date;
     private final DeliveryProductId deliveryProductId;
 
-    public Feedback(FeedbackId feedbackId, FeedbackComments comments, FeedbackURLAttachment urlAttachment, FeedbackDate feedbackDate,
-                    DeliveryProductId deliveryProductId) {
+    public Feedback(FeedbackId feedbackId, FeedbackComments comments, FeedbackURLAttachment urlAttachment,
+            FeedbackDate feedbackDate, DeliveryProductId deliveryProductId) {
         this.feedbackId = feedbackId;
         this.comments = comments;
         this.urlAttachment = urlAttachment;
@@ -22,16 +22,15 @@ public final class Feedback extends AggregateRoot {
         this.deliveryProductId = deliveryProductId;
     }
 
-    public static Feedback create(FeedbackComments comments, FeedbackURLAttachment urlAttachment, FeedbackDate feedbackDate, DeliveryProductId deliveryProductId) {
+    public static Feedback create(FeedbackComments comments, FeedbackURLAttachment urlAttachment,
+            FeedbackDate feedbackDate, DeliveryProductId deliveryProductId) {
         return new Feedback(null, comments, urlAttachment, feedbackDate, deliveryProductId);
     }
 
-    public static Feedback fromPrimitives(Long id, String comments, String urlAttachment, Date date, Long deliveryProductId) {
-        return new Feedback(
-                FeedbackId.fromValue(id),
-                FeedbackComments.fromValue(comments),
-                FeedbackURLAttachment.fromValue(urlAttachment),
-                FeedbackDate.fromValue(date),
+    public static Feedback fromPrimitives(Long id, String comments, String urlAttachment, Date date,
+            Long deliveryProductId) {
+        return new Feedback(FeedbackId.fromValue(id), FeedbackComments.fromValue(comments),
+                FeedbackURLAttachment.fromValue(urlAttachment), FeedbackDate.fromValue(date),
                 DeliveryProductId.fromValue(deliveryProductId));
     }
 

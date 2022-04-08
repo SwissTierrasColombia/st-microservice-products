@@ -18,13 +18,16 @@ public final class XTFUrl {
     }
 
     private void ensureUrl(String value) {
-        if (value == null || value.isEmpty()) throw new XTFUrlInvalid();
+        if (value == null || value.isEmpty())
+            throw new XTFUrlInvalid();
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         XTFUrl xtfUrl = (XTFUrl) o;
         return Objects.equals(value, xtfUrl.value);
     }

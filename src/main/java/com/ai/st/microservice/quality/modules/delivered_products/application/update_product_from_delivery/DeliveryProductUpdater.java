@@ -21,7 +21,8 @@ public final class DeliveryProductUpdater implements CommandUseCase<DeliveryProd
     private final DeliveryRepository deliveryRepository;
     private final DeliveryProductRepository deliveryProductRepository;
 
-    public DeliveryProductUpdater(DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository) {
+    public DeliveryProductUpdater(DeliveryRepository deliveryRepository,
+            DeliveryProductRepository deliveryProductRepository) {
         this.deliveryRepository = deliveryRepository;
         this.deliveryProductRepository = deliveryProductRepository;
     }
@@ -42,14 +43,10 @@ public final class DeliveryProductUpdater implements CommandUseCase<DeliveryProd
             throw new DeliveryProductNotFound();
         }
 
-        deliveryProductRepository.update(DeliveryProduct.fromPrimitives(
-                deliveryProduct.deliveryProductId().value(),
-                deliveryProduct.deliveryProductDate().value(),
-                observations.value(),
-                deliveryProduct.productId().value(),
-                deliveryProduct.deliveryProductStatusId().value(),
-                deliveryProduct.deliveryProductStatusDate().value()
-        ));
+        deliveryProductRepository.update(DeliveryProduct.fromPrimitives(deliveryProduct.deliveryProductId().value(),
+                deliveryProduct.deliveryProductDate().value(), observations.value(),
+                deliveryProduct.productId().value(), deliveryProduct.deliveryProductStatusId().value(),
+                deliveryProduct.deliveryProductStatusDate().value()));
     }
 
     private void verifyPermissions(DeliveryId deliveryId, OperatorCode operatorCode) {
@@ -67,7 +64,8 @@ public final class DeliveryProductUpdater implements CommandUseCase<DeliveryProd
 
         // verify status of the delivery
         if (!delivery.isDraft()) {
-            throw new UnauthorizedToModifyDelivery("No se puede actualizar el producto, porque el estado de la entrega no lo permite.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede actualizar el producto, porque el estado de la entrega no lo permite.");
         }
 
     }

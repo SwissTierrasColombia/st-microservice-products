@@ -14,7 +14,8 @@ public final class ProductDate {
     }
 
     private void ensureDate(Date value) {
-        if (value == null) throw new ProductDateInvalid();
+        if (value == null)
+            throw new ProductDateInvalid();
     }
 
     public static ProductDate fromValue(Date value) {

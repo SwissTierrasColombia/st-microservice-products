@@ -4,6 +4,7 @@ import com.ai.st.microservice.quality.modules.attachments.domain.DeliveryProduct
 
 public interface ILIOldMicroservice {
 
-    void sendToValidation(DeliveryProductAttachmentUUID attachmentUUID, String pathFile, boolean skipGeometryValidation, boolean skipErrors);
+    void sendToValidation(DeliveryProductAttachmentUUID attachmentUUID, String pathFile, boolean skipGeometryValidation,
+            boolean skipErrors);
 
 }

@@ -25,14 +25,15 @@ import com.ai.st.microservice.quality.modules.shared.domain.Service;
 import java.util.stream.Collectors;
 
 @Service
-public final class AttachmentsProductFinder implements QueryUseCase<AttachmentsProductFinderQuery, ListResponse<AttachmentProductResponse>> {
+public final class AttachmentsProductFinder
+        implements QueryUseCase<AttachmentsProductFinderQuery, ListResponse<AttachmentProductResponse>> {
 
     private final DeliveryRepository deliveryRepository;
     private final DeliveryProductRepository deliveryProductRepository;
     private final DeliveryProductAttachmentRepository attachmentRepository;
 
     public AttachmentsProductFinder(DeliveryProductAttachmentRepository attachmentRepository,
-                                    DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository) {
+            DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository) {
         this.attachmentRepository = attachmentRepository;
         this.deliveryRepository = deliveryRepository;
         this.deliveryProductRepository = deliveryProductRepository;
@@ -46,11 +47,12 @@ public final class AttachmentsProductFinder implements QueryUseCase<AttachmentsP
 
         verifyPermissions(deliveryId, deliveryProductId, query.role(), query.entityCode());
 
-        return new ListResponse<>(attachmentRepository.findByDeliveryProductId(deliveryProductId)
-                .stream().map(this::mappingResponse).collect(Collectors.toList()));
+        return new ListResponse<>(attachmentRepository.findByDeliveryProductId(deliveryProductId).stream()
+                .map(this::mappingResponse).collect(Collectors.toList()));
     }
 
-    private void verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId, Roles role, Long entityCode) {
+    private void verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId, Roles role,
+            Long entityCode) {
 
         // verify delivery exists
         Delivery delivery = deliveryRepository.search(deliveryId);
@@ -72,7 +74,8 @@ public final class AttachmentsProductFinder implements QueryUseCase<AttachmentsP
         }
         if (role.equals(Roles.MANAGER)) {
             // verify status of the delivery
-            if (!delivery.deliveryBelongToManager(ManagerCode.fromValue(entityCode)) || !delivery.isAvailableToManager()) {
+            if (!delivery.deliveryBelongToManager(ManagerCode.fromValue(entityCode))
+                    || !delivery.isAvailableToManager()) {
                 throw new UnauthorizedToSearchDelivery();
             }
         }

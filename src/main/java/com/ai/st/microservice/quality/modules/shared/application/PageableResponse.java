@@ -11,7 +11,8 @@ public final class PageableResponse<T> implements Response {
     private final int totalPages;
     private final int size;
 
-    public PageableResponse(List<T> items, int currentPage, int numberOfElements, long totalElements, int totalPages, int size) {
+    public PageableResponse(List<T> items, int currentPage, int numberOfElements, long totalElements, int totalPages,
+            int size) {
         this.currentPage = currentPage;
         this.numberOfElements = numberOfElements;
         this.totalElements = totalElements;

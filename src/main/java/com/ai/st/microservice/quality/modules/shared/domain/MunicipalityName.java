@@ -9,7 +9,8 @@ public final class MunicipalityName extends StringValueObject {
     }
 
     private static void ensureName(String value) {
-        if (value == null || value.isEmpty()) throw new MunicipalityNameInvalid();
+        if (value == null || value.isEmpty())
+            throw new MunicipalityNameInvalid();
     }
 
     public static MunicipalityName fromValue(String value) {

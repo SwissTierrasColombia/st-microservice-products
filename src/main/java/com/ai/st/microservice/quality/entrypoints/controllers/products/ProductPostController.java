@@ -21,7 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api(value = "Manage products", tags = {"Products"})
+@Api(value = "Manage products", tags = { "Products" })
 @RestController
 public final class ProductPostController extends ApiController {
 
@@ -30,19 +30,17 @@ public final class ProductPostController extends ApiController {
     private final ProductCreator productCreator;
 
     public ProductPostController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                 OperatorBusiness operatorBusiness, ProductCreator productCreator) {
+            OperatorBusiness operatorBusiness, ProductCreator productCreator) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.productCreator = productCreator;
     }
 
     @PostMapping(value = "api/quality/v1/products", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Create product")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Product created", response = ProductResponse.class),
-            @ApiResponse(code = 500, message = "Error Server")})
+    @ApiResponses(value = { @ApiResponse(code = 201, message = "Product created", response = ProductResponse.class),
+            @ApiResponse(code = 500, message = "Error Server") })
     @ResponseBody
-    public ResponseEntity<?> createProduct(
-            @RequestBody CreateProductRequest request,
+    public ResponseEntity<?> createProduct(@RequestBody CreateProductRequest request,
             @RequestHeader("authorization") String headerAuthorization) {
 
         HttpStatus httpStatus;
@@ -58,11 +56,7 @@ public final class ProductPostController extends ApiController {
             String description = request.getDescription();
             validateDescription(description);
 
-            productCreator.handle(
-                    new ProductCreatorCommand(
-                            name, description, request.isXTF(), session.entityCode()
-                    )
-            );
+            productCreator.handle(new ProductCreatorCommand(name, description, request.isXTF(), session.entityCode()));
 
             httpStatus = HttpStatus.CREATED;
 

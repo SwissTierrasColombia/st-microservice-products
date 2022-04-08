@@ -23,7 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api(value = "Manage Deliveries", tags = {"Deliveries"})
+@Api(value = "Manage Deliveries", tags = { "Deliveries" })
 @RestController
 public final class DeliveryProductGetController extends ApiController {
 
@@ -32,21 +32,18 @@ public final class DeliveryProductGetController extends ApiController {
     private final DeliveryProductsFinder deliveryProductsFinder;
 
     public DeliveryProductGetController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                        OperatorBusiness operatorBusiness, DeliveryProductsFinder deliveryProductsFinder) {
+            OperatorBusiness operatorBusiness, DeliveryProductsFinder deliveryProductsFinder) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.deliveryProductsFinder = deliveryProductsFinder;
     }
 
     @GetMapping(value = "api/quality/v1/deliveries/{deliveryId}/products", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get deliveries")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Deliveries got", response = PageableResponse.class),
-            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class)})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Deliveries got", response = PageableResponse.class),
+            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class) })
     @ResponseBody
-    public ResponseEntity<?> findDeliveryProducts(
-            @PathVariable Long deliveryId,
-            @RequestHeader("authorization") String headerAuthorization
-    ) {
+    public ResponseEntity<?> findDeliveryProducts(@PathVariable Long deliveryId,
+            @RequestHeader("authorization") String headerAuthorization) {
 
         HttpStatus httpStatus;
         Object responseDto;
@@ -55,9 +52,8 @@ public final class DeliveryProductGetController extends ApiController {
 
             InformationSession session = this.getInformationSession(headerAuthorization);
 
-            responseDto = deliveryProductsFinder.handle(
-                    new DeliveryProductsFinderQuery(
-                            deliveryId, session.role(), session.entityCode())).list();
+            responseDto = deliveryProductsFinder
+                    .handle(new DeliveryProductsFinderQuery(deliveryId, session.role(), session.entityCode())).list();
 
             httpStatus = HttpStatus.OK;
 

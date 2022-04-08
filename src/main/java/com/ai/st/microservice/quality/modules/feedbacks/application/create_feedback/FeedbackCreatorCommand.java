@@ -11,8 +11,8 @@ public final class FeedbackCreatorCommand implements Command {
     private final byte[] attachment;
     private final String attachmentExtension;
 
-    public FeedbackCreatorCommand(Long deliveryId, Long deliveryProductId, Long managerCode,
-                                  String feedback, byte[] attachment, String attachmentExtension) {
+    public FeedbackCreatorCommand(Long deliveryId, Long deliveryProductId, Long managerCode, String feedback,
+            byte[] attachment, String attachmentExtension) {
         this.deliveryId = deliveryId;
         this.deliveryProductId = deliveryProductId;
         this.managerCode = managerCode;

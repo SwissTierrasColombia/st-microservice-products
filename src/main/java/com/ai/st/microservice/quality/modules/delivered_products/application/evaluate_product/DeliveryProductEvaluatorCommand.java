@@ -4,7 +4,9 @@ import com.ai.st.microservice.quality.modules.shared.application.Command;
 
 public final class DeliveryProductEvaluatorCommand implements Command {
 
-    public enum Statuses {ACCEPTED, REJECTED}
+    public enum Statuses {
+        ACCEPTED, REJECTED
+    }
 
     private final Long deliveryId;
     private final Long deliveryProductId;

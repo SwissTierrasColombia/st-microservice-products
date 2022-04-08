@@ -23,7 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api(value = "Manage products", tags = {"Products"})
+@Api(value = "Manage products", tags = { "Products" })
 @RestController
 public final class ProductDeleteController extends ApiController {
 
@@ -32,19 +32,17 @@ public final class ProductDeleteController extends ApiController {
     private final ProductRemover productRemover;
 
     public ProductDeleteController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                   OperatorBusiness operatorBusiness, ProductRemover productRemover) {
+            OperatorBusiness operatorBusiness, ProductRemover productRemover) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.productRemover = productRemover;
     }
 
     @DeleteMapping(value = "api/quality/v1/products/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Delete product")
-    @ApiResponses(value = {
-            @ApiResponse(code = 204, message = "Products"),
-            @ApiResponse(code = 500, message = "Error Server")})
+    @ApiResponses(value = { @ApiResponse(code = 204, message = "Products"),
+            @ApiResponse(code = 500, message = "Error Server") })
     @ResponseBody
-    public ResponseEntity<?> deleteProduct(
-            @PathVariable Long productId,
+    public ResponseEntity<?> deleteProduct(@PathVariable Long productId,
             @RequestHeader("authorization") String headerAuthorization) {
 
         HttpStatus httpStatus;
@@ -56,11 +54,7 @@ public final class ProductDeleteController extends ApiController {
 
             validateProductId(productId);
 
-            productRemover.handle(
-                    new ProductRemoverCommand(
-                            productId, session.entityCode()
-                    )
-            );
+            productRemover.handle(new ProductRemoverCommand(productId, session.entityCode()));
 
             httpStatus = HttpStatus.NO_CONTENT;
 

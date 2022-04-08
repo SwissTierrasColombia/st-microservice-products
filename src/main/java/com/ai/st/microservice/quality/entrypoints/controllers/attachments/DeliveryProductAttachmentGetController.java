@@ -38,7 +38,7 @@ import java.io.FileInputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-@Api(value = "Manage Deliveries", tags = {"Deliveries"})
+@Api(value = "Manage Deliveries", tags = { "Deliveries" })
 @RestController
 public final class DeliveryProductAttachmentGetController extends ApiController {
 
@@ -51,10 +51,9 @@ public final class DeliveryProductAttachmentGetController extends ApiController 
     private final AttachmentReportURLGetter attachmentReportURLGetter;
 
     public DeliveryProductAttachmentGetController(AdministrationBusiness administrationBusiness,
-                                                  ManagerBusiness managerBusiness, OperatorBusiness operatorBusiness,
-                                                  ServletContext servletContext, AttachmentFinder attachmentFinder,
-                                                  AttachmentsProductFinder attachmentsProductFinder,
-                                                  AttachmentURLGetter attachmentURLGetter, AttachmentReportURLGetter attachmentReportURLGetter) {
+            ManagerBusiness managerBusiness, OperatorBusiness operatorBusiness, ServletContext servletContext,
+            AttachmentFinder attachmentFinder, AttachmentsProductFinder attachmentsProductFinder,
+            AttachmentURLGetter attachmentURLGetter, AttachmentReportURLGetter attachmentReportURLGetter) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.servletContext = servletContext;
         this.attachmentFinder = attachmentFinder;
@@ -67,12 +66,10 @@ public final class DeliveryProductAttachmentGetController extends ApiController 
     @ApiOperation(value = "Get attachments from delivery product")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Attachments got", response = AttachmentProductResponse.class, responseContainer = "List"),
-            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class)})
+            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class) })
     @ResponseBody
-    public ResponseEntity<?> findAttachmentsFromProduct(
-            @PathVariable Long deliveryId,
-            @PathVariable Long deliveryProductId,
-            @RequestHeader("authorization") String headerAuthorization) {
+    public ResponseEntity<?> findAttachmentsFromProduct(@PathVariable Long deliveryId,
+            @PathVariable Long deliveryProductId, @RequestHeader("authorization") String headerAuthorization) {
 
         HttpStatus httpStatus;
         Object responseDto;
@@ -84,20 +81,19 @@ public final class DeliveryProductAttachmentGetController extends ApiController 
             validateDeliveryId(deliveryId);
             validateDeliveryProductId(deliveryProductId);
 
-            responseDto = attachmentsProductFinder.handle(
-                    new AttachmentsProductFinderQuery(
-                            deliveryId, deliveryProductId, session.role(), session.entityCode()
-                    )
-            ).list();
+            responseDto = attachmentsProductFinder.handle(new AttachmentsProductFinderQuery(deliveryId,
+                    deliveryProductId, session.role(), session.entityCode())).list();
 
             httpStatus = HttpStatus.OK;
 
         } catch (DomainError e) {
-            log.error("Error DeliveryProductAttachmentGetController@findAttachmentsFromProduct#Domain ---> " + e.getMessage());
+            log.error("Error DeliveryProductAttachmentGetController@findAttachmentsFromProduct#Domain ---> "
+                    + e.getMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
             responseDto = new BasicResponseDto(e.errorMessage(), 2);
         } catch (Exception e) {
-            log.error("Error DeliveryProductAttachmentGetController@findAttachmentsFromProduct#General ---> " + e.getMessage());
+            log.error("Error DeliveryProductAttachmentGetController@findAttachmentsFromProduct#General ---> "
+                    + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
             responseDto = new BasicResponseDto(e.getMessage(), 1);
         }
@@ -109,11 +105,9 @@ public final class DeliveryProductAttachmentGetController extends ApiController 
     @ApiOperation(value = "Get attachment from delivery product")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Attachment got", response = AttachmentProductResponse.class),
-            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class)})
+            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class) })
     @ResponseBody
-    public ResponseEntity<?> findXTFAttachment(
-            @PathVariable Long deliveryId,
-            @PathVariable Long deliveryProductId,
+    public ResponseEntity<?> findXTFAttachment(@PathVariable Long deliveryId, @PathVariable Long deliveryProductId,
             @PathVariable Long attachmentId) {
 
         HttpStatus httpStatus;
@@ -125,8 +119,8 @@ public final class DeliveryProductAttachmentGetController extends ApiController 
             validateDeliveryProductId(deliveryProductId);
             validateAttachmentId(attachmentId);
 
-            responseDto = attachmentFinder.handle(
-                    new AttachmentFinderQuery(deliveryId, deliveryProductId, attachmentId, true));
+            responseDto = attachmentFinder
+                    .handle(new AttachmentFinderQuery(deliveryId, deliveryProductId, attachmentId, true));
 
             httpStatus = HttpStatus.OK;
 
@@ -146,14 +140,11 @@ public final class DeliveryProductAttachmentGetController extends ApiController 
 
     @GetMapping(value = "api/quality/v1/deliveries/{deliveryId}/products/{deliveryProductId}/attachments/{attachmentId}/download")
     @ApiOperation(value = "Download file")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "File downloaded"),
-            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class)})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "File downloaded"),
+            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class) })
     @ResponseBody
-    public ResponseEntity<?> downloadAttachment(@PathVariable Long deliveryId,
-                                                @PathVariable Long deliveryProductId,
-                                                @PathVariable Long attachmentId,
-                                                @RequestHeader("authorization") String headerAuthorization) {
+    public ResponseEntity<?> downloadAttachment(@PathVariable Long deliveryId, @PathVariable Long deliveryProductId,
+            @PathVariable Long attachmentId, @RequestHeader("authorization") String headerAuthorization) {
 
         MediaType mediaType;
         File file;
@@ -167,9 +158,8 @@ public final class DeliveryProductAttachmentGetController extends ApiController 
             validateDeliveryProductId(deliveryProductId);
             validateAttachmentId(attachmentId);
 
-            String pathFile = attachmentURLGetter.handle(new AttachmentURLGetterQuery(
-                    deliveryId, deliveryProductId, attachmentId, session.role(), session.entityCode()
-            )).value();
+            String pathFile = attachmentURLGetter.handle(new AttachmentURLGetterQuery(deliveryId, deliveryProductId,
+                    attachmentId, session.role(), session.entityCode())).value();
 
             Path path = Paths.get(pathFile);
             String fileName = path.getFileName().toString();
@@ -198,14 +188,12 @@ public final class DeliveryProductAttachmentGetController extends ApiController 
 
     @GetMapping(value = "api/quality/v1/deliveries/{deliveryId}/products/{deliveryProductId}/attachments/{attachmentId}/report-download")
     @ApiOperation(value = "Download report file")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "File downloaded"),
-            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class)})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "File downloaded"),
+            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class) })
     @ResponseBody
     public ResponseEntity<?> downloadReportAttachment(@PathVariable Long deliveryId,
-                                                      @PathVariable Long deliveryProductId,
-                                                      @PathVariable Long attachmentId,
-                                                      @RequestHeader("authorization") String headerAuthorization) {
+            @PathVariable Long deliveryProductId, @PathVariable Long attachmentId,
+            @RequestHeader("authorization") String headerAuthorization) {
 
         MediaType mediaType;
         File file;
@@ -219,9 +207,8 @@ public final class DeliveryProductAttachmentGetController extends ApiController 
             validateDeliveryProductId(deliveryProductId);
             validateAttachmentId(attachmentId);
 
-            String pathFile = attachmentReportURLGetter.handle(new AttachmentReportURLGetterQuery(
-                    deliveryId, deliveryProductId, attachmentId, session.entityCode()
-            )).value();
+            String pathFile = attachmentReportURLGetter.handle(new AttachmentReportURLGetterQuery(deliveryId,
+                    deliveryProductId, attachmentId, session.entityCode())).value();
 
             Path path = Paths.get(pathFile);
             String fileName = path.getFileName().toString();
@@ -238,10 +225,12 @@ public final class DeliveryProductAttachmentGetController extends ApiController 
             resource = new InputStreamResource(new FileInputStream(file));
 
         } catch (DomainError e) {
-            log.error("Error DeliveryProductAttachmentGetController@downloadReportAttachment#Domain ---> " + e.getMessage());
+            log.error("Error DeliveryProductAttachmentGetController@downloadReportAttachment#Domain ---> "
+                    + e.getMessage());
             return new ResponseEntity<>(new BasicResponseDto(e.errorMessage(), 2), HttpStatus.UNPROCESSABLE_ENTITY);
         } catch (Exception e) {
-            log.error("Error DeliveryProductAttachmentGetController@downloadReportAttachment#General ---> " + e.getMessage());
+            log.error("Error DeliveryProductAttachmentGetController@downloadReportAttachment#General ---> "
+                    + e.getMessage());
             return new ResponseEntity<>(new BasicResponseDto(e.getMessage(), 1), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 

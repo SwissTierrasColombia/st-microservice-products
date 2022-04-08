@@ -14,7 +14,8 @@ public final class ProductName {
     }
 
     private void ensureProductName(String value) {
-        if (value == null || value.length() <= 0) throw new ProductNameInvalid();
+        if (value == null || value.length() <= 0)
+            throw new ProductNameInvalid();
     }
 
     public static ProductName fromValue(String value) {
@@ -27,8 +28,10 @@ public final class ProductName {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         ProductName that = (ProductName) o;
         return Objects.equals(value, that.value);
     }

@@ -15,7 +15,7 @@ public final class DeliveryProductResponse implements Response {
     private final Date deliveryProductStatusDate;
 
     public DeliveryProductResponse(Long id, Date deliveryProductDate, String observations, Long productId,
-                                   Long deliveryProductStatusId, Date deliveryProductStatusDate) {
+            Long deliveryProductStatusId, Date deliveryProductStatusDate) {
         this.id = id;
         this.deliveryProductDate = deliveryProductDate;
         this.observations = observations;
@@ -25,12 +25,9 @@ public final class DeliveryProductResponse implements Response {
     }
 
     public static DeliveryProductResponse fromAggregate(DeliveryProduct deliveryProduct) {
-        return new DeliveryProductResponse(
-                deliveryProduct.deliveryProductId().value(),
-                deliveryProduct.deliveryProductDate().value(),
-                deliveryProduct.deliveryProductObservations().value(),
-                deliveryProduct.productId().value(),
-                deliveryProduct.deliveryProductStatusId().value(),
+        return new DeliveryProductResponse(deliveryProduct.deliveryProductId().value(),
+                deliveryProduct.deliveryProductDate().value(), deliveryProduct.deliveryProductObservations().value(),
+                deliveryProduct.productId().value(), deliveryProduct.deliveryProductStatusId().value(),
                 deliveryProduct.deliveryProductStatusDate().value());
     }
 

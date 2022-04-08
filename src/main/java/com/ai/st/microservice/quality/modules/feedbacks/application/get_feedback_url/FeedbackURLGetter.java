@@ -30,7 +30,7 @@ public final class FeedbackURLGetter implements QueryUseCase<FeedbackURLGetterQu
     private final DeliveryProductFeedbackRepository feedbackRepository;
 
     public FeedbackURLGetter(DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository,
-                             DeliveryProductFeedbackRepository feedbackRepository) {
+            DeliveryProductFeedbackRepository feedbackRepository) {
         this.deliveryRepository = deliveryRepository;
         this.deliveryProductRepository = deliveryProductRepository;
         this.feedbackRepository = feedbackRepository;
@@ -43,13 +43,14 @@ public final class FeedbackURLGetter implements QueryUseCase<FeedbackURLGetterQu
         DeliveryProductId deliveryProductId = DeliveryProductId.fromValue(query.deliveryProductId());
         FeedbackId feedbackId = FeedbackId.fromValue(query.feedbackId());
 
-        Feedback feedback =
-                verifyPermissions(deliveryId, deliveryProductId, feedbackId, query.role(), query.entityCode());
+        Feedback feedback = verifyPermissions(deliveryId, deliveryProductId, feedbackId, query.role(),
+                query.entityCode());
 
         return new StringResponse(feedback.urlAttachment().value());
     }
 
-    private Feedback verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId, FeedbackId feedbackId, Roles role, Long entityCode) {
+    private Feedback verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId,
+            FeedbackId feedbackId, Roles role, Long entityCode) {
 
         // verify delivery exists
         Delivery delivery = deliveryRepository.search(deliveryId);
@@ -71,7 +72,8 @@ public final class FeedbackURLGetter implements QueryUseCase<FeedbackURLGetterQu
         }
         if (role.equals(Roles.MANAGER)) {
             // verify status of the delivery
-            if (!delivery.deliveryBelongToManager(ManagerCode.fromValue(entityCode)) || !delivery.isAvailableToManager()) {
+            if (!delivery.deliveryBelongToManager(ManagerCode.fromValue(entityCode))
+                    || !delivery.isAvailableToManager()) {
                 throw new UnauthorizedToSearchDelivery();
             }
         }

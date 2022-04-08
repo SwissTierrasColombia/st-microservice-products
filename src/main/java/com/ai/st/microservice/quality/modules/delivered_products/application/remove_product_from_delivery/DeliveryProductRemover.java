@@ -27,12 +27,14 @@ public final class DeliveryProductRemover implements CommandUseCase<DeliveryProd
     private final DeliveryProductAttachmentRepository attachmentRepository;
     private final AttachmentProductRemover attachmentProductRemover;
 
-    public DeliveryProductRemover(DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository,
-                                  DeliveryProductAttachmentRepository attachmentRepository, StoreFile storeFile) {
+    public DeliveryProductRemover(DeliveryRepository deliveryRepository,
+            DeliveryProductRepository deliveryProductRepository,
+            DeliveryProductAttachmentRepository attachmentRepository, StoreFile storeFile) {
         this.deliveryRepository = deliveryRepository;
         this.deliveryProductRepository = deliveryProductRepository;
         this.attachmentRepository = attachmentRepository;
-        this.attachmentProductRemover = new AttachmentProductRemover(attachmentRepository, deliveryProductRepository, deliveryRepository, storeFile);
+        this.attachmentProductRemover = new AttachmentProductRemover(attachmentRepository, deliveryProductRepository,
+                deliveryRepository, storeFile);
     }
 
     @Override
@@ -49,7 +51,8 @@ public final class DeliveryProductRemover implements CommandUseCase<DeliveryProd
         deliveryProductRepository.remove(deliveryProductId);
     }
 
-    private void verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId, OperatorCode operatorCode) {
+    private void verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId,
+            OperatorCode operatorCode) {
 
         // verify delivery exists
         Delivery delivery = deliveryRepository.search(deliveryId);
@@ -70,23 +73,23 @@ public final class DeliveryProductRemover implements CommandUseCase<DeliveryProd
 
         // verify status of the delivery
         if (!delivery.isDraft()) {
-            throw new UnauthorizedToModifyDelivery("No se puede eliminar el producto, porque el estado de la entrega no lo permite.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede eliminar el producto, porque el estado de la entrega no lo permite.");
         }
 
     }
 
-    private void removeAttachmentsFromDeliveryProduct(DeliveryId deliveryId, DeliveryProductId deliveryProductId, OperatorCode operatorCode) {
-        attachmentRepository.findByDeliveryProductId(deliveryProductId).forEach(attachment ->
-                removeAttachment(deliveryId, attachment, operatorCode));
+    private void removeAttachmentsFromDeliveryProduct(DeliveryId deliveryId, DeliveryProductId deliveryProductId,
+            OperatorCode operatorCode) {
+        attachmentRepository.findByDeliveryProductId(deliveryProductId)
+                .forEach(attachment -> removeAttachment(deliveryId, attachment, operatorCode));
     }
 
-    private void removeAttachment(DeliveryId deliveryId, DeliveryProductAttachment attachment, OperatorCode operatorCode) {
-        attachmentProductRemover.handle(new AttachmentProductRemoverCommand(
-                deliveryId.value(),
-                attachment.deliveryProductId().value(),
-                attachment.deliveryProductAttachmentId().value(),
-                operatorCode.value()
-        ));
+    private void removeAttachment(DeliveryId deliveryId, DeliveryProductAttachment attachment,
+            OperatorCode operatorCode) {
+        attachmentProductRemover
+                .handle(new AttachmentProductRemoverCommand(deliveryId.value(), attachment.deliveryProductId().value(),
+                        attachment.deliveryProductAttachmentId().value(), operatorCode.value()));
     }
 
 }

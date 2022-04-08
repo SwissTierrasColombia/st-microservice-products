@@ -28,7 +28,7 @@ public final class FeedbackFinder implements QueryUseCase<FeedbackFinderQuery, L
     private final DeliveryProductFeedbackRepository feedbackRepository;
 
     public FeedbackFinder(DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository,
-                          DeliveryProductFeedbackRepository feedbackRepository) {
+            DeliveryProductFeedbackRepository feedbackRepository) {
         this.deliveryRepository = deliveryRepository;
         this.deliveryProductRepository = deliveryProductRepository;
         this.feedbackRepository = feedbackRepository;
@@ -42,11 +42,12 @@ public final class FeedbackFinder implements QueryUseCase<FeedbackFinderQuery, L
 
         verifyPermissions(deliveryId, deliveryProductId, query.role(), query.entityCode());
 
-        return new ListResponse<>(
-                feedbackRepository.findByDeliveryProductId(deliveryProductId).stream().map(FeedbackResponse::fromAggregate).collect(Collectors.toList()));
+        return new ListResponse<>(feedbackRepository.findByDeliveryProductId(deliveryProductId).stream()
+                .map(FeedbackResponse::fromAggregate).collect(Collectors.toList()));
     }
 
-    private void verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId, Roles role, Long entityCode) {
+    private void verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId, Roles role,
+            Long entityCode) {
 
         // verify delivery exists
         Delivery delivery = deliveryRepository.search(deliveryId);
@@ -68,7 +69,8 @@ public final class FeedbackFinder implements QueryUseCase<FeedbackFinderQuery, L
         }
         if (role.equals(Roles.MANAGER)) {
             // verify status of the delivery
-            if (!delivery.deliveryBelongToManager(ManagerCode.fromValue(entityCode)) || !delivery.isAvailableToManager()) {
+            if (!delivery.deliveryBelongToManager(ManagerCode.fromValue(entityCode))
+                    || !delivery.isAvailableToManager()) {
                 throw new UnauthorizedToSearchDelivery();
             }
         }

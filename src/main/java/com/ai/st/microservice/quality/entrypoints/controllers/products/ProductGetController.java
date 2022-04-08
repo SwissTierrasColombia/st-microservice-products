@@ -25,7 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api(value = "Manage products", tags = {"Products"})
+@Api(value = "Manage products", tags = { "Products" })
 @RestController
 public final class ProductGetController extends ApiController {
 
@@ -34,7 +34,7 @@ public final class ProductGetController extends ApiController {
     private final ManagerProductsFinder productsFinder;
 
     public ProductGetController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                OperatorBusiness operatorBusiness, ManagerProductsFinder productsFinder) {
+            OperatorBusiness operatorBusiness, ManagerProductsFinder productsFinder) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.productsFinder = productsFinder;
     }
@@ -43,10 +43,11 @@ public final class ProductGetController extends ApiController {
     @ApiOperation(value = "Search products from manager")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Products", responseContainer = "List", response = ProductResponse.class),
-            @ApiResponse(code = 500, message = "Error Server")})
+            @ApiResponse(code = 500, message = "Error Server") })
     @ResponseBody
-    public ResponseEntity<?> searchProductsFromManager(@RequestParam(name = "manager", required = false) Long managerCode,
-                                                       @RequestHeader("authorization") String headerAuthorization) {
+    public ResponseEntity<?> searchProductsFromManager(
+            @RequestParam(name = "manager", required = false) Long managerCode,
+            @RequestHeader("authorization") String headerAuthorization) {
         HttpStatus httpStatus;
         Object responseDto;
 
@@ -62,10 +63,7 @@ public final class ProductGetController extends ApiController {
                 throw new InputValidationException("El gestor es requerido.");
             }
 
-            responseDto = productsFinder.handle(
-                    new ManagerProductsFinderQuery(
-                            managerCode
-                    )).list();
+            responseDto = productsFinder.handle(new ManagerProductsFinderQuery(managerCode)).list();
             httpStatus = HttpStatus.OK;
 
         } catch (InputValidationException e) {

@@ -30,8 +30,8 @@ public final class AttachmentURLGetter implements QueryUseCase<AttachmentURLGett
     private final DeliveryProductRepository deliveryProductRepository;
     private final DeliveryProductAttachmentRepository attachmentRepository;
 
-    public AttachmentURLGetter(DeliveryProductAttachmentRepository attachmentRepository, DeliveryProductRepository deliveryProductRepository,
-                               DeliveryRepository deliveryRepository) {
+    public AttachmentURLGetter(DeliveryProductAttachmentRepository attachmentRepository,
+            DeliveryProductRepository deliveryProductRepository, DeliveryRepository deliveryRepository) {
         this.attachmentRepository = attachmentRepository;
         this.deliveryRepository = deliveryRepository;
         this.deliveryProductRepository = deliveryProductRepository;
@@ -44,14 +44,14 @@ public final class AttachmentURLGetter implements QueryUseCase<AttachmentURLGett
         DeliveryProductId deliveryProductId = new DeliveryProductId(query.deliveryProductId());
         DeliveryProductAttachmentId attachmentId = new DeliveryProductAttachmentId(query.attachmentId());
 
-        DeliveryProductAttachment deliveryProductAttachment =
-                verifyPermissions(deliveryId, deliveryProductId, attachmentId, query.role(), query.entityCode());
+        DeliveryProductAttachment deliveryProductAttachment = verifyPermissions(deliveryId, deliveryProductId,
+                attachmentId, query.role(), query.entityCode());
 
         return new StringResponse(getPathFile(deliveryProductAttachment));
     }
 
-    private DeliveryProductAttachment verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId, DeliveryProductAttachmentId attachmentId,
-                                                        Roles role, Long entityCode) {
+    private DeliveryProductAttachment verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId,
+            DeliveryProductAttachmentId attachmentId, Roles role, Long entityCode) {
 
         // verify delivery exists
         Delivery delivery = deliveryRepository.search(deliveryId);
@@ -73,7 +73,8 @@ public final class AttachmentURLGetter implements QueryUseCase<AttachmentURLGett
         }
         if (role.equals(Roles.MANAGER)) {
             // verify status of the delivery
-            if (!delivery.deliveryBelongToManager(ManagerCode.fromValue(entityCode)) || !delivery.isAvailableToManager()) {
+            if (!delivery.deliveryBelongToManager(ManagerCode.fromValue(entityCode))
+                    || !delivery.isAvailableToManager()) {
                 throw new UnauthorizedToSearchDelivery();
             }
         }

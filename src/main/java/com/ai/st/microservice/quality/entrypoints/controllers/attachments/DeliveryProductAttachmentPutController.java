@@ -24,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Objects;
 
-@Api(value = "Manage Attachments", tags = {"Attachments"})
+@Api(value = "Manage Attachments", tags = { "Attachments" })
 @RestController
 public final class DeliveryProductAttachmentPutController extends ApiController {
 
@@ -34,10 +34,9 @@ public final class DeliveryProductAttachmentPutController extends ApiController 
     private final StoreFile storeFile;
     private final CompressorFile compressorFile;
 
-    public DeliveryProductAttachmentPutController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                                  OperatorBusiness operatorBusiness,
-                                                  ReportAggregator reportAggregator, StoreFile storeFile,
-                                                  CompressorFile compressorFile) {
+    public DeliveryProductAttachmentPutController(AdministrationBusiness administrationBusiness,
+            ManagerBusiness managerBusiness, OperatorBusiness operatorBusiness, ReportAggregator reportAggregator,
+            StoreFile storeFile, CompressorFile compressorFile) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.reportAggregator = reportAggregator;
         this.storeFile = storeFile;
@@ -46,14 +45,11 @@ public final class DeliveryProductAttachmentPutController extends ApiController 
 
     @PutMapping(value = "api/quality/v1/deliveries/{deliveryId}/products/{deliveryProductId}/attachments/{attachmentId}/report", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Add report to xtf attachment")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Report added"),
-            @ApiResponse(code = 500, message = "Error Server", response = String.class)})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Report added"),
+            @ApiResponse(code = 500, message = "Error Server", response = String.class) })
     @ResponseBody
-    public ResponseEntity<?> addReportToXTFAttachment(
-            @PathVariable Long deliveryId,
-            @PathVariable Long deliveryProductId,
-            @PathVariable Long attachmentId,
+    public ResponseEntity<?> addReportToXTFAttachment(@PathVariable Long deliveryId,
+            @PathVariable Long deliveryProductId, @PathVariable Long attachmentId,
             @ModelAttribute RevisionXTFAttachmentRequest request,
             @RequestHeader("authorization") String headerAuthorization) {
 
@@ -71,23 +67,25 @@ public final class DeliveryProductAttachmentPutController extends ApiController 
             validateReportXTFAttachment(request);
             validateObservations(request.getObservations());
 
-            reportAggregator.handle(new ReportAggregatorCommand(
-                    deliveryId, deliveryProductId, attachmentId, session.entityCode(),
-                    session.userCode(), request.isOverwriteReport(), request.getObservations(),
+            reportAggregator.handle(new ReportAggregatorCommand(deliveryId, deliveryProductId, attachmentId,
+                    session.entityCode(), session.userCode(), request.isOverwriteReport(), request.getObservations(),
                     request.getAttachment().getBytes(), "zip"));
 
             httpStatus = HttpStatus.OK;
 
         } catch (InputValidationException e) {
-            log.error("Error DeliveryProductAttachmentPutController@addReportToXTFAttachment#Validation ---> " + e.getMessage());
+            log.error("Error DeliveryProductAttachmentPutController@addReportToXTFAttachment#Validation ---> "
+                    + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
             responseDto = new BasicResponseDto(e.getMessage(), 1);
         } catch (DomainError e) {
-            log.error("Error DeliveryProductAttachmentPutController@addReportToXTFAttachment#Domain ---> " + e.errorMessage());
+            log.error("Error DeliveryProductAttachmentPutController@addReportToXTFAttachment#Domain ---> "
+                    + e.errorMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
             responseDto = new BasicResponseDto(e.errorMessage(), 2);
         } catch (Exception e) {
-            log.error("Error DeliveryProductAttachmentPutController@addReportToXTFAttachment#General ---> " + e.getMessage());
+            log.error("Error DeliveryProductAttachmentPutController@addReportToXTFAttachment#General ---> "
+                    + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
             responseDto = new BasicResponseDto(e.getMessage(), 4);
         }
@@ -139,13 +137,15 @@ public final class DeliveryProductAttachmentPutController extends ApiController 
 
         boolean filePresent = compressorFile.checkIfFileIsPresent(temporalFilePath, "pdf");
         if (!filePresent) {
-            throw new InputValidationException("El comprimido no contiene un archivo en formato PDF correspondiente al reporte de revisión.");
+            throw new InputValidationException(
+                    "El comprimido no contiene un archivo en formato PDF correspondiente al reporte de revisión.");
         }
 
         if (countEntries == 2) {
             boolean fileGPKGPresent = compressorFile.checkIfFileIsPresent(temporalFilePath, "gpkg");
             if (!fileGPKGPresent) {
-                throw new InputValidationException("El comprimido sólo acepta de forma opcional archivos gpkg (GeoPackage).");
+                throw new InputValidationException(
+                        "El comprimido sólo acepta de forma opcional archivos gpkg (GeoPackage).");
             }
         }
 
@@ -194,4 +194,3 @@ final class RevisionXTFAttachmentRequest {
         this.observations = observations;
     }
 }
-

@@ -17,7 +17,8 @@ public final class FeedbackDate extends DateObjectValue {
     }
 
     private static void ensureDate(Date value) {
-        if (value == null) throw new FeedbackDateInvalid();
+        if (value == null)
+            throw new FeedbackDateInvalid();
     }
 
 }

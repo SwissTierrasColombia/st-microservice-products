@@ -12,8 +12,8 @@ public final class XTFVersion {
     }
 
     private void ensureVersion(String value) {
-        if (value == null || value.isEmpty() || (!value.equalsIgnoreCase("1.0") &&
-                !value.equalsIgnoreCase("1.1"))) throw new XTFVersionInvalid();
+        if (value == null || value.isEmpty() || (!value.equalsIgnoreCase("1.0") && !value.equalsIgnoreCase("1.1")))
+            throw new XTFVersionInvalid();
     }
 
     public String value() {

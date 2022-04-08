@@ -13,7 +13,8 @@ public final class DeliveryProductStatusResponse {
     }
 
     public static DeliveryProductStatusResponse fromAggregate(DeliveryProductStatus deliveryProductStatus) {
-        return new DeliveryProductStatusResponse(deliveryProductStatus.id().value(), deliveryProductStatus.name().value());
+        return new DeliveryProductStatusResponse(deliveryProductStatus.id().value(),
+                deliveryProductStatus.name().value());
     }
 
     public Long id() {

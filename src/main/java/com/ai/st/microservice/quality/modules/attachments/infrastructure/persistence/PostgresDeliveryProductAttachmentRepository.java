@@ -31,10 +31,11 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
     private final DeliveredProductAttachmentFTPJPARepository deliveredProductAttachmentFTPJPARepository;
     private final DeliveredProductAttachmentDocumentJPARepository deliveredProductAttachmentDocumentJPARepository;
 
-    public PostgresDeliveryProductAttachmentRepository(DeliveredProductAttachmentJPARepository deliveredProductAttachmentJPARepository,
-                                                       DeliveredProductAttachmentXTFJPARepository deliveredProductAttachmentXTFJPARepository,
-                                                       DeliveredProductAttachmentFTPJPARepository deliveredProductAttachmentFTPJPARepository,
-                                                       DeliveredProductAttachmentDocumentJPARepository deliveredProductAttachmentDocumentJPARepository) {
+    public PostgresDeliveryProductAttachmentRepository(
+            DeliveredProductAttachmentJPARepository deliveredProductAttachmentJPARepository,
+            DeliveredProductAttachmentXTFJPARepository deliveredProductAttachmentXTFJPARepository,
+            DeliveredProductAttachmentFTPJPARepository deliveredProductAttachmentFTPJPARepository,
+            DeliveredProductAttachmentDocumentJPARepository deliveredProductAttachmentDocumentJPARepository) {
         this.deliveredProductAttachmentJPARepository = deliveredProductAttachmentJPARepository;
         this.deliveredProductAttachmentXTFJPARepository = deliveredProductAttachmentXTFJPARepository;
         this.deliveredProductAttachmentFTPJPARepository = deliveredProductAttachmentFTPJPARepository;
@@ -46,7 +47,6 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
 
         DeliveredProductEntity deliveryProduct = new DeliveredProductEntity();
         deliveryProduct.setId(deliveryProductAttachment.deliveryProductId().value());
-
 
         DeliveredProductAttachmentEntity attachmentEntity = new DeliveredProductAttachmentEntity();
         attachmentEntity.setUuid(deliveryProductAttachment.uuid().value());
@@ -71,7 +71,7 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
     }
 
     private void saveXTFAttachment(DeliveryProductXTFAttachment xtfAttachment,
-                                   DeliveredProductAttachmentEntity attachmentEntity) {
+            DeliveredProductAttachmentEntity attachmentEntity) {
 
         DeliveredProductAttachmentXTFEntity xtfEntity = new DeliveredProductAttachmentXTFEntity();
         xtfEntity.setDeliveredProductAttachment(attachmentEntity);
@@ -86,7 +86,7 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
     }
 
     private void saveFTPAttachment(DeliveryProductFTPAttachment ftpAttachment,
-                                   DeliveredProductAttachmentEntity attachmentEntity) {
+            DeliveredProductAttachmentEntity attachmentEntity) {
 
         DeliveredProductAttachmentFTPEntity ftpEntity = new DeliveredProductAttachmentFTPEntity();
         ftpEntity.setDeliveredProductAttachment(attachmentEntity);
@@ -99,7 +99,7 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
     }
 
     private void saveDocumentAttachment(DeliveryProductDocumentAttachment documentAttachment,
-                                        DeliveredProductAttachmentEntity attachmentEntity) {
+            DeliveredProductAttachmentEntity attachmentEntity) {
 
         DeliveredProductAttachmentDocumentEntity documentEntity = new DeliveredProductAttachmentDocumentEntity();
         documentEntity.setDeliveredProductAttachment(attachmentEntity);
@@ -111,8 +111,8 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
     @Override
     public DeliveryProductAttachment search(DeliveryProductAttachmentId id) {
 
-        DeliveredProductAttachmentEntity deliveredProductAttachmentEntity =
-                deliveredProductAttachmentJPARepository.findById(id.value()).orElse(null);
+        DeliveredProductAttachmentEntity deliveredProductAttachmentEntity = deliveredProductAttachmentJPARepository
+                .findById(id.value()).orElse(null);
 
         if (deliveredProductAttachmentEntity != null) {
             return handleFind(deliveredProductAttachmentEntity);
@@ -124,8 +124,8 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
     @Override
     public DeliveryProductAttachment search(DeliveryProductAttachmentUUID uuid) {
 
-        DeliveredProductAttachmentEntity deliveredProductAttachmentEntity =
-                deliveredProductAttachmentJPARepository.findByUuid(uuid.value());
+        DeliveredProductAttachmentEntity deliveredProductAttachmentEntity = deliveredProductAttachmentJPARepository
+                .findByUuid(uuid.value());
 
         if (deliveredProductAttachmentEntity != null) {
             return handleFind(deliveredProductAttachmentEntity);
@@ -136,35 +136,34 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
 
     private DeliveryProductAttachment handleFind(DeliveredProductAttachmentEntity deliveredProductAttachmentEntity) {
 
-        DeliveredProductAttachmentXTFEntity xtfEntity =
-                deliveredProductAttachmentXTFJPARepository.findByDeliveredProductAttachment(deliveredProductAttachmentEntity);
+        DeliveredProductAttachmentXTFEntity xtfEntity = deliveredProductAttachmentXTFJPARepository
+                .findByDeliveredProductAttachment(deliveredProductAttachmentEntity);
         if (xtfEntity != null) {
-            return DeliveryProductXTFAttachment.fromPrimitives(
-                    deliveredProductAttachmentEntity.getId(), deliveredProductAttachmentEntity.getUuid(), deliveredProductAttachmentEntity.getObservations(),
-                    deliveredProductAttachmentEntity.getDeliveredProduct().getId(), deliveredProductAttachmentEntity.getCreatedAt(),
-                    xtfEntity.getValid(), xtfEntity.getUrl(), xtfEntity.getReportRevision(), xtfEntity.getReportObservations(),
-                    xtfEntity.getVersion(), xtfEntity.getStatus().name()
-            );
+            return DeliveryProductXTFAttachment.fromPrimitives(deliveredProductAttachmentEntity.getId(),
+                    deliveredProductAttachmentEntity.getUuid(), deliveredProductAttachmentEntity.getObservations(),
+                    deliveredProductAttachmentEntity.getDeliveredProduct().getId(),
+                    deliveredProductAttachmentEntity.getCreatedAt(), xtfEntity.getValid(), xtfEntity.getUrl(),
+                    xtfEntity.getReportRevision(), xtfEntity.getReportObservations(), xtfEntity.getVersion(),
+                    xtfEntity.getStatus().name());
         }
 
-        DeliveredProductAttachmentFTPEntity ftpEntity =
-                deliveredProductAttachmentFTPJPARepository.findByDeliveredProductAttachment(deliveredProductAttachmentEntity);
+        DeliveredProductAttachmentFTPEntity ftpEntity = deliveredProductAttachmentFTPJPARepository
+                .findByDeliveredProductAttachment(deliveredProductAttachmentEntity);
         if (ftpEntity != null) {
-            return DeliveryProductFTPAttachment.fromPrimitives(
-                    deliveredProductAttachmentEntity.getId(), deliveredProductAttachmentEntity.getUuid(), deliveredProductAttachmentEntity.getObservations(),
-                    deliveredProductAttachmentEntity.getDeliveredProduct().getId(), deliveredProductAttachmentEntity.getCreatedAt(),
-                    ftpEntity.getDomain(), ftpEntity.getPort(), ftpEntity.getUsername(), ftpEntity.getPassword()
-            );
+            return DeliveryProductFTPAttachment.fromPrimitives(deliveredProductAttachmentEntity.getId(),
+                    deliveredProductAttachmentEntity.getUuid(), deliveredProductAttachmentEntity.getObservations(),
+                    deliveredProductAttachmentEntity.getDeliveredProduct().getId(),
+                    deliveredProductAttachmentEntity.getCreatedAt(), ftpEntity.getDomain(), ftpEntity.getPort(),
+                    ftpEntity.getUsername(), ftpEntity.getPassword());
         }
 
-        DeliveredProductAttachmentDocumentEntity documentEntity =
-                deliveredProductAttachmentDocumentJPARepository.findByDeliveredProductAttachment(deliveredProductAttachmentEntity);
+        DeliveredProductAttachmentDocumentEntity documentEntity = deliveredProductAttachmentDocumentJPARepository
+                .findByDeliveredProductAttachment(deliveredProductAttachmentEntity);
         if (documentEntity != null) {
-            return DeliveryProductDocumentAttachment.fromPrimitives(
-                    deliveredProductAttachmentEntity.getId(), deliveredProductAttachmentEntity.getUuid(), deliveredProductAttachmentEntity.getObservations(),
-                    deliveredProductAttachmentEntity.getDeliveredProduct().getId(), deliveredProductAttachmentEntity.getCreatedAt(),
-                    documentEntity.getUrl()
-            );
+            return DeliveryProductDocumentAttachment.fromPrimitives(deliveredProductAttachmentEntity.getId(),
+                    deliveredProductAttachmentEntity.getUuid(), deliveredProductAttachmentEntity.getObservations(),
+                    deliveredProductAttachmentEntity.getDeliveredProduct().getId(),
+                    deliveredProductAttachmentEntity.getCreatedAt(), documentEntity.getUrl());
         }
 
         return null;
@@ -173,13 +172,13 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
     @Override
     public void updateXTFStatus(DeliveryProductAttachmentUUID uuid, XTFStatus status) {
 
-        DeliveredProductAttachmentEntity deliveredProductAttachmentEntity =
-                deliveredProductAttachmentJPARepository.findByUuid(uuid.value());
+        DeliveredProductAttachmentEntity deliveredProductAttachmentEntity = deliveredProductAttachmentJPARepository
+                .findByUuid(uuid.value());
 
         if (deliveredProductAttachmentEntity != null) {
 
-            DeliveredProductAttachmentXTFEntity xtfEntity =
-                    deliveredProductAttachmentXTFJPARepository.findByDeliveredProductAttachment(deliveredProductAttachmentEntity);
+            DeliveredProductAttachmentXTFEntity xtfEntity = deliveredProductAttachmentXTFJPARepository
+                    .findByDeliveredProductAttachment(deliveredProductAttachmentEntity);
 
             StatusXTFEnum statusEntity = mappingEnum(status);
             xtfEntity.setStatus(statusEntity);
@@ -197,17 +196,17 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
 
     private StatusXTFEnum mappingEnum(XTFStatus status) {
         switch (status.value()) {
-            case ACCEPTED:
-                return StatusXTFEnum.ACCEPTED;
-            case REJECTED:
-                return StatusXTFEnum.REJECTED;
-            case QUALITY_PROCESS_IN_VALIDATION:
-                return StatusXTFEnum.QUALITY_PROCESS_IN_VALIDATION;
-            case QUALITY_PROCESS_FINISHED:
-                return StatusXTFEnum.QUALITY_PROCESS_FINISHED;
-            case IN_VALIDATION:
-            default:
-                return StatusXTFEnum.IN_VALIDATION;
+        case ACCEPTED:
+            return StatusXTFEnum.ACCEPTED;
+        case REJECTED:
+            return StatusXTFEnum.REJECTED;
+        case QUALITY_PROCESS_IN_VALIDATION:
+            return StatusXTFEnum.QUALITY_PROCESS_IN_VALIDATION;
+        case QUALITY_PROCESS_FINISHED:
+            return StatusXTFEnum.QUALITY_PROCESS_FINISHED;
+        case IN_VALIDATION:
+        default:
+            return StatusXTFEnum.IN_VALIDATION;
         }
     }
 
@@ -217,8 +216,8 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
         DeliveredProductEntity deliveredProduct = new DeliveredProductEntity();
         deliveredProduct.setId(deliveryProductId.value());
 
-        return deliveredProductAttachmentJPARepository.findByDeliveredProduct(deliveredProduct)
-                .stream().map(this::handleFind).collect(Collectors.toList());
+        return deliveredProductAttachmentJPARepository.findByDeliveredProduct(deliveredProduct).stream()
+                .map(this::handleFind).collect(Collectors.toList());
     }
 
     @Override
@@ -230,21 +229,22 @@ public class PostgresDeliveryProductAttachmentRepository implements DeliveryProd
 
         deliveredProductAttachmentXTFJPARepository.deleteByDeliveredProductAttachment(deliveredProductAttachmentEntity);
         deliveredProductAttachmentFTPJPARepository.deleteByDeliveredProductAttachment(deliveredProductAttachmentEntity);
-        deliveredProductAttachmentDocumentJPARepository.deleteByDeliveredProductAttachment(deliveredProductAttachmentEntity);
+        deliveredProductAttachmentDocumentJPARepository
+                .deleteByDeliveredProductAttachment(deliveredProductAttachmentEntity);
         deliveredProductAttachmentJPARepository.deleteById(id.value());
     }
 
     @Override
     public void updateReportRevisionXTF(DeliveryProductAttachmentUUID uuid, XTFReportRevisionUrl reportRevisionUrl,
-                                        XTFReportObservations observations) {
+            XTFReportObservations observations) {
 
-        DeliveredProductAttachmentEntity deliveredProductAttachmentEntity =
-                deliveredProductAttachmentJPARepository.findByUuid(uuid.value());
+        DeliveredProductAttachmentEntity deliveredProductAttachmentEntity = deliveredProductAttachmentJPARepository
+                .findByUuid(uuid.value());
 
         if (deliveredProductAttachmentEntity != null) {
 
-            DeliveredProductAttachmentXTFEntity xtfEntity =
-                    deliveredProductAttachmentXTFJPARepository.findByDeliveredProductAttachment(deliveredProductAttachmentEntity);
+            DeliveredProductAttachmentXTFEntity xtfEntity = deliveredProductAttachmentXTFJPARepository
+                    .findByDeliveredProductAttachment(deliveredProductAttachmentEntity);
 
             if (reportRevisionUrl == null) {
                 xtfEntity.setReportRevision(null);

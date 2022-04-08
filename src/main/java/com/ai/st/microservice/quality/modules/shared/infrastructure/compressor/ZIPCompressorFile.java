@@ -17,7 +17,6 @@ import java.util.zip.ZipOutputStream;
 @Service
 public final class ZIPCompressorFile implements CompressorFile {
 
-
     @Override
     public int countEntries(String filePath) throws CompressError {
         int count = 0;
@@ -100,6 +99,5 @@ public final class ZIPCompressorFile implements CompressorFile {
             throw new CompressError("Ha ocurrido un error creando el archivo zip.");
         }
     }
-
 
 }

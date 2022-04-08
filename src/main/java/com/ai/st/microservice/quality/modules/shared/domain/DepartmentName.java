@@ -9,7 +9,8 @@ public final class DepartmentName extends StringValueObject {
     }
 
     private static void ensureName(String value) {
-        if (value == null || value.isEmpty()) throw new DepartmentNameInvalid();
+        if (value == null || value.isEmpty())
+            throw new DepartmentNameInvalid();
     }
 
     public static DepartmentName fromValue(String value) {

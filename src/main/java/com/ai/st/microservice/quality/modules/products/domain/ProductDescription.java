@@ -20,8 +20,10 @@ public final class ProductDescription {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         ProductDescription that = (ProductDescription) o;
         return Objects.equals(value, that.value);
     }

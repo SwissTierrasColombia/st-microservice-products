@@ -27,15 +27,13 @@ public class StMicroserviceProductsApplicationStartup implements ApplicationList
     private final DeliveryProductStatusesFinder deliveryProductStatusesFinder;
 
     public StMicroserviceProductsApplicationStartup(DeliveryStatusCreator deliveryStatusCreator,
-                                                    DeliveryStatusesFinder deliveryStatusesFinder,
-                                                    DeliveryProductStatusCreator deliveryProductStatusCreator,
-                                                    DeliveryProductStatusesFinder deliveryProductStatusesFinder) {
+            DeliveryStatusesFinder deliveryStatusesFinder, DeliveryProductStatusCreator deliveryProductStatusCreator,
+            DeliveryProductStatusesFinder deliveryProductStatusesFinder) {
         this.deliveryStatusCreator = deliveryStatusCreator;
         this.deliveryStatusesFinder = deliveryStatusesFinder;
         this.deliveryProductStatusCreator = deliveryProductStatusCreator;
         this.deliveryProductStatusesFinder = deliveryProductStatusesFinder;
     }
-
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -52,7 +50,8 @@ public class StMicroserviceProductsApplicationStartup implements ApplicationList
             deliveryStatusCreator.handle(new DeliveryStatusCreatorCommand(DeliveryStatusId.DRAFT, "BORRADOR"));
             deliveryStatusCreator.handle(new DeliveryStatusCreatorCommand(DeliveryStatusId.DELIVERED, "ENTREGADO"));
             deliveryStatusCreator.handle(new DeliveryStatusCreatorCommand(DeliveryStatusId.IN_REVIEW, "EN REVISIÓN"));
-            deliveryStatusCreator.handle(new DeliveryStatusCreatorCommand(DeliveryStatusId.IN_REMEDIATION, "EN CORRECCIÓN"));
+            deliveryStatusCreator
+                    .handle(new DeliveryStatusCreatorCommand(DeliveryStatusId.IN_REMEDIATION, "EN CORRECCIÓN"));
             deliveryStatusCreator.handle(new DeliveryStatusCreatorCommand(DeliveryStatusId.ACCEPTED, "ACEPTADO"));
             deliveryStatusCreator.handle(new DeliveryStatusCreatorCommand(DeliveryStatusId.REJECTED, "RECHAZADO"));
             log.info("The domains 'delivery statuses' have been loaded!");
@@ -64,9 +63,12 @@ public class StMicroserviceProductsApplicationStartup implements ApplicationList
 
         int count = deliveryProductStatusesFinder.handle(new DeliveryProductStatusesFinderQuery()).size();
         if (count == 0) {
-            deliveryProductStatusCreator.handle(new DeliveryProductStatusCreatorCommand(DeliveryProductStatusId.PENDING, "PENDIENTE"));
-            deliveryProductStatusCreator.handle(new DeliveryProductStatusCreatorCommand(DeliveryProductStatusId.ACCEPTED, "ACEPTADO"));
-            deliveryProductStatusCreator.handle(new DeliveryProductStatusCreatorCommand(DeliveryProductStatusId.REJECTED, "RECHAZADO"));
+            deliveryProductStatusCreator
+                    .handle(new DeliveryProductStatusCreatorCommand(DeliveryProductStatusId.PENDING, "PENDIENTE"));
+            deliveryProductStatusCreator
+                    .handle(new DeliveryProductStatusCreatorCommand(DeliveryProductStatusId.ACCEPTED, "ACEPTADO"));
+            deliveryProductStatusCreator
+                    .handle(new DeliveryProductStatusCreatorCommand(DeliveryProductStatusId.REJECTED, "RECHAZADO"));
             log.info("The domains 'delivery product statuses' have been loaded!");
         }
 

@@ -4,7 +4,9 @@ import com.ai.st.microservice.quality.modules.shared.application.Command;
 
 public final class XTFStatusUpdaterCommand implements Command {
 
-    public enum Status {ACCEPTED, REJECTED, QUALITY_PROCESS_FINISHED}
+    public enum Status {
+        ACCEPTED, REJECTED, QUALITY_PROCESS_FINISHED
+    }
 
     private final Status status;
     private final String attachmentUUID;

@@ -36,20 +36,16 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
     private final ProductJPARepository productJPARepository;
     private final DeliveryJPARepository deliveryJPARepository;
 
-    public static final Map<String, String> MAPPING_FIELDS = new HashMap<>(
-            Map.ofEntries(
-                    new AbstractMap.SimpleEntry<>("deliveryDate", "createdAt"),
-                    new AbstractMap.SimpleEntry<>("deliveryStatus", "deliveryStatus"),
-                    new AbstractMap.SimpleEntry<>("manager", "managerCode"),
-                    new AbstractMap.SimpleEntry<>("operator", "operatorCode"),
-                    new AbstractMap.SimpleEntry<>("code", "code"),
-                    new AbstractMap.SimpleEntry<>("municipality", "municipalityCode")
-            ));
+    public static final Map<String, String> MAPPING_FIELDS = new HashMap<>(Map.ofEntries(
+            new AbstractMap.SimpleEntry<>("deliveryDate", "createdAt"),
+            new AbstractMap.SimpleEntry<>("deliveryStatus", "deliveryStatus"),
+            new AbstractMap.SimpleEntry<>("manager", "managerCode"),
+            new AbstractMap.SimpleEntry<>("operator", "operatorCode"), new AbstractMap.SimpleEntry<>("code", "code"),
+            new AbstractMap.SimpleEntry<>("municipality", "municipalityCode")));
 
     public PostgresDeliveryRepository(DeliveryStatusJPARepository deliveryStatusJPARepository,
-                                      DeliveryProductStatusJPARepository deliveryProductStatusJPARepository,
-                                      ProductJPARepository productJPARepository,
-                                      DeliveryJPARepository deliveryJPARepository) {
+            DeliveryProductStatusJPARepository deliveryProductStatusJPARepository,
+            ProductJPARepository productJPARepository, DeliveryJPARepository deliveryJPARepository) {
         this.deliveryStatusJPARepository = deliveryStatusJPARepository;
         this.deliveryProductStatusJPARepository = deliveryProductStatusJPARepository;
         this.productJPARepository = productJPARepository;
@@ -59,8 +55,8 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
     @Override
     public void save(Delivery delivery) {
 
-        DeliveryStatusEntity deliveryStatusEntity =
-                deliveryStatusJPARepository.findById(delivery.deliveryStatusId().value()).orElse(null);
+        DeliveryStatusEntity deliveryStatusEntity = deliveryStatusJPARepository
+                .findById(delivery.deliveryStatusId().value()).orElse(null);
 
         DeliveryEntity deliveryEntity = new DeliveryEntity();
         deliveryEntity.setCreatedAt(delivery.deliveryDate().value());
@@ -78,10 +74,10 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
         deliveryEntity.setStatusAt(delivery.deliveryStatusDate().value());
 
         delivery.deliveryProducts().forEach(deliveryProduct -> {
-            DeliveryProductStatusEntity deliveryProductStatusEntity =
-                    deliveryProductStatusJPARepository.findById(deliveryProduct.deliveryProductStatusId().value()).orElse(null);
-            ProductEntity productEntity =
-                    productJPARepository.findById(deliveryProduct.productId().value()).orElse(null);
+            DeliveryProductStatusEntity deliveryProductStatusEntity = deliveryProductStatusJPARepository
+                    .findById(deliveryProduct.deliveryProductStatusId().value()).orElse(null);
+            ProductEntity productEntity = productJPARepository.findById(deliveryProduct.productId().value())
+                    .orElse(null);
             DeliveredProductEntity deliveredProductEntity = new DeliveredProductEntity();
             deliveredProductEntity.setCreatedAt(deliveryProduct.deliveryProductDate().value());
             deliveredProductEntity.setObservations(deliveryProduct.deliveryProductObservations().value());
@@ -140,14 +136,11 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
 
         List<Delivery> deliveries = deliveryEntities.stream().map(this::mapping).collect(Collectors.toList());
 
-        return new PageableDomain<>(
-                deliveries,
-                page != null ? Optional.of(page.getNumber() + 1) : Optional.empty(),
+        return new PageableDomain<>(deliveries, page != null ? Optional.of(page.getNumber() + 1) : Optional.empty(),
                 page != null ? Optional.of(page.getNumberOfElements()) : Optional.empty(),
                 page != null ? Optional.of(page.getTotalElements()) : Optional.empty(),
                 page != null ? Optional.of(page.getTotalPages()) : Optional.empty(),
-                page != null ? Optional.of(page.getSize()) : Optional.empty()
-        );
+                page != null ? Optional.of(page.getSize()) : Optional.empty());
     }
 
     private Specification<DeliveryEntity> addFilters(List<Filter> filters) {
@@ -179,19 +172,19 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
     private Specification<DeliveryEntity> createSpecification(Filter filter) {
         try {
             switch (filter.operator()) {
-                case EQUAL:
-                    return (root, query, criteriaBuilder) ->
-                            criteriaBuilder.equal(buildPath(root, filter.field().value()), filter.value().value());
-                case NOT_EQUAL:
-                    return (root, query, criteriaBuilder) ->
-                            criteriaBuilder.notEqual(buildPath(root, filter.field().value()), filter.value().value());
-                case CONTAINS:
-                    return (root, query, criteriaBuilder) -> {
-                        List<String> list = filter.values().stream().map(FilterValue::value).collect(Collectors.toList());
-                        return buildPath(root, filter.field().value()).in(list);
-                    };
-                default:
-                    throw new OperatorUnsupported();
+            case EQUAL:
+                return (root, query, criteriaBuilder) -> criteriaBuilder.equal(buildPath(root, filter.field().value()),
+                        filter.value().value());
+            case NOT_EQUAL:
+                return (root, query, criteriaBuilder) -> criteriaBuilder
+                        .notEqual(buildPath(root, filter.field().value()), filter.value().value());
+            case CONTAINS:
+                return (root, query, criteriaBuilder) -> {
+                    List<String> list = filter.values().stream().map(FilterValue::value).collect(Collectors.toList());
+                    return buildPath(root, filter.field().value()).in(list);
+                };
+            default:
+                throw new OperatorUnsupported();
             }
         } catch (Exception e) {
             throw new FieldUnsupported();
@@ -242,23 +235,13 @@ public final class PostgresDeliveryRepository implements DeliveryRepository {
     }
 
     private Delivery mapping(DeliveryEntity deliveryEntity) {
-        return Delivery.fromPrimitives(
-                deliveryEntity.getId(),
-                deliveryEntity.getCode(),
-                deliveryEntity.getMunicipalityCode(),
-                deliveryEntity.getMunicipalityName(),
-                deliveryEntity.getDepartmentName(),
-                deliveryEntity.getManagerCode(),
-                deliveryEntity.getManagerName(),
-                deliveryEntity.getOperatorCode(),
-                deliveryEntity.getOperatorName(),
-                deliveryEntity.getUserCode(),
-                deliveryEntity.getObservations(),
-                deliveryEntity.getCreatedAt(),
-                deliveryEntity.getDeliveryStatus().getId(),
-                deliveryEntity.getFinalComments(),
-                deliveryEntity.getStatusAt()
-        );
+        return Delivery.fromPrimitives(deliveryEntity.getId(), deliveryEntity.getCode(),
+                deliveryEntity.getMunicipalityCode(), deliveryEntity.getMunicipalityName(),
+                deliveryEntity.getDepartmentName(), deliveryEntity.getManagerCode(), deliveryEntity.getManagerName(),
+                deliveryEntity.getOperatorCode(), deliveryEntity.getOperatorName(), deliveryEntity.getUserCode(),
+                deliveryEntity.getObservations(), deliveryEntity.getCreatedAt(),
+                deliveryEntity.getDeliveryStatus().getId(), deliveryEntity.getFinalComments(),
+                deliveryEntity.getStatusAt());
     }
 
 }

@@ -34,7 +34,7 @@ import java.io.FileInputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-@Api(value = "Manage Deliveries", tags = {"Deliveries"})
+@Api(value = "Manage Deliveries", tags = { "Deliveries" })
 @RestController
 public final class DeliveryProductFeedbackGetController extends ApiController {
 
@@ -44,8 +44,9 @@ public final class DeliveryProductFeedbackGetController extends ApiController {
     private final FeedbackFinder feedbackFinder;
     private final FeedbackURLGetter feedbackURLGetter;
 
-    public DeliveryProductFeedbackGetController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                                OperatorBusiness operatorBusiness, ServletContext servletContext, FeedbackFinder feedbackFinder, FeedbackURLGetter feedbackURLGetter) {
+    public DeliveryProductFeedbackGetController(AdministrationBusiness administrationBusiness,
+            ManagerBusiness managerBusiness, OperatorBusiness operatorBusiness, ServletContext servletContext,
+            FeedbackFinder feedbackFinder, FeedbackURLGetter feedbackURLGetter) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.servletContext = servletContext;
         this.feedbackFinder = feedbackFinder;
@@ -56,13 +57,10 @@ public final class DeliveryProductFeedbackGetController extends ApiController {
     @ApiOperation(value = "Get feedbacks")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Feedback got", response = FeedbackResponse.class, responseContainer = "List"),
-            @ApiResponse(code = 500, message = "Error Server", response = String.class)})
+            @ApiResponse(code = 500, message = "Error Server", response = String.class) })
     @ResponseBody
-    public ResponseEntity<?> findFeedbacks(
-            @PathVariable Long deliveryId,
-            @PathVariable Long deliveryProductId,
+    public ResponseEntity<?> findFeedbacks(@PathVariable Long deliveryId, @PathVariable Long deliveryProductId,
             @RequestHeader("authorization") String headerAuthorization) {
-
 
         HttpStatus httpStatus;
         Object responseDto;
@@ -75,9 +73,8 @@ public final class DeliveryProductFeedbackGetController extends ApiController {
             validateDeliveryProductId(deliveryProductId);
 
             responseDto = feedbackFinder.handle(
-                    new FeedbackFinderQuery(
-                            deliveryId, deliveryProductId, session.role(), session.entityCode()
-                    )).list();
+                    new FeedbackFinderQuery(deliveryId, deliveryProductId, session.role(), session.entityCode()))
+                    .list();
 
             httpStatus = HttpStatus.OK;
 
@@ -100,14 +97,11 @@ public final class DeliveryProductFeedbackGetController extends ApiController {
 
     @GetMapping(value = "api/quality/v1/deliveries/{deliveryId}/products/{deliveryProductId}/feedbacks/{feedbackId}/download")
     @ApiOperation(value = "Download file")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "File downloaded"),
-            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class)})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "File downloaded"),
+            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class) })
     @ResponseBody
-    public ResponseEntity<?> downloadFeedback(@PathVariable Long deliveryId,
-                                              @PathVariable Long deliveryProductId,
-                                              @PathVariable Long feedbackId,
-                                              @RequestHeader("authorization") String headerAuthorization) {
+    public ResponseEntity<?> downloadFeedback(@PathVariable Long deliveryId, @PathVariable Long deliveryProductId,
+            @PathVariable Long feedbackId, @RequestHeader("authorization") String headerAuthorization) {
 
         MediaType mediaType;
         File file;
@@ -121,10 +115,8 @@ public final class DeliveryProductFeedbackGetController extends ApiController {
             validateDeliveryProductId(deliveryProductId);
             validateFeedbackId(feedbackId);
 
-            String pathFile = feedbackURLGetter.handle(
-                    new FeedbackURLGetterQuery(
-                            deliveryId, deliveryProductId, feedbackId, session.role(), session.entityCode()
-                    )).value();
+            String pathFile = feedbackURLGetter.handle(new FeedbackURLGetterQuery(deliveryId, deliveryProductId,
+                    feedbackId, session.role(), session.entityCode())).value();
 
             Path path = Paths.get(pathFile);
             String fileName = path.getFileName().toString();

@@ -36,9 +36,10 @@ public final class QualityProcessStarter implements CommandUseCase<QualityProces
     private final ManagerMicroservice managerMicroservice;
     private final TaskMicroservice taskMicroservice;
 
-    public QualityProcessStarter(DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository,
-                                 DeliveryProductAttachmentRepository attachmentRepository, ManagerMicroservice managerMicroservice,
-                                 TaskMicroservice taskMicroservice) {
+    public QualityProcessStarter(DeliveryRepository deliveryRepository,
+            DeliveryProductRepository deliveryProductRepository,
+            DeliveryProductAttachmentRepository attachmentRepository, ManagerMicroservice managerMicroservice,
+            TaskMicroservice taskMicroservice) {
         this.deliveryRepository = deliveryRepository;
         this.deliveryProductRepository = deliveryProductRepository;
         this.attachmentRepository = attachmentRepository;
@@ -56,19 +57,20 @@ public final class QualityProcessStarter implements CommandUseCase<QualityProces
 
         Delivery delivery = deliveryRepository.search(deliveryId);
 
-        DeliveryProductXTFAttachment attachment = verifyPermissions(delivery, deliveryProductId, attachmentId, managerCode);
+        DeliveryProductXTFAttachment attachment = verifyPermissions(delivery, deliveryProductId, attachmentId,
+                managerCode);
 
         List<UserCode> usersCodeList = managerMicroservice.getUsersByManager(managerCode);
-
 
         taskMicroservice.createQualityRulesTask(deliveryId, deliveryProductId, attachment,
                 new DepartmentMunicipality(delivery.departmentName(), delivery.municipalityName()), usersCodeList);
 
-        attachmentRepository.updateXTFStatus(attachment.uuid(), new XTFStatus(XTFStatus.Status.QUALITY_PROCESS_IN_VALIDATION));
+        attachmentRepository.updateXTFStatus(attachment.uuid(),
+                new XTFStatus(XTFStatus.Status.QUALITY_PROCESS_IN_VALIDATION));
     }
 
     private DeliveryProductXTFAttachment verifyPermissions(Delivery delivery, DeliveryProductId deliveryProductId,
-                                                           DeliveryProductAttachmentId attachmentId, ManagerCode managerCode) {
+            DeliveryProductAttachmentId attachmentId, ManagerCode managerCode) {
 
         // verify delivery exists
         if (delivery == null) {
@@ -93,17 +95,20 @@ public final class QualityProcessStarter implements CommandUseCase<QualityProces
 
         // verify status of the delivery
         if (!delivery.isInReview()) {
-            throw new UnauthorizedToModifyDelivery("No se puede iniciar el proceso de calidad porque el estado de la entrega no lo permite.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede iniciar el proceso de calidad porque el estado de la entrega no lo permite.");
         }
 
         // verify status of the delivery product
         if (!deliveryProduct.isPending()) {
-            throw new UnauthorizedToModifyDelivery("No se puede iniciar el proceso de calidad, porque el producto ya fue aceptado o rechazado.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede iniciar el proceso de calidad, porque el producto ya fue aceptado o rechazado.");
         }
 
         // verify type attachment
         if (!deliveryProductAttachment.isXTF()) {
-            throw new UnauthorizedToModifyDelivery("No se puede iniciar el proceso de calidad, sólo esta permitido para archivos XTF.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede iniciar el proceso de calidad, sólo esta permitido para archivos XTF.");
         }
 
         // verify status of xtf attachment

@@ -20,7 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api(value = "Manage Deliveries", tags = {"Deliveries"})
+@Api(value = "Manage Deliveries", tags = { "Deliveries" })
 @RestController
 public final class DeliveryProductPutController extends ApiController {
 
@@ -29,23 +29,19 @@ public final class DeliveryProductPutController extends ApiController {
     private final DeliveryProductUpdater deliveryProductUpdater;
 
     public DeliveryProductPutController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                        OperatorBusiness operatorBusiness, DeliveryProductUpdater deliveryProductUpdater) {
+            OperatorBusiness operatorBusiness, DeliveryProductUpdater deliveryProductUpdater) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.deliveryProductUpdater = deliveryProductUpdater;
     }
 
     @PutMapping(value = "api/quality/v1/deliveries/{deliveryId}/products/{deliveryProductId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Update product from delivery")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Product updated"),
-            @ApiResponse(code = 500, message = "Error Server", response = String.class)})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Product updated"),
+            @ApiResponse(code = 500, message = "Error Server", response = String.class) })
     @ResponseBody
-    public ResponseEntity<?> updateProductFromDelivery(
-            @PathVariable Long deliveryId,
-            @PathVariable Long deliveryProductId,
-            @RequestBody UpdateProductFromDeliveryRequest request,
+    public ResponseEntity<?> updateProductFromDelivery(@PathVariable Long deliveryId,
+            @PathVariable Long deliveryProductId, @RequestBody UpdateProductFromDeliveryRequest request,
             @RequestHeader("authorization") String headerAuthorization) {
-
 
         HttpStatus httpStatus;
         Object responseDto = null;
@@ -60,10 +56,8 @@ public final class DeliveryProductPutController extends ApiController {
             String observations = request.getObservations();
             validateObservations(observations);
 
-            deliveryProductUpdater.handle(
-                    new DeliveryProductUpdaterCommand(
-                            deliveryId, deliveryProductId, observations, session.entityCode()
-                    ));
+            deliveryProductUpdater.handle(new DeliveryProductUpdaterCommand(deliveryId, deliveryProductId, observations,
+                    session.entityCode()));
 
             httpStatus = HttpStatus.OK;
 

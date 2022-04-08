@@ -9,8 +9,8 @@ import com.ai.st.microservice.quality.modules.shared.domain.Service;
 import java.util.stream.Collectors;
 
 @Service
-public final class DeliveryProductStatusesFinder implements QueryUseCase<DeliveryProductStatusesFinderQuery, ListResponse<DeliveryProductStatusResponse>> {
-
+public final class DeliveryProductStatusesFinder
+        implements QueryUseCase<DeliveryProductStatusesFinderQuery, ListResponse<DeliveryProductStatusResponse>> {
 
     private final DeliveryProductStatusRepository repository;
 
@@ -20,7 +20,8 @@ public final class DeliveryProductStatusesFinder implements QueryUseCase<Deliver
 
     @Override
     public ListResponse<DeliveryProductStatusResponse> handle(DeliveryProductStatusesFinderQuery query) {
-        return new ListResponse<>(repository.all().stream().map(DeliveryProductStatusResponse::fromAggregate).collect(Collectors.toList()));
+        return new ListResponse<>(repository.all().stream().map(DeliveryProductStatusResponse::fromAggregate)
+                .collect(Collectors.toList()));
     }
 
 }
