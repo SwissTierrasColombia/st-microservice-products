@@ -11,6 +11,8 @@ import com.ai.st.microservice.quality.modules.delivered_products.application.eva
 import com.ai.st.microservice.quality.modules.delivered_products.application.evaluate_product.DeliveryProductEvaluatorCommand;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.TracingKeyword;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -51,6 +53,9 @@ public final class DeliveryProductPatchController extends ApiController {
 
         try {
 
+            SCMTracing.setTransactionName("changeProductStatusToAccepted");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
+
             InformationSession session = this.getInformationSession(headerAuthorization);
 
             validateDeliveryId(deliveryId);
@@ -65,17 +70,20 @@ public final class DeliveryProductPatchController extends ApiController {
             log.error("Error DeliveryProductPatchController@changeProductStatusToAccepted#Validation ---> "
                     + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
-            responseDto = new BasicResponseDto(e.getMessage(), 1);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (DomainError e) {
             log.error("Error DeliveryProductPatchController@changeProductStatusToAccepted#Domain ---> "
                     + e.errorMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+            responseDto = new BasicResponseDto(e.errorMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (Exception e) {
             log.error("Error DeliveryProductPatchController@changeProductStatusToAccepted#General ---> "
                     + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 3);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);
@@ -94,6 +102,9 @@ public final class DeliveryProductPatchController extends ApiController {
 
         try {
 
+            SCMTracing.setTransactionName("changeProductStatusToRejected");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
+
             InformationSession session = this.getInformationSession(headerAuthorization);
 
             validateDeliveryId(deliveryId);
@@ -108,17 +119,20 @@ public final class DeliveryProductPatchController extends ApiController {
             log.error("Error DeliveryProductPatchController@changeProductStatusToRejected#Validation ---> "
                     + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
-            responseDto = new BasicResponseDto(e.getMessage(), 1);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (DomainError e) {
             log.error("Error DeliveryProductPatchController@changeProductStatusToRejected#Domain ---> "
                     + e.errorMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+            responseDto = new BasicResponseDto(e.errorMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (Exception e) {
             log.error("Error DeliveryProductPatchController@changeProductStatusToRejected#General ---> "
                     + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 3);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);

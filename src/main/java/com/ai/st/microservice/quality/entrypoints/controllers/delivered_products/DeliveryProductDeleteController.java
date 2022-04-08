@@ -11,6 +11,8 @@ import com.ai.st.microservice.quality.modules.delivered_products.application.rem
 import com.ai.st.microservice.quality.modules.delivered_products.application.remove_product_from_delivery.DeliveryProductRemoverCommand;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.TracingKeyword;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -50,6 +52,9 @@ public final class DeliveryProductDeleteController extends ApiController {
 
         try {
 
+            SCMTracing.setTransactionName("removeProductFromDelivery");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
+
             InformationSession session = this.getInformationSession(headerAuthorization);
 
             validateDeliveryId(deliveryId);
@@ -64,15 +69,18 @@ public final class DeliveryProductDeleteController extends ApiController {
             log.error("Error DeliveryProductDeleteController@removeProductFromDelivery#Validation ---> "
                     + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
-            responseDto = new BasicResponseDto(e.getMessage(), 3);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (DomainError e) {
             log.error("Error DeliveryProductDeleteController@removeProductFromDelivery#Domain ---> " + e.getMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+            responseDto = new BasicResponseDto(e.errorMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (Exception e) {
             log.error("Error DeliveryProductDeleteController@removeProductFromDelivery#General ---> " + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 1);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);

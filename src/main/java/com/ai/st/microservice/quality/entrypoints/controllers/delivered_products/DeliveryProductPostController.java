@@ -11,6 +11,8 @@ import com.ai.st.microservice.quality.modules.delivered_products.application.add
 import com.ai.st.microservice.quality.modules.delivered_products.application.add_product_to_delivery.DeliveryProductAssigner;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.TracingKeyword;
 import io.swagger.annotations.*;
 
 import org.slf4j.Logger;
@@ -48,6 +50,10 @@ public final class DeliveryProductPostController extends ApiController {
 
         try {
 
+            SCMTracing.setTransactionName("addProductToDelivery");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
+            SCMTracing.addCustomParameter(TracingKeyword.BODY_REQUEST, request.toString());
+
             InformationSession session = this.getInformationSession(headerAuthorization);
 
             validateDeliveryId(deliveryId);
@@ -63,15 +69,18 @@ public final class DeliveryProductPostController extends ApiController {
         } catch (InputValidationException e) {
             log.error("Error DeliveryProductPostController@addProductToDelivery#Validation ---> " + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
-            responseDto = new BasicResponseDto(e.getMessage(), 1);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (DomainError e) {
             log.error("Error DeliveryProductPostController@addProductToDelivery#Domain ---> " + e.errorMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+            responseDto = new BasicResponseDto(e.errorMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (Exception e) {
             log.error("Error DeliveryProductPostController@addProductToDelivery#General ---> " + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 3);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);
@@ -103,5 +112,10 @@ final class AddProductToDeliveryRequest {
 
     public void setProductId(Long productId) {
         this.productId = productId;
+    }
+
+    @Override
+    public String toString() {
+        return "AddProductToDeliveryRequest{" + "productId=" + productId + '}';
     }
 }
