@@ -13,6 +13,8 @@ import com.ai.st.microservice.quality.modules.attachments.application.start_qual
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.CompressorFile;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.StoreFile;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.TracingKeyword;
 import io.swagger.annotations.*;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -61,6 +63,10 @@ public final class DeliveryProductAttachmentPostController extends ApiController
 
         try {
 
+            SCMTracing.setTransactionName("addAttachmentToProduct");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
+            SCMTracing.addCustomParameter(TracingKeyword.BODY_REQUEST, request.toString());
+
             InformationSession session = this.getInformationSession(headerAuthorization);
 
             validateDeliveryId(deliveryId);
@@ -88,22 +94,26 @@ public final class DeliveryProductAttachmentPostController extends ApiController
             log.error("Error DeliveryProductAttachmentPostController@addAttachmentToProduct#Validation ---> "
                     + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
-            responseDto = new BasicResponseDto(e.getMessage(), 1);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (DomainError e) {
             log.error("Error DeliveryProductAttachmentPostController@addAttachmentToProduct#Domain ---> "
                     + e.errorMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+            responseDto = new BasicResponseDto(e.errorMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (IOException e) {
             log.error("Error DeliveryProductAttachmentPostController@addAttachmentToProduct#Files ---> "
                     + e.getMessage());
-            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 3);
+            httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (Exception e) {
             log.error("Error DeliveryProductAttachmentPostController@addAttachmentToProduct#General ---> "
                     + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 4);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);
@@ -122,6 +132,9 @@ public final class DeliveryProductAttachmentPostController extends ApiController
 
         try {
 
+            SCMTracing.setTransactionName("addAttachmentToProduct");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
+
             InformationSession session = this.getInformationSession(headerAuthorization);
 
             validateDeliveryId(deliveryId);
@@ -137,17 +150,20 @@ public final class DeliveryProductAttachmentPostController extends ApiController
             log.error("Error DeliveryProductAttachmentPostController@startQualityProcess#Validation ---> "
                     + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
-            responseDto = new BasicResponseDto(e.getMessage(), 1);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (DomainError e) {
             log.error("Error DeliveryProductAttachmentPostController@startQualityProcess#Domain ---> "
                     + e.errorMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+            responseDto = new BasicResponseDto(e.errorMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (Exception e) {
             log.error(
                     "Error DeliveryProductAttachmentPostController@startQualityProcess#General ---> " + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 4);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);
@@ -276,6 +292,12 @@ final class AddAttachmentToProductRequest {
     public void setDocument(AddDocumentAttachmentRequest document) {
         this.document = document;
     }
+
+    @Override
+    public String toString() {
+        return "AddAttachmentToProductRequest{" + "observations='" + observations + '\'' + ", xtf=" + xtf + ", ftp="
+                + ftp + ", document=" + document + '}';
+    }
 }
 
 final class AddXTFAttachmentRequest {
@@ -300,6 +322,11 @@ final class AddXTFAttachmentRequest {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    @Override
+    public String toString() {
+        return "AddXTFAttachmentRequest{" + "version='" + version + '\'' + '}';
     }
 }
 
@@ -348,6 +375,12 @@ final class AddFTPAttachmentRequest {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    @Override
+    public String toString() {
+        return "AddFTPAttachmentRequest{" + "domain='" + domain + '\'' + ", port='" + port + '\'' + ", username='"
+                + username + '\'' + ", password='" + password + '\'' + '}';
+    }
 }
 
 final class AddDocumentAttachmentRequest {
@@ -361,5 +394,10 @@ final class AddDocumentAttachmentRequest {
 
     public void setAttachment(MultipartFile attachment) {
         this.attachment = attachment;
+    }
+
+    @Override
+    public String toString() {
+        return "AddDocumentAttachmentRequest{" + "attachment=" + attachment.toString() + '}';
     }
 }

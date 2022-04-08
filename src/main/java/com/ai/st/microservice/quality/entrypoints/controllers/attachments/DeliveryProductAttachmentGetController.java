@@ -18,6 +18,8 @@ import com.ai.st.microservice.quality.modules.attachments.application.get_attach
 import com.ai.st.microservice.quality.modules.attachments.application.get_attachment_url.AttachmentURLGetterQuery;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.TracingKeyword;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -76,6 +78,9 @@ public final class DeliveryProductAttachmentGetController extends ApiController 
 
         try {
 
+            SCMTracing.setTransactionName("findAttachmentsFromProduct");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
+
             InformationSession session = this.getInformationSession(headerAuthorization);
 
             validateDeliveryId(deliveryId);
@@ -90,12 +95,14 @@ public final class DeliveryProductAttachmentGetController extends ApiController 
             log.error("Error DeliveryProductAttachmentGetController@findAttachmentsFromProduct#Domain ---> "
                     + e.getMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+            responseDto = new BasicResponseDto(e.errorMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (Exception e) {
             log.error("Error DeliveryProductAttachmentGetController@findAttachmentsFromProduct#General ---> "
                     + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 1);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);
@@ -115,6 +122,8 @@ public final class DeliveryProductAttachmentGetController extends ApiController 
 
         try {
 
+            SCMTracing.setTransactionName("findXTFAttachment");
+
             validateDeliveryId(deliveryId);
             validateDeliveryProductId(deliveryProductId);
             validateAttachmentId(attachmentId);
@@ -127,15 +136,16 @@ public final class DeliveryProductAttachmentGetController extends ApiController 
         } catch (DomainError e) {
             log.error("Error DeliveryProductAttachmentGetController@findXTFAttachment#Domain ---> " + e.getMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+            responseDto = new BasicResponseDto(e.errorMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (Exception e) {
             log.error("Error DeliveryProductAttachmentGetController@findXTFAttachment#General ---> " + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 1);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);
-
     }
 
     @GetMapping(value = "api/quality/v1/deliveries/{deliveryId}/products/{deliveryProductId}/attachments/{attachmentId}/download")
@@ -151,6 +161,9 @@ public final class DeliveryProductAttachmentGetController extends ApiController 
         InputStreamResource resource;
 
         try {
+
+            SCMTracing.setTransactionName("downloadAttachment");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
 
             InformationSession session = this.getInformationSession(headerAuthorization);
 
@@ -176,11 +189,13 @@ public final class DeliveryProductAttachmentGetController extends ApiController 
             resource = new InputStreamResource(new FileInputStream(file));
 
         } catch (DomainError e) {
+            SCMTracing.sendError(e.getMessage());
             log.error("Error DeliveryProductAttachmentGetController@downloadAttachment#Domain ---> " + e.getMessage());
-            return new ResponseEntity<>(new BasicResponseDto(e.errorMessage(), 2), HttpStatus.UNPROCESSABLE_ENTITY);
+            return new ResponseEntity<>(new BasicResponseDto(e.errorMessage()), HttpStatus.UNPROCESSABLE_ENTITY);
         } catch (Exception e) {
+            SCMTracing.sendError(e.getMessage());
             log.error("Error DeliveryProductAttachmentGetController@downloadAttachment#General ---> " + e.getMessage());
-            return new ResponseEntity<>(new BasicResponseDto(e.getMessage(), 1), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new BasicResponseDto(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return this.responseFile(file, mediaType, resource);
@@ -200,6 +215,9 @@ public final class DeliveryProductAttachmentGetController extends ApiController 
         InputStreamResource resource;
 
         try {
+
+            SCMTracing.setTransactionName("downloadReportAttachment");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
 
             InformationSession session = this.getInformationSession(headerAuthorization);
 
@@ -225,13 +243,15 @@ public final class DeliveryProductAttachmentGetController extends ApiController 
             resource = new InputStreamResource(new FileInputStream(file));
 
         } catch (DomainError e) {
+            SCMTracing.sendError(e.getMessage());
             log.error("Error DeliveryProductAttachmentGetController@downloadReportAttachment#Domain ---> "
                     + e.getMessage());
-            return new ResponseEntity<>(new BasicResponseDto(e.errorMessage(), 2), HttpStatus.UNPROCESSABLE_ENTITY);
+            return new ResponseEntity<>(new BasicResponseDto(e.errorMessage()), HttpStatus.UNPROCESSABLE_ENTITY);
         } catch (Exception e) {
+            SCMTracing.sendError(e.getMessage());
             log.error("Error DeliveryProductAttachmentGetController@downloadReportAttachment#General ---> "
                     + e.getMessage());
-            return new ResponseEntity<>(new BasicResponseDto(e.getMessage(), 1), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new BasicResponseDto(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return this.responseFile(file, mediaType, resource);

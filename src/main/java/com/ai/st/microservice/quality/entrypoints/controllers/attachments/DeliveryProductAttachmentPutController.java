@@ -11,6 +11,8 @@ import com.ai.st.microservice.quality.modules.attachments.application.add_report
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.CompressorFile;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.StoreFile;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.TracingKeyword;
 import io.swagger.annotations.*;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -58,6 +60,10 @@ public final class DeliveryProductAttachmentPutController extends ApiController 
 
         try {
 
+            SCMTracing.setTransactionName("addReportToXTFAttachment");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
+            SCMTracing.addCustomParameter(TracingKeyword.BODY_REQUEST, request.toString());
+
             InformationSession session = this.getInformationSession(headerAuthorization);
 
             validateDeliveryId(deliveryId);
@@ -77,17 +83,20 @@ public final class DeliveryProductAttachmentPutController extends ApiController 
             log.error("Error DeliveryProductAttachmentPutController@addReportToXTFAttachment#Validation ---> "
                     + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
-            responseDto = new BasicResponseDto(e.getMessage(), 1);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (DomainError e) {
             log.error("Error DeliveryProductAttachmentPutController@addReportToXTFAttachment#Domain ---> "
                     + e.errorMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+            responseDto = new BasicResponseDto(e.errorMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (Exception e) {
             log.error("Error DeliveryProductAttachmentPutController@addReportToXTFAttachment#General ---> "
                     + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 4);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);

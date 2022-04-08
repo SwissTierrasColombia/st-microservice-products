@@ -9,6 +9,8 @@ import com.ai.st.microservice.common.dto.operators.MicroserviceOperatorDto;
 import com.ai.st.microservice.common.exceptions.DisconnectedMicroserviceException;
 import com.ai.st.microservice.quality.modules.shared.application.Roles;
 
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.TracingKeyword;
 import com.google.common.io.Files;
 
 import org.springframework.core.io.InputStreamResource;
@@ -42,12 +44,21 @@ public abstract class ApiController {
     protected InformationSession getInformationSession(String headerAuthorization)
             throws DisconnectedMicroserviceException {
         MicroserviceUserDto userDtoSession = this.getUserSession(headerAuthorization);
+        SCMTracing.addCustomParameter(TracingKeyword.USER_ID, userDtoSession.getId());
+        SCMTracing.addCustomParameter(TracingKeyword.USER_EMAIL, userDtoSession.getEmail());
+        SCMTracing.addCustomParameter(TracingKeyword.USER_NAME, userDtoSession.getUsername());
         if (administrationBusiness.isManager(userDtoSession)) {
+            SCMTracing.addCustomParameter(TracingKeyword.IS_MANAGER, true);
             MicroserviceManagerDto managerDto = managerBusiness.getManagerByUserCode(userDtoSession.getId());
+            SCMTracing.addCustomParameter(TracingKeyword.MANAGER_ID, managerDto.getId());
+            SCMTracing.addCustomParameter(TracingKeyword.MANAGER_NAME, managerDto.getName());
             return new InformationSession(Roles.MANAGER, managerDto.getId(), userDtoSession.getId(),
                     managerDto.getName());
         } else if (administrationBusiness.isOperator(userDtoSession)) {
+            SCMTracing.addCustomParameter(TracingKeyword.IS_OPERATOR, true);
             MicroserviceOperatorDto operatorDto = operatorBusiness.getOperatorByUserCode(userDtoSession.getId());
+            SCMTracing.addCustomParameter(TracingKeyword.OPERATOR_ID, operatorDto.getId());
+            SCMTracing.addCustomParameter(TracingKeyword.OPERATOR_NAME, operatorDto.getName());
             return new InformationSession(Roles.OPERATOR, operatorDto.getId(), userDtoSession.getId(),
                     operatorDto.getName());
         }

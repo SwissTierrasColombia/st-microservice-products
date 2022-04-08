@@ -11,6 +11,8 @@ import com.ai.st.microservice.quality.modules.attachments.application.remove_att
 import com.ai.st.microservice.quality.modules.attachments.application.remove_attachment_from_product.AttachmentProductRemoverCommand;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.TracingKeyword;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -51,6 +53,9 @@ public final class DeliveryProductAttachmentDeleteController extends ApiControll
 
         try {
 
+            SCMTracing.setTransactionName("removeAttachmentFromProduct");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
+
             InformationSession session = this.getInformationSession(headerAuthorization);
 
             validateDeliveryId(deliveryId);
@@ -66,17 +71,20 @@ public final class DeliveryProductAttachmentDeleteController extends ApiControll
             log.error("Error DeliveryProductAttachmentDeleteController@removeAttachmentFromProduct#Validation ---> "
                     + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
-            responseDto = new BasicResponseDto(e.getMessage(), 3);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (DomainError e) {
             log.error("Error DeliveryProductAttachmentDeleteController@removeAttachmentFromProduct#Domain ---> "
                     + e.getMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+            responseDto = new BasicResponseDto(e.errorMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (Exception e) {
             log.error("Error DeliveryProductAttachmentDeleteController@removeAttachmentFromProduct#General ---> "
                     + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 1);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);
