@@ -13,7 +13,7 @@
 
     <groupId>com.ai.st.microservice.quality</groupId>
     <artifactId>st-microservice-quality</artifactId>
-    <version>1.0.1</version>
+    <version>1.2.0</version>
     <name>st-microservice-quality</name>
     <description>Products BPM</description>
 
@@ -97,15 +97,17 @@
         </dependency>
 
         <dependency>
-            <groupId>com.newrelic.logging</groupId>
-            <artifactId>logback</artifactId>
-            <version>2.3.2</version>
+            <groupId>com.newrelic.agent.java</groupId>
+            <artifactId>newrelic-api</artifactId>
+            <version>7.5.0</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>com.newrelic.agent.java</groupId>
-            <artifactId>newrelic-api</artifactId>
+            <artifactId>newrelic-agent</artifactId>
             <version>7.5.0</version>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>
