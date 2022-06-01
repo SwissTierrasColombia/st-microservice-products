@@ -132,7 +132,7 @@ public final class DeliveryProductAttachmentPostController extends ApiController
 
         try {
 
-            SCMTracing.setTransactionName("addAttachmentToProduct");
+            SCMTracing.setTransactionName("startQualityProcess");
             SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
 
             InformationSession session = this.getInformationSession(headerAuthorization);
