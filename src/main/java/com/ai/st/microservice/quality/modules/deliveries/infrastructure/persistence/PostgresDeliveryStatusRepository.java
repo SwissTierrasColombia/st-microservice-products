@@ -28,8 +28,9 @@ public final class PostgresDeliveryStatusRepository implements DeliveryStatusRep
 
     @Override
     public List<DeliveryStatus> all() {
-        return repository.findAll().stream().map(deliveryStatusEntity -> DeliveryStatus
-                .fromPrimitives(deliveryStatusEntity.getId(), deliveryStatusEntity.getName()))
+        return repository
+                .findAll().stream().map(deliveryStatusEntity -> DeliveryStatus
+                        .fromPrimitives(deliveryStatusEntity.getId(), deliveryStatusEntity.getName()))
                 .collect(Collectors.toList());
     }
 

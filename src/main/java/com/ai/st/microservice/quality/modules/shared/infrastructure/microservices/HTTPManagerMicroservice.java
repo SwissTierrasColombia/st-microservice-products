@@ -10,6 +10,9 @@ import com.ai.st.microservice.quality.modules.shared.domain.UserCode;
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.ManagerMicroservice;
 import com.ai.st.microservice.quality.modules.shared.domain.exceptions.ManagerNotFound;
 import com.ai.st.microservice.quality.modules.shared.domain.exceptions.MicroserviceUnreachable;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,6 +22,8 @@ import java.util.stream.Collectors;
 
 @Service
 public final class HTTPManagerMicroservice implements ManagerMicroservice {
+
+    private final Logger log = LoggerFactory.getLogger(HTTPILIOldMicroservice.class);
 
     private final ManagerFeignClient managerFeignClient;
 
@@ -47,10 +52,14 @@ public final class HTTPManagerMicroservice implements ManagerMicroservice {
             List<MicroserviceManagerUserDto> users = managerFeignClient.findUsersByManager(managerCode.value(),
                     new ArrayList<>(Collections.singletonList(RoleBusiness.SUB_ROLE_DIRECTOR_MANAGER)));
 
-            usersCodes = users.stream().map(
-                    managerUserDto -> new UserCode(managerUserDto.getUserCode())).collect(Collectors.toList());
+            usersCodes = users.stream().map(managerUserDto -> new UserCode(managerUserDto.getUserCode()))
+                    .collect(Collectors.toList());
 
         } catch (Exception e) {
+            String messageError = String.format("Error consultando los usuarios del gestor %d : %s",
+                    managerCode.value(), e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
             throw new MicroserviceUnreachable("manager");
         }
 

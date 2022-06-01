@@ -14,7 +14,8 @@ public final class ManagerCode {
     }
 
     private void ensureValidCode(Long value) {
-        if (value == null || value <= 0) throw new ManagerInvalid();
+        if (value == null || value <= 0)
+            throw new ManagerInvalid();
     }
 
     public static ManagerCode fromValue(Long value) {
@@ -27,8 +28,10 @@ public final class ManagerCode {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         ManagerCode that = (ManagerCode) o;
         return value.equals(that.value);
     }

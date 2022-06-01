@@ -9,7 +9,8 @@ public final class DeliveryProductUpdaterCommand implements Command {
     private final String observations;
     private final Long operatorCode;
 
-    public DeliveryProductUpdaterCommand(Long deliveryId, Long deliveryProductId, String observations, Long operatorCode) {
+    public DeliveryProductUpdaterCommand(Long deliveryId, Long deliveryProductId, String observations,
+            Long operatorCode) {
         this.deliveryId = deliveryId;
         this.deliveryProductId = deliveryProductId;
         this.observations = observations;

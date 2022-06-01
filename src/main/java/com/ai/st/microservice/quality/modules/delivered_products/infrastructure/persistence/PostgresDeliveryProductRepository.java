@@ -70,7 +70,8 @@ public final class PostgresDeliveryProductRepository implements DeliveryProductR
 
     @Override
     public void update(DeliveryProduct deliveryProduct) {
-        DeliveredProductEntity deliveredProductEntity = repository.findById(deliveryProduct.deliveryProductId().value()).orElse(null);
+        DeliveredProductEntity deliveredProductEntity = repository.findById(deliveryProduct.deliveryProductId().value())
+                .orElse(null);
         if (deliveredProductEntity != null) {
             deliveredProductEntity.setObservations(deliveryProduct.deliveryProductObservations().value());
             repository.save(deliveredProductEntity);
@@ -97,14 +98,9 @@ public final class PostgresDeliveryProductRepository implements DeliveryProductR
     }
 
     private DeliveryProduct mapping(DeliveredProductEntity deliveredProductEntity) {
-        return DeliveryProduct.fromPrimitives(
-                deliveredProductEntity.getId(),
-                deliveredProductEntity.getCreatedAt(),
-                deliveredProductEntity.getObservations(),
-                deliveredProductEntity.getProduct().getId(),
-                deliveredProductEntity.getStatus().getId(),
-                deliveredProductEntity.getStatusAt()
-        );
+        return DeliveryProduct.fromPrimitives(deliveredProductEntity.getId(), deliveredProductEntity.getCreatedAt(),
+                deliveredProductEntity.getObservations(), deliveredProductEntity.getProduct().getId(),
+                deliveredProductEntity.getStatus().getId(), deliveredProductEntity.getStatusAt());
     }
 
 }

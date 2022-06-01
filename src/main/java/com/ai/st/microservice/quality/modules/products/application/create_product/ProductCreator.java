@@ -26,13 +26,8 @@ public final class ProductCreator implements CommandUseCase<ProductCreatorComman
         ProductXTF productXTF = ProductXTF.fromValue(command.isXTF());
         ManagerCode managerCode = ManagerCode.fromValue(command.managerCode());
 
-        Product product = Product.create(
-                productName,
-                productDescription,
-                managerCode,
-                productXTF,
-                ProductDate.fromValue(dateTime.now())
-        );
+        Product product = Product.create(productName, productDescription, managerCode, productXTF,
+                ProductDate.fromValue(dateTime.now()));
 
         repository.save(product);
     }

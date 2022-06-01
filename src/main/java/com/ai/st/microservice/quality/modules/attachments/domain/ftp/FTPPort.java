@@ -12,7 +12,8 @@ public final class FTPPort {
     }
 
     private void ensurePort(String value) {
-        if (value == null || value.isEmpty()) throw new FTPPortInvalid();
+        if (value == null || value.isEmpty())
+            throw new FTPPortInvalid();
     }
 
     public String value() {

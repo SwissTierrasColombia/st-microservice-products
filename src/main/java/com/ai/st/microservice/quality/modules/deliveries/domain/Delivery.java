@@ -30,10 +30,12 @@ public final class Delivery extends AggregateRoot {
     private final List<DeliveryProduct> deliveryProducts;
     private final DeliveryFinalComments deliveryFinalComments;
 
-    private Delivery(DeliveryId id, DeliveryCode code, MunicipalityCode municipalityCode, MunicipalityName municipalityName, DepartmentName departmentName,
-                     ManagerCode manager, ManagerName managerName, OperatorCode operatorCode, OperatorName operatorName, UserCode user,
-                     DeliveryObservations observations, DeliveryDate deliveryDate, DeliveryStatusId deliveryStatusId,
-                     DeliveryStatusDate deliveryStatusDate, DeliveryFinalComments deliveryFinalComments, List<DeliveryProduct> deliveryProducts) {
+    private Delivery(DeliveryId id, DeliveryCode code, MunicipalityCode municipalityCode,
+            MunicipalityName municipalityName, DepartmentName departmentName, ManagerCode manager,
+            ManagerName managerName, OperatorCode operatorCode, OperatorName operatorName, UserCode user,
+            DeliveryObservations observations, DeliveryDate deliveryDate, DeliveryStatusId deliveryStatusId,
+            DeliveryStatusDate deliveryStatusDate, DeliveryFinalComments deliveryFinalComments,
+            List<DeliveryProduct> deliveryProducts) {
         this.id = id;
         this.code = code;
         this.municipalityName = municipalityName;
@@ -52,53 +54,40 @@ public final class Delivery extends AggregateRoot {
         this.deliveryFinalComments = deliveryFinalComments;
     }
 
-    public static Delivery create(DeliveryId id, DeliveryCode code, MunicipalityCode municipalityCode, MunicipalityName municipalityName,
-                                  DepartmentName departmentName, ManagerCode manager, ManagerName managerName, OperatorCode operatorCode,
-                                  OperatorName operatorName, UserCode user, DeliveryObservations observations, DeliveryDate date, DeliveryStatusId deliveryStatus) {
-        return new Delivery(id, code, municipalityCode, municipalityName, departmentName, manager,
-                managerName, operatorCode, operatorName, user, observations, date, deliveryStatus, new DeliveryStatusDate(new Date()),
-                null, new ArrayList<>());
+    public static Delivery create(DeliveryId id, DeliveryCode code, MunicipalityCode municipalityCode,
+            MunicipalityName municipalityName, DepartmentName departmentName, ManagerCode manager,
+            ManagerName managerName, OperatorCode operatorCode, OperatorName operatorName, UserCode user,
+            DeliveryObservations observations, DeliveryDate date, DeliveryStatusId deliveryStatus) {
+        return new Delivery(id, code, municipalityCode, municipalityName, departmentName, manager, managerName,
+                operatorCode, operatorName, user, observations, date, deliveryStatus,
+                new DeliveryStatusDate(new Date()), null, new ArrayList<>());
     }
 
-    public static Delivery create(DeliveryCode code, MunicipalityCode municipalityCode, MunicipalityName municipalityName, DepartmentName departmentName,
-                                  ManagerCode manager, ManagerName managerName, OperatorCode operatorCode, OperatorName operatorName, UserCode user,
-                                  DeliveryObservations observations, DeliveryDate date, DeliveryStatusId deliveryStatus) {
-        return new Delivery(null, code, municipalityCode, municipalityName, departmentName, manager, managerName, operatorCode, operatorName,
-                user, observations, date, deliveryStatus, new DeliveryStatusDate(new Date()), null, new ArrayList<>());
+    public static Delivery create(DeliveryCode code, MunicipalityCode municipalityCode,
+            MunicipalityName municipalityName, DepartmentName departmentName, ManagerCode manager,
+            ManagerName managerName, OperatorCode operatorCode, OperatorName operatorName, UserCode user,
+            DeliveryObservations observations, DeliveryDate date, DeliveryStatusId deliveryStatus) {
+        return new Delivery(null, code, municipalityCode, municipalityName, departmentName, manager, managerName,
+                operatorCode, operatorName, user, observations, date, deliveryStatus,
+                new DeliveryStatusDate(new Date()), null, new ArrayList<>());
     }
 
-    public static Delivery fromPrimitives(Long id, String code, String municipalityCode, String municipalityName, String departmentName,
-                                          Long managerCode, String managerName, Long operatorCode, String operatorName,
-                                          Long userCode, String observations, Date createdAt, Long statusId, String comments, Date statusDate) {
-        return new Delivery(
-                new DeliveryId(id),
-                new DeliveryCode(code),
-                new MunicipalityCode(municipalityCode),
-                MunicipalityName.fromValue(municipalityName),
-                DepartmentName.fromValue(departmentName),
-                new ManagerCode(managerCode),
-                ManagerName.fromValue(managerName),
-                new OperatorCode(operatorCode),
-                OperatorName.fromValue(operatorName),
-                new UserCode(userCode),
-                new DeliveryObservations(observations),
-                new DeliveryDate(createdAt),
-                new DeliveryStatusId(statusId),
-                new DeliveryStatusDate(statusDate),
-                (comments != null) ? DeliveryFinalComments.fromValue(comments) : null,
-                new ArrayList<>());
+    public static Delivery fromPrimitives(Long id, String code, String municipalityCode, String municipalityName,
+            String departmentName, Long managerCode, String managerName, Long operatorCode, String operatorName,
+            Long userCode, String observations, Date createdAt, Long statusId, String comments, Date statusDate) {
+        return new Delivery(new DeliveryId(id), new DeliveryCode(code), new MunicipalityCode(municipalityCode),
+                MunicipalityName.fromValue(municipalityName), DepartmentName.fromValue(departmentName),
+                new ManagerCode(managerCode), ManagerName.fromValue(managerName), new OperatorCode(operatorCode),
+                OperatorName.fromValue(operatorName), new UserCode(userCode), new DeliveryObservations(observations),
+                new DeliveryDate(createdAt), new DeliveryStatusId(statusId), new DeliveryStatusDate(statusDate),
+                (comments != null) ? DeliveryFinalComments.fromValue(comments) : null, new ArrayList<>());
     }
 
-    public void addProduct(DeliveryProductDate deliveryProductDate, DeliveryProductObservations deliveryProductObservations,
-                           ProductId productId, DeliveryProductStatusId deliveryProductStatusId) {
-        this.deliveryProducts.add(new DeliveryProduct(
-                null,
-                deliveryProductDate,
-                deliveryProductObservations,
-                productId,
-                deliveryProductStatusId,
-                new DeliveryProductStatusDate(new Date()),
-                new ArrayList<>()));
+    public void addProduct(DeliveryProductDate deliveryProductDate,
+            DeliveryProductObservations deliveryProductObservations, ProductId productId,
+            DeliveryProductStatusId deliveryProductStatusId) {
+        this.deliveryProducts.add(new DeliveryProduct(null, deliveryProductDate, deliveryProductObservations, productId,
+                deliveryProductStatusId, new DeliveryProductStatusDate(new Date()), new ArrayList<>()));
     }
 
     public DeliveryId id() {
@@ -182,30 +171,21 @@ public final class Delivery extends AggregateRoot {
     }
 
     public static List<DeliveryStatusId> statusesAllowedToManager() {
-        return Arrays.asList(
-                new DeliveryStatusId(DeliveryStatusId.DELIVERED),
-                new DeliveryStatusId(DeliveryStatusId.IN_REVIEW),
-                new DeliveryStatusId(DeliveryStatusId.IN_REMEDIATION),
-                new DeliveryStatusId(DeliveryStatusId.ACCEPTED),
-                new DeliveryStatusId(DeliveryStatusId.REJECTED)
-        );
+        return Arrays.asList(new DeliveryStatusId(DeliveryStatusId.DELIVERED),
+                new DeliveryStatusId(DeliveryStatusId.IN_REVIEW), new DeliveryStatusId(DeliveryStatusId.IN_REMEDIATION),
+                new DeliveryStatusId(DeliveryStatusId.ACCEPTED), new DeliveryStatusId(DeliveryStatusId.REJECTED));
     }
 
     public static List<DeliveryStatusId> statusesAllowedToOperator() {
-        return Arrays.asList(
-                new DeliveryStatusId(DeliveryStatusId.DRAFT),
-                new DeliveryStatusId(DeliveryStatusId.DELIVERED),
-                new DeliveryStatusId(DeliveryStatusId.IN_REVIEW),
-                new DeliveryStatusId(DeliveryStatusId.IN_REMEDIATION),
-                new DeliveryStatusId(DeliveryStatusId.ACCEPTED),
-                new DeliveryStatusId(DeliveryStatusId.REJECTED)
-        );
+        return Arrays.asList(new DeliveryStatusId(DeliveryStatusId.DRAFT),
+                new DeliveryStatusId(DeliveryStatusId.DELIVERED), new DeliveryStatusId(DeliveryStatusId.IN_REVIEW),
+                new DeliveryStatusId(DeliveryStatusId.IN_REMEDIATION), new DeliveryStatusId(DeliveryStatusId.ACCEPTED),
+                new DeliveryStatusId(DeliveryStatusId.REJECTED));
     }
 
     public boolean isAvailableToManager() {
-        DeliveryStatusId statusFound =
-                statusesAllowedToManager().stream().filter(statusId -> statusId.value().equals(deliveryStatusId.value()))
-                        .findAny().orElse(null);
+        DeliveryStatusId statusFound = statusesAllowedToManager().stream()
+                .filter(statusId -> statusId.value().equals(deliveryStatusId.value())).findAny().orElse(null);
         return statusFound != null;
     }
 

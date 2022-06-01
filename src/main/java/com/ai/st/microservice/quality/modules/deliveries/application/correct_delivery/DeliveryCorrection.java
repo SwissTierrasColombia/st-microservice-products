@@ -24,12 +24,13 @@ public final class DeliveryCorrection implements CommandUseCase<DeliveryCorrecti
     private final DeliveryProductRepository deliveryProductRepository;
     private final IntegrityDeliveryChecker integrityDeliveryChecker;
 
-    public DeliveryCorrection(DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository1,
-                              DeliveryProductRepository deliveryProductRepository, ProductRepository productRepository,
-                              DeliveryProductAttachmentRepository attachmentRepository) {
+    public DeliveryCorrection(DeliveryRepository deliveryRepository,
+            DeliveryProductRepository deliveryProductRepository1, DeliveryProductRepository deliveryProductRepository,
+            ProductRepository productRepository, DeliveryProductAttachmentRepository attachmentRepository) {
         this.deliveryRepository = deliveryRepository;
         this.deliveryProductRepository = deliveryProductRepository1;
-        this.integrityDeliveryChecker = new IntegrityDeliveryChecker(deliveryProductRepository, attachmentRepository, productRepository);
+        this.integrityDeliveryChecker = new IntegrityDeliveryChecker(deliveryProductRepository, attachmentRepository,
+                productRepository);
     }
 
     @Override
@@ -58,7 +59,8 @@ public final class DeliveryCorrection implements CommandUseCase<DeliveryCorrecti
 
         // verify status of the delivery
         if (!delivery.isInRemediation()) {
-            throw new UnauthorizedToModifyDelivery("No se puede re enviar la entrega, porque el estado de la misma no lo permite.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede re enviar la entrega, porque el estado de la misma no lo permite.");
         }
 
         integrityDeliveryChecker.handle(new IntegrityDeliveryCheckerCommand(deliveryId.value()));
@@ -67,9 +69,11 @@ public final class DeliveryCorrection implements CommandUseCase<DeliveryCorrecti
     }
 
     private void verifyIfThereIsSomeRejectedProduct(DeliveryId deliveryId) {
-        long count = deliveryProductRepository.findByDeliveryId(deliveryId).stream().filter(DeliveryProduct::isRejected).count();
+        long count = deliveryProductRepository.findByDeliveryId(deliveryId).stream().filter(DeliveryProduct::isRejected)
+                .count();
         if (count > 0)
-            throw new UnauthorizedToModifyDelivery("No se puede re enviar la entrega, porque hay productos que no han sido corregidos.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede re enviar la entrega, porque hay productos que no han sido corregidos.");
     }
 
 }

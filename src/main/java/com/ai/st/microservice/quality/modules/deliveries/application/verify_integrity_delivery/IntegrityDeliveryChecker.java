@@ -24,8 +24,7 @@ public final class IntegrityDeliveryChecker implements CommandUseCase<IntegrityD
     private final ProductRepository productRepository;
 
     public IntegrityDeliveryChecker(DeliveryProductRepository deliveryProductRepository,
-                                    DeliveryProductAttachmentRepository attachmentRepository,
-                                    ProductRepository productRepository) {
+            DeliveryProductAttachmentRepository attachmentRepository, ProductRepository productRepository) {
         this.deliveryProductRepository = deliveryProductRepository;
         this.attachmentRepository = attachmentRepository;
         this.productRepository = productRepository;
@@ -42,7 +41,8 @@ public final class IntegrityDeliveryChecker implements CommandUseCase<IntegrityD
     private void verifyIntegrityOfProducts(DeliveryId deliveryId) {
         List<DeliveryProduct> deliveryProducts = deliveryProductRepository.findByDeliveryId(deliveryId);
         deliveryProducts.forEach(deliveryProduct -> {
-            List<DeliveryProductAttachment> attachments = attachmentRepository.findByDeliveryProductId(deliveryProduct.deliveryProductId());
+            List<DeliveryProductAttachment> attachments = attachmentRepository
+                    .findByDeliveryProductId(deliveryProduct.deliveryProductId());
             if (productIsXTF(deliveryProduct.productId())) {
                 verifyXTFAttachment(attachments);
             }
@@ -67,15 +67,16 @@ public final class IntegrityDeliveryChecker implements CommandUseCase<IntegrityD
     }
 
     private void verifyXTFAttachment(List<DeliveryProductAttachment> attachments) {
-        List<DeliveryProductAttachment> xtfAttachments =
-                attachments.stream().filter(DeliveryProductAttachment::isXTF).collect(Collectors.toList());
+        List<DeliveryProductAttachment> xtfAttachments = attachments.stream().filter(DeliveryProductAttachment::isXTF)
+                .collect(Collectors.toList());
 
         if (xtfAttachments.size() == 0) {
             throw new UnauthorizedToChangeDeliveryStatusToDelivered(
                     "No se puede enviar la entrega porque existe un producto que requiere se cargue al menos un archivo en formato XTF.");
         }
 
-        long count = xtfAttachments.stream().filter(attachment -> !((DeliveryProductXTFAttachment) attachment).accepted()).count();
+        long count = xtfAttachments.stream()
+                .filter(attachment -> !((DeliveryProductXTFAttachment) attachment).accepted()).count();
         if (count >= 1) {
             throw new UnauthorizedToChangeDeliveryStatusToDelivered(
                     "No se puede enviar la entrega porque existe un producto con un adjunto XTF cargado y no aceptado.");

@@ -14,7 +14,7 @@ public final class Product {
     private final ProductDate productDate;
 
     public Product(ProductId id, ProductName name, ProductDescription description, ManagerCode managerCode,
-                   ProductXTF productXTF, ProductDate createdAt) {
+            ProductXTF productXTF, ProductDate createdAt) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -23,25 +23,20 @@ public final class Product {
         this.productDate = createdAt;
     }
 
-    public static Product create(ProductId productId, ProductName name, ProductDescription description, ManagerCode managerCode,
-                                 ProductXTF productXTF, ProductDate createdAt) {
+    public static Product create(ProductId productId, ProductName name, ProductDescription description,
+            ManagerCode managerCode, ProductXTF productXTF, ProductDate createdAt) {
         return new Product(productId, name, description, managerCode, productXTF, createdAt);
     }
 
     public static Product create(ProductName name, ProductDescription description, ManagerCode managerCode,
-                                 ProductXTF productXTF, ProductDate createdAt) {
+            ProductXTF productXTF, ProductDate createdAt) {
         return new Product(null, name, description, managerCode, productXTF, createdAt);
     }
 
-    public static Product fromPrimitives(Long id, String name, String description, Long managerCode,
-                                         boolean productXTF, Date createdAt) {
-        return new Product(
-                new ProductId(id),
-                new ProductName(name),
-                new ProductDescription(description),
-                new ManagerCode(managerCode),
-                new ProductXTF(productXTF),
-                new ProductDate(createdAt));
+    public static Product fromPrimitives(Long id, String name, String description, Long managerCode, boolean productXTF,
+            Date createdAt) {
+        return new Product(new ProductId(id), new ProductName(name), new ProductDescription(description),
+                new ManagerCode(managerCode), new ProductXTF(productXTF), new ProductDate(createdAt));
     }
 
     public ProductId id() {
@@ -75,6 +70,5 @@ public final class Product {
     public boolean belongToManager(ManagerCode managerCode) {
         return managerCode.value().equals(this.managerCode.value());
     }
-
 
 }

@@ -11,5 +11,5 @@ public final class StringResponse implements Response {
     public String value() {
         return value;
     }
-    
+
 }

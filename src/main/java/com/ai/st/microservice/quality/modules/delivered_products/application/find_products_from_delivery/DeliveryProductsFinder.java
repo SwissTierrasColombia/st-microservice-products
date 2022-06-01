@@ -18,12 +18,14 @@ import com.ai.st.microservice.quality.modules.shared.domain.Service;
 import java.util.stream.Collectors;
 
 @Service
-public final class DeliveryProductsFinder implements QueryUseCase<DeliveryProductsFinderQuery, ListResponse<DeliveryProductResponse>> {
+public final class DeliveryProductsFinder
+        implements QueryUseCase<DeliveryProductsFinderQuery, ListResponse<DeliveryProductResponse>> {
 
     private final DeliveryRepository deliveryRepository;
     private final DeliveryProductRepository deliveryProductRepository;
 
-    public DeliveryProductsFinder(DeliveryProductRepository deliveryProductRepository, DeliveryRepository deliveryRepository) {
+    public DeliveryProductsFinder(DeliveryProductRepository deliveryProductRepository,
+            DeliveryRepository deliveryRepository) {
         this.deliveryProductRepository = deliveryProductRepository;
         this.deliveryRepository = deliveryRepository;
     }
@@ -57,7 +59,8 @@ public final class DeliveryProductsFinder implements QueryUseCase<DeliveryProduc
         }
         if (role.equals(Roles.MANAGER)) {
             // verify status of the delivery
-            if (!delivery.deliveryBelongToManager(ManagerCode.fromValue(entityCode)) || !delivery.isAvailableToManager()) {
+            if (!delivery.deliveryBelongToManager(ManagerCode.fromValue(entityCode))
+                    || !delivery.isAvailableToManager()) {
                 throw new UnauthorizedToSearchDelivery();
             }
         }

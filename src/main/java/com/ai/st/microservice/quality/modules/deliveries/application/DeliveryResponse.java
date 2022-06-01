@@ -24,8 +24,9 @@ public final class DeliveryResponse implements Response {
     private final String finalComments;
 
     public DeliveryResponse(Long id, String code, Date deliveryDate, Long managerCode, String municipalityCode,
-                            String observations, Long operatorCode, Long userCode, Long deliveryStatusId, Date deliveryStatusDate, String departmentName,
-                            String municipalityName, String managerName, String operatorName, String finalComments) {
+            String observations, Long operatorCode, Long userCode, Long deliveryStatusId, Date deliveryStatusDate,
+            String departmentName, String municipalityName, String managerName, String operatorName,
+            String finalComments) {
         this.id = id;
         this.code = code;
         this.deliveryDate = deliveryDate;
@@ -44,20 +45,11 @@ public final class DeliveryResponse implements Response {
     }
 
     public static DeliveryResponse fromAggregate(Delivery delivery) {
-        return new DeliveryResponse(delivery.id().value(),
-                delivery.code().value(),
-                delivery.deliveryDate().value(),
-                delivery.manager().value(),
-                delivery.municipality().value(),
-                delivery.observations().value(),
-                delivery.operator().value(),
-                delivery.user().value(),
-                delivery.deliveryStatusId().value(),
-                delivery.deliveryStatusDate().value(),
-                delivery.departmentName().value(),
-                delivery.municipalityName().value(),
-                delivery.managerName().value(),
-                delivery.operatorName().value(),
+        return new DeliveryResponse(delivery.id().value(), delivery.code().value(), delivery.deliveryDate().value(),
+                delivery.manager().value(), delivery.municipality().value(), delivery.observations().value(),
+                delivery.operator().value(), delivery.user().value(), delivery.deliveryStatusId().value(),
+                delivery.deliveryStatusDate().value(), delivery.departmentName().value(),
+                delivery.municipalityName().value(), delivery.managerName().value(), delivery.operatorName().value(),
                 (delivery.deliveryFinalComments() != null) ? delivery.deliveryFinalComments().value() : null);
     }
 

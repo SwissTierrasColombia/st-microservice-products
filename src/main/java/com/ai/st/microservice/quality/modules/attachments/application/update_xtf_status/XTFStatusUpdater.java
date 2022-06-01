@@ -24,7 +24,8 @@ public final class XTFStatusUpdater implements CommandUseCase<XTFStatusUpdaterCo
         if (command.attachmentUUID() != null) {
             uuid = new DeliveryProductAttachmentUUID(command.attachmentUUID());
         } else {
-            DeliveryProductAttachment deliveryProductAttachment = attachmentRepository.search(DeliveryProductAttachmentId.fromValue(command.attachmentId()));
+            DeliveryProductAttachment deliveryProductAttachment = attachmentRepository
+                    .search(DeliveryProductAttachmentId.fromValue(command.attachmentId()));
             uuid = new DeliveryProductAttachmentUUID(deliveryProductAttachment.uuid().value());
         }
 

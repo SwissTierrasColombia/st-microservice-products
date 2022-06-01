@@ -11,6 +11,8 @@ import com.ai.st.microservice.quality.modules.delivered_products.application.upd
 import com.ai.st.microservice.quality.modules.delivered_products.application.update_product_from_delivery.DeliveryProductUpdaterCommand;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.TracingKeyword;
 import io.swagger.annotations.*;
 
 import org.slf4j.Logger;
@@ -20,7 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api(value = "Manage Deliveries", tags = {"Deliveries"})
+@Api(value = "Manage Deliveries", tags = { "Deliveries" })
 @RestController
 public final class DeliveryProductPutController extends ApiController {
 
@@ -29,28 +31,28 @@ public final class DeliveryProductPutController extends ApiController {
     private final DeliveryProductUpdater deliveryProductUpdater;
 
     public DeliveryProductPutController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                        OperatorBusiness operatorBusiness, DeliveryProductUpdater deliveryProductUpdater) {
+            OperatorBusiness operatorBusiness, DeliveryProductUpdater deliveryProductUpdater) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.deliveryProductUpdater = deliveryProductUpdater;
     }
 
     @PutMapping(value = "api/quality/v1/deliveries/{deliveryId}/products/{deliveryProductId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Update product from delivery")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Product updated"),
-            @ApiResponse(code = 500, message = "Error Server", response = String.class)})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Product updated"),
+            @ApiResponse(code = 500, message = "Error Server", response = String.class) })
     @ResponseBody
-    public ResponseEntity<?> updateProductFromDelivery(
-            @PathVariable Long deliveryId,
-            @PathVariable Long deliveryProductId,
-            @RequestBody UpdateProductFromDeliveryRequest request,
+    public ResponseEntity<?> updateProductFromDelivery(@PathVariable Long deliveryId,
+            @PathVariable Long deliveryProductId, @RequestBody UpdateProductFromDeliveryRequest request,
             @RequestHeader("authorization") String headerAuthorization) {
-
 
         HttpStatus httpStatus;
         Object responseDto = null;
 
         try {
+
+            SCMTracing.setTransactionName("updateProductFromDelivery");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
+            SCMTracing.addCustomParameter(TracingKeyword.BODY_REQUEST, request.toString());
 
             InformationSession session = this.getInformationSession(headerAuthorization);
 
@@ -60,25 +62,26 @@ public final class DeliveryProductPutController extends ApiController {
             String observations = request.getObservations();
             validateObservations(observations);
 
-            deliveryProductUpdater.handle(
-                    new DeliveryProductUpdaterCommand(
-                            deliveryId, deliveryProductId, observations, session.entityCode()
-                    ));
+            deliveryProductUpdater.handle(new DeliveryProductUpdaterCommand(deliveryId, deliveryProductId, observations,
+                    session.entityCode()));
 
             httpStatus = HttpStatus.OK;
 
         } catch (InputValidationException e) {
             log.error("Error DeliveryProductPutController@updateProductFromDelivery#Validation ---> " + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
-            responseDto = new BasicResponseDto(e.getMessage(), 1);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (DomainError e) {
             log.error("Error DeliveryProductPutController@updateProductFromDelivery#Domain ---> " + e.errorMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+            responseDto = new BasicResponseDto(e.errorMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (Exception e) {
             log.error("Error DeliveryProductPutController@updateProductFromDelivery#General ---> " + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 3);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);
@@ -113,5 +116,10 @@ final class UpdateProductFromDeliveryRequest {
 
     public void setObservations(String observations) {
         this.observations = observations;
+    }
+
+    @Override
+    public String toString() {
+        return "UpdateProductFromDeliveryRequest{" + "observations='" + observations + '\'' + '}';
     }
 }

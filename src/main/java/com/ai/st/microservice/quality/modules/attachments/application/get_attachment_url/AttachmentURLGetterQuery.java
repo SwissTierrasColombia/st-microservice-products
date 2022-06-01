@@ -11,7 +11,8 @@ public final class AttachmentURLGetterQuery implements Query {
     private final Roles role;
     private final Long entityCode;
 
-    public AttachmentURLGetterQuery(Long deliveryId, Long deliveryProductId, Long attachmentId, Roles role, Long entityCode) {
+    public AttachmentURLGetterQuery(Long deliveryId, Long deliveryProductId, Long attachmentId, Roles role,
+            Long entityCode) {
         this.deliveryId = deliveryId;
         this.deliveryProductId = deliveryProductId;
         this.attachmentId = attachmentId;

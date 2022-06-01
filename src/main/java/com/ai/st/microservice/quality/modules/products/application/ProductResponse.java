@@ -23,13 +23,8 @@ public final class ProductResponse {
     }
 
     public static ProductResponse fromAggregate(Product product) {
-        return new ProductResponse(
-                product.id().value(),
-                product.name().value(),
-                product.description().value(),
-                product.managerCode().value(),
-                product.productXTF().value(),
-                product.productDate().value());
+        return new ProductResponse(product.id().value(), product.name().value(), product.description().value(),
+                product.managerCode().value(), product.productXTF().value(), product.productDate().value());
     }
 
     public Long id() {

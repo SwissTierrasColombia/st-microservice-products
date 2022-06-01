@@ -4,7 +4,8 @@ import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.
 import com.ai.st.microservice.quality.modules.shared.infrastructure.persistence.entities.DeliveredProductAttachmentFTPEntity;
 import org.springframework.data.repository.CrudRepository;
 
-public interface DeliveredProductAttachmentFTPJPARepository extends CrudRepository<DeliveredProductAttachmentFTPEntity, Long> {
+public interface DeliveredProductAttachmentFTPJPARepository
+        extends CrudRepository<DeliveredProductAttachmentFTPEntity, Long> {
 
     DeliveredProductAttachmentFTPEntity findByDeliveredProductAttachment(DeliveredProductAttachmentEntity attachment);
 

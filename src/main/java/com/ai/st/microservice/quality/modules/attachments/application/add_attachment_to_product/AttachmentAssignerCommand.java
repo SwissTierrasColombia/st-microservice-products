@@ -9,7 +9,8 @@ public final class AttachmentAssignerCommand implements Command {
     private final Long operatorCode;
     private final Attachment attachment;
 
-    public AttachmentAssignerCommand(Long deliveryId, Long deliveryProductId, Long operatorCode, Attachment attachment) {
+    public AttachmentAssignerCommand(Long deliveryId, Long deliveryProductId, Long operatorCode,
+            Attachment attachment) {
         this.deliveryId = deliveryId;
         this.deliveryProductId = deliveryProductId;
         this.operatorCode = operatorCode;

@@ -19,7 +19,8 @@ public final class OperatorCode {
     }
 
     private void ensureValidCode(Long value) {
-        if (value == null || value <= 0) throw new OperatorInvalid();
+        if (value == null || value <= 0)
+            throw new OperatorInvalid();
     }
 
     public static OperatorCode fromValue(Long value) {
@@ -28,8 +29,10 @@ public final class OperatorCode {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         OperatorCode that = (OperatorCode) o;
         return value.equals(that.value);
     }

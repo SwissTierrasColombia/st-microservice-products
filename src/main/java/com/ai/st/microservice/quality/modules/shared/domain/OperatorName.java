@@ -9,7 +9,8 @@ public final class OperatorName extends StringValueObject {
     }
 
     private static void ensureName(String value) {
-        if (value == null || value.isEmpty()) throw new OperatorNameInvalid();
+        if (value == null || value.isEmpty())
+            throw new OperatorNameInvalid();
     }
 
     public static OperatorName fromValue(String value) {

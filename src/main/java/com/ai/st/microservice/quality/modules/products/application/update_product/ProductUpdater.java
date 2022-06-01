@@ -31,14 +31,8 @@ public final class ProductUpdater implements CommandUseCase<ProductUpdaterComman
 
         verifyPermissions(product, managerCode);
 
-        repository.update(Product.create(
-                productId,
-                productName,
-                productDescription,
-                managerCode,
-                productXTF,
-                product.productDate()
-        ));
+        repository.update(Product.create(productId, productName, productDescription, managerCode, productXTF,
+                product.productDate()));
     }
 
     private void checkProduct(Product product) {

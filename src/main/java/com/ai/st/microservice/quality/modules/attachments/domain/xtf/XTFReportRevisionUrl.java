@@ -18,7 +18,8 @@ public final class XTFReportRevisionUrl {
     }
 
     private void ensureUrl(String value) {
-        if (value == null || value.isEmpty()) throw new XTFReportRevisionUrlInvalid(value);
+        if (value == null || value.isEmpty())
+            throw new XTFReportRevisionUrlInvalid(value);
     }
 
 }

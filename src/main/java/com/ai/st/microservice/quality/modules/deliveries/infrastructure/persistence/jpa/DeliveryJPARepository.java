@@ -10,8 +10,8 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
 
-public interface DeliveryJPARepository extends PagingAndSortingRepository<DeliveryEntity, Long>,
-        JpaSpecificationExecutor<DeliveryEntity> {
+public interface DeliveryJPARepository
+        extends PagingAndSortingRepository<DeliveryEntity, Long>, JpaSpecificationExecutor<DeliveryEntity> {
 
     Page<DeliveryEntity> findAll(Pageable pageable);
 

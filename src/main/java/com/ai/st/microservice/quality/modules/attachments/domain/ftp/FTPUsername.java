@@ -12,7 +12,8 @@ public final class FTPUsername {
     }
 
     private void ensureUsername(String value) {
-        if (value == null || value.isEmpty()) throw new FTPUsernameInvalid();
+        if (value == null || value.isEmpty())
+            throw new FTPUsernameInvalid();
     }
 
     public String value() {

@@ -11,7 +11,8 @@ public final class FTPPassword {
     }
 
     private void ensurePassword(String value) {
-        if (value == null || value.isEmpty()) throw new FTPPasswordInvalid();
+        if (value == null || value.isEmpty())
+            throw new FTPPasswordInvalid();
     }
 
     public String value() {

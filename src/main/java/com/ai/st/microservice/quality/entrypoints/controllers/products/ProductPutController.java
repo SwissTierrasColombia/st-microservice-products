@@ -12,6 +12,8 @@ import com.ai.st.microservice.quality.modules.products.application.update_produc
 import com.ai.st.microservice.quality.modules.products.application.update_product.ProductUpdaterCommand;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.TracingKeyword;
 import io.swagger.annotations.*;
 
 import org.slf4j.Logger;
@@ -21,7 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api(value = "Manage products", tags = {"Products"})
+@Api(value = "Manage products", tags = { "Products" })
 @RestController
 public final class ProductPutController extends ApiController {
 
@@ -30,27 +32,27 @@ public final class ProductPutController extends ApiController {
     private final ProductUpdater productUpdater;
 
     public ProductPutController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                OperatorBusiness operatorBusiness, ProductUpdater productUpdater) {
+            OperatorBusiness operatorBusiness, ProductUpdater productUpdater) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.productUpdater = productUpdater;
     }
 
     @PutMapping(value = "api/quality/v1/products/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Update product")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Product updated", response = ProductResponse.class),
-            @ApiResponse(code = 500, message = "Error Server")})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Product updated", response = ProductResponse.class),
+            @ApiResponse(code = 500, message = "Error Server") })
     @ResponseBody
-    public ResponseEntity<?> updateProduct(
-            @PathVariable Long productId,
-            @RequestBody UpdateProductRequest request,
+    public ResponseEntity<?> updateProduct(@PathVariable Long productId, @RequestBody UpdateProductRequest request,
             @RequestHeader("authorization") String headerAuthorization) {
-
 
         HttpStatus httpStatus;
         Object responseDto = null;
 
         try {
+
+            SCMTracing.setTransactionName("updateProduct");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
+            SCMTracing.addCustomParameter(TracingKeyword.BODY_REQUEST, request.toString());
 
             InformationSession session = this.getInformationSession(headerAuthorization);
 
@@ -63,25 +65,25 @@ public final class ProductPutController extends ApiController {
             validateDescription(description);
 
             productUpdater.handle(
-                    new ProductUpdaterCommand(
-                            productId, name, description, request.isXTF(), session.entityCode()
-                    )
-            );
+                    new ProductUpdaterCommand(productId, name, description, request.isXTF(), session.entityCode()));
 
             httpStatus = HttpStatus.OK;
 
         } catch (InputValidationException e) {
             log.error("Error ProductPutController@updateProduct#Validation ---> " + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
-            responseDto = new BasicResponseDto(e.getMessage(), 3);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (DomainError e) {
             log.error("Error ProductPutController@updateProduct#Domain ---> " + e.getMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+            responseDto = new BasicResponseDto(e.errorMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (Exception e) {
             log.error("Error ProductPutController@updateProduct#General ---> " + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 1);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);
@@ -138,5 +140,11 @@ final class UpdateProductRequest {
 
     public void setXTF(boolean XTF) {
         isXTF = XTF;
+    }
+
+    @Override
+    public String toString() {
+        return "UpdateProductRequest{" + "name='" + name + '\'' + ", description='" + description + '\'' + ", isXTF="
+                + isXTF + '}';
     }
 }

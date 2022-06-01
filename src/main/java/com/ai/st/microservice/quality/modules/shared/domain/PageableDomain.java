@@ -13,7 +13,7 @@ public final class PageableDomain<T> {
     private final Optional<Integer> size;
 
     public PageableDomain(List<T> items, Optional<Integer> currentPage, Optional<Integer> numberOfElements,
-                          Optional<Long> totalElements, Optional<Integer> totalPages, Optional<Integer> size) {
+            Optional<Long> totalElements, Optional<Integer> totalPages, Optional<Integer> size) {
         this.currentPage = currentPage;
         this.numberOfElements = numberOfElements;
         this.totalElements = totalElements;

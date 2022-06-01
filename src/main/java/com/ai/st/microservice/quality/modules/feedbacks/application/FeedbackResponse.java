@@ -20,12 +20,8 @@ public final class FeedbackResponse implements Response {
     }
 
     public static FeedbackResponse fromAggregate(Feedback feedback) {
-        return new FeedbackResponse(
-                feedback.feedbackId().value(),
-                feedback.comments().value(),
-                feedback.date().value(),
-                feedback.hasAttachment()
-        );
+        return new FeedbackResponse(feedback.feedbackId().value(), feedback.comments().value(), feedback.date().value(),
+                feedback.hasAttachment());
     }
 
     public Long feedbackId() {

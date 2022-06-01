@@ -9,6 +9,8 @@ import com.ai.st.microservice.quality.entrypoints.controllers.ApiController;
 import com.ai.st.microservice.quality.modules.attachments.application.update_xtf_status.XTFStatusUpdater;
 import com.ai.st.microservice.quality.modules.attachments.application.update_xtf_status.XTFStatusUpdaterCommand;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.TracingKeyword;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api(value = "Manage Attachments", tags = {"Attachments"})
+@Api(value = "Manage Attachments", tags = { "Attachments" })
 @RestController
 public final class DeliveryProductAttachmentPatchController extends ApiController {
 
@@ -25,49 +27,57 @@ public final class DeliveryProductAttachmentPatchController extends ApiControlle
 
     private final XTFStatusUpdater xtfStatusUpdater;
 
-    public DeliveryProductAttachmentPatchController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                                    OperatorBusiness operatorBusiness, XTFStatusUpdater xtfStatusUpdater) {
+    public DeliveryProductAttachmentPatchController(AdministrationBusiness administrationBusiness,
+            ManagerBusiness managerBusiness, OperatorBusiness operatorBusiness, XTFStatusUpdater xtfStatusUpdater) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.xtfStatusUpdater = xtfStatusUpdater;
     }
 
     @PatchMapping(value = "api/quality/v1/deliveries/{deliveryId}/products/{deliveryProductId}/attachments/{attachmentId}/status/quality-process-finished", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Update XTF Status to Quality Process Finished")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Status XTF updated"),
-            @ApiResponse(code = 500, message = "Error Server", response = String.class)})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Status XTF updated"),
+            @ApiResponse(code = 500, message = "Error Server", response = String.class) })
     @ResponseBody
-    public ResponseEntity<?> updateXTFStatusToQualityProcessFinished(
-            @PathVariable Long deliveryId,
-            @PathVariable Long deliveryProductId,
-            @PathVariable Long attachmentId) {
+    public ResponseEntity<?> updateXTFStatusToQualityProcessFinished(@PathVariable Long deliveryId,
+            @PathVariable Long deliveryProductId, @PathVariable Long attachmentId) {
 
         HttpStatus httpStatus;
         Object responseDto = null;
 
         try {
 
+            SCMTracing.setTransactionName("updateXTFStatusToQualityProcessFinished");
+
             validateDeliveryId(deliveryId);
             validateProductId(deliveryProductId);
             validateAttachmentId(attachmentId);
 
-            xtfStatusUpdater.handle(new XTFStatusUpdaterCommand(
-                    XTFStatusUpdaterCommand.Status.QUALITY_PROCESS_FINISHED, attachmentId));
+            xtfStatusUpdater.handle(
+                    new XTFStatusUpdaterCommand(XTFStatusUpdaterCommand.Status.QUALITY_PROCESS_FINISHED, attachmentId));
 
             httpStatus = HttpStatus.OK;
 
         } catch (InputValidationException e) {
-            log.error("Error DeliveryProductAttachmentPatchController@updateXTFStatusToQualityProcessFinished#Validation ---> " + e.getMessage());
+            log.error(
+                    "Error DeliveryProductAttachmentPatchController@updateXTFStatusToQualityProcessFinished#Validation ---> "
+                            + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
-            responseDto = new BasicResponseDto(e.getMessage(), 1);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (DomainError e) {
-            log.error("Error DeliveryProductAttachmentPatchController@updateXTFStatusToQualityProcessFinished#Domain ---> " + e.errorMessage());
+            log.error(
+                    "Error DeliveryProductAttachmentPatchController@updateXTFStatusToQualityProcessFinished#Domain ---> "
+                            + e.errorMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+            responseDto = new BasicResponseDto(e.errorMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (Exception e) {
-            log.error("Error DeliveryProductAttachmentPatchController@updateXTFStatusToQualityProcessFinished#General ---> " + e.getMessage());
+            log.error(
+                    "Error DeliveryProductAttachmentPatchController@updateXTFStatusToQualityProcessFinished#General ---> "
+                            + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 4);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);
@@ -75,41 +85,45 @@ public final class DeliveryProductAttachmentPatchController extends ApiControlle
 
     @PatchMapping(value = "api/quality/v1/deliveries/{deliveryId}/products/{deliveryProductId}/attachments/{attachmentId}/status/accepted", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Update XTF Status to Quality Process Finished")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Status XTF updated"),
-            @ApiResponse(code = 500, message = "Error Server", response = String.class)})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Status XTF updated"),
+            @ApiResponse(code = 500, message = "Error Server", response = String.class) })
     @ResponseBody
-    public ResponseEntity<?> updateXTFStatusToAccepted(
-            @PathVariable Long deliveryId,
-            @PathVariable Long deliveryProductId,
-            @PathVariable Long attachmentId) {
+    public ResponseEntity<?> updateXTFStatusToAccepted(@PathVariable Long deliveryId,
+            @PathVariable Long deliveryProductId, @PathVariable Long attachmentId) {
 
         HttpStatus httpStatus;
         Object responseDto = null;
 
         try {
 
+            SCMTracing.setTransactionName("updateXTFStatusToAccepted");
+
             validateDeliveryId(deliveryId);
             validateProductId(deliveryProductId);
             validateAttachmentId(attachmentId);
 
-            xtfStatusUpdater.handle(new XTFStatusUpdaterCommand(
-                    XTFStatusUpdaterCommand.Status.ACCEPTED, attachmentId));
+            xtfStatusUpdater.handle(new XTFStatusUpdaterCommand(XTFStatusUpdaterCommand.Status.ACCEPTED, attachmentId));
 
             httpStatus = HttpStatus.OK;
 
         } catch (InputValidationException e) {
-            log.error("Error DeliveryProductAttachmentPatchController@updateXTFStatusToQualityProcessFinished#Validation ---> " + e.getMessage());
+            log.error("Error DeliveryProductAttachmentPatchController@updateXTFStatusToAccepted#Validation ---> "
+                    + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
-            responseDto = new BasicResponseDto(e.getMessage(), 1);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (DomainError e) {
-            log.error("Error DeliveryProductAttachmentPatchController@updateXTFStatusToQualityProcessFinished#Domain ---> " + e.errorMessage());
+            log.error("Error DeliveryProductAttachmentPatchController@updateXTFStatusToAccepted#Domain ---> "
+                    + e.errorMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+            responseDto = new BasicResponseDto(e.errorMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (Exception e) {
-            log.error("Error DeliveryProductAttachmentPatchController@updateXTFStatusToQualityProcessFinished#General ---> " + e.getMessage());
+            log.error("Error DeliveryProductAttachmentPatchController@updateXTFStatusToAccepted#General ---> "
+                    + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 4);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);

@@ -35,8 +35,8 @@ public final class ReportAggregator implements CommandUseCase<ReportAggregatorCo
     private final StoreFile storeFile;
 
     public ReportAggregator(DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository,
-                            DeliveryProductAttachmentRepository attachmentRepository, TaskMicroservice taskMicroservice,
-                            StoreFile storeFile) {
+            DeliveryProductAttachmentRepository attachmentRepository, TaskMicroservice taskMicroservice,
+            StoreFile storeFile) {
         this.deliveryRepository = deliveryRepository;
         this.deliveryProductRepository = deliveryProductRepository;
         this.attachmentRepository = attachmentRepository;
@@ -59,15 +59,13 @@ public final class ReportAggregator implements CommandUseCase<ReportAggregatorCo
         String namespace = buildNamespace(deliveryId);
         String pathUrl = storeFile.storeFilePermanently(command.bytesFile(), command.extensionFile(), namespace);
 
-        attachmentRepository.updateReportRevisionXTF(attachment.uuid(),
-                new XTFReportRevisionUrl(pathUrl, false),
-                new XTFReportObservations(command.observations())
-        );
+        attachmentRepository.updateReportRevisionXTF(attachment.uuid(), new XTFReportRevisionUrl(pathUrl, false),
+                new XTFReportObservations(command.observations()));
     }
 
     private DeliveryProductXTFAttachment verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId,
-                                                           DeliveryProductAttachmentId attachmentId, ManagerCode managerCode,
-                                                           UserCode userCode, boolean overwriteReport) {
+            DeliveryProductAttachmentId attachmentId, ManagerCode managerCode, UserCode userCode,
+            boolean overwriteReport) {
 
         // verify delivery exists
         Delivery delivery = deliveryRepository.search(deliveryId);
@@ -93,23 +91,27 @@ public final class ReportAggregator implements CommandUseCase<ReportAggregatorCo
 
         // verify status of the delivery
         if (!delivery.isInReview()) {
-            throw new UnauthorizedToModifyDelivery("No se puede cargar el reporte de revisión porque el estado de la entrega no lo permite.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede cargar el reporte de revisión porque el estado de la entrega no lo permite.");
         }
 
         // verify status of the delivery product
         if (!deliveryProduct.isPending()) {
-            throw new UnauthorizedToModifyDelivery("No se puede cargar el reporte de revisión porque el producto ya fue aceptado o rechazado.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede cargar el reporte de revisión porque el producto ya fue aceptado o rechazado.");
         }
 
         // verify type attachment
         if (!deliveryProductAttachment.isXTF()) {
-            throw new UnauthorizedToModifyDelivery("No se puede cargar el reporte de revisión porque el archivo no es un XTF.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede cargar el reporte de revisión porque el archivo no es un XTF.");
         }
 
         // verify status of xtf attachment
         DeliveryProductXTFAttachment attachmentXTF = (DeliveryProductXTFAttachment) deliveryProductAttachment;
         if (!attachmentXTF.qualityInValidation()) {
-            throw new UnauthorizedToModifyDelivery("No se puede cargar el reporte de revisión porque el archivo no está en estado de validación.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede cargar el reporte de revisión porque el archivo no está en estado de validación.");
         }
 
         // verify if file has already a report
@@ -123,12 +125,14 @@ public final class ReportAggregator implements CommandUseCase<ReportAggregatorCo
         // verify if exits any open tasks related to the attachment
         TaskXTFQualityControl task = taskMicroservice.findQualityProcessTask(attachmentXTF);
         if (task == null) {
-            throw new UnauthorizedToModifyDelivery("No se puede cargar el reporte de revisión porque no existe una tarea abierta para el proceso de calidad.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede cargar el reporte de revisión porque no existe una tarea abierta para el proceso de calidad.");
         }
 
         // verify user belongs to task
         if (!task.userId().equals(userCode.value())) {
-            throw new UnauthorizedToModifyDelivery("El usuario no pertenece a la tarea por lo cual no puede cargar el reporte de revisión.");
+            throw new UnauthorizedToModifyDelivery(
+                    "El usuario no pertenece a la tarea por lo cual no puede cargar el reporte de revisión.");
         }
 
         // verify attachment belong to delivery product

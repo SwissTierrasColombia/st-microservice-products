@@ -31,8 +31,9 @@ public final class AttachmentProductRemover implements CommandUseCase<Attachment
     private final DeliveryProductAttachmentRepository attachmentRepository;
     private final StoreFile storeFile;
 
-    public AttachmentProductRemover(DeliveryProductAttachmentRepository attachmentRepository, DeliveryProductRepository deliveryProductRepository,
-                                    DeliveryRepository deliveryRepository, StoreFile storeFile) {
+    public AttachmentProductRemover(DeliveryProductAttachmentRepository attachmentRepository,
+            DeliveryProductRepository deliveryProductRepository, DeliveryRepository deliveryRepository,
+            StoreFile storeFile) {
         this.storeFile = storeFile;
         this.attachmentRepository = attachmentRepository;
         this.deliveryRepository = deliveryRepository;
@@ -47,8 +48,8 @@ public final class AttachmentProductRemover implements CommandUseCase<Attachment
         DeliveryProductAttachmentId attachmentId = new DeliveryProductAttachmentId(command.attachmentId());
         OperatorCode operatorCode = new OperatorCode(command.operatorCode());
 
-        DeliveryProductAttachment deliveryProductAttachment =
-                verifyPermissions(deliveryId, deliveryProductId, attachmentId, operatorCode);
+        DeliveryProductAttachment deliveryProductAttachment = verifyPermissions(deliveryId, deliveryProductId,
+                attachmentId, operatorCode);
 
         deleteStorage(deliveryProductAttachment);
 
@@ -58,7 +59,7 @@ public final class AttachmentProductRemover implements CommandUseCase<Attachment
     }
 
     private DeliveryProductAttachment verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId,
-                                                        DeliveryProductAttachmentId attachmentId, OperatorCode operatorCode) {
+            DeliveryProductAttachmentId attachmentId, OperatorCode operatorCode) {
 
         // verify delivery exists
         Delivery delivery = deliveryRepository.search(deliveryId);
@@ -84,12 +85,14 @@ public final class AttachmentProductRemover implements CommandUseCase<Attachment
 
         // verify status of the delivery
         if (!delivery.isDraft() && !delivery.isInRemediation()) {
-            throw new UnauthorizedToModifyDelivery("No se puede eliminar el adjunto, porque el estado de la entrega no lo permite.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede eliminar el adjunto, porque el estado de la entrega no lo permite.");
         }
 
         // verify status of the delivery product
         if (deliveryProduct.isAccepted()) {
-            throw new UnauthorizedToModifyDelivery("No se puede eliminar el adjunto, porque el producto ya fue aceptado.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede eliminar el adjunto, porque el producto ya fue aceptado.");
         }
 
         // verify attachment belong to delivery product

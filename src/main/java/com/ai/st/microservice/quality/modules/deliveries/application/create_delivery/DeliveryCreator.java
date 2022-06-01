@@ -35,8 +35,8 @@ public final class DeliveryCreator implements CommandUseCase<CreateDeliveryComma
     private final ManagerProductsFinder managerProductsFinder;
 
     public DeliveryCreator(DeliveryRepository deliveryRepository, ProductRepository productRepository,
-                           WorkspaceMicroservice workspaceMicroservice, ManagerMicroservice managerMicroservice,
-                           OperatorMicroservice operatorMicroservice, DateTime dateTime) {
+            WorkspaceMicroservice workspaceMicroservice, ManagerMicroservice managerMicroservice,
+            OperatorMicroservice operatorMicroservice, DateTime dateTime) {
         this.deliveryRepository = deliveryRepository;
         this.workspaceMicroservice = workspaceMicroservice;
         this.managerMicroservice = managerMicroservice;
@@ -57,33 +57,24 @@ public final class DeliveryCreator implements CommandUseCase<CreateDeliveryComma
 
         DepartmentMunicipality departmentMunicipality = findDepartmentMunicipality(municipalityCode);
 
-        Delivery delivery = Delivery.create(
-                new DeliveryCode(generateDeliveryCode()),
-                municipalityCode,
-                departmentMunicipality.municipality(),
-                departmentMunicipality.department(),
-                managerCode,
-                findManagerName(managerCode),
-                operatorCode,
-                findOperatorName(operatorCode),
-                new UserCode(command.userCode()),
-                new DeliveryObservations(command.observations()),
-                new DeliveryDate(dateTime.now()),
-                new DeliveryStatusId(DeliveryStatusId.DRAFT)
-        );
+        Delivery delivery = Delivery.create(new DeliveryCode(generateDeliveryCode()), municipalityCode,
+                departmentMunicipality.municipality(), departmentMunicipality.department(), managerCode,
+                findManagerName(managerCode), operatorCode, findOperatorName(operatorCode),
+                new UserCode(command.userCode()), new DeliveryObservations(command.observations()),
+                new DeliveryDate(dateTime.now()), new DeliveryStatusId(DeliveryStatusId.DRAFT));
 
-        command.deliveryProducts().forEach(productId -> delivery.addProduct(
-                new DeliveryProductDate(dateTime.now()),
-                new DeliveryProductObservations(""),
-                new ProductId(productId),
-                new DeliveryProductStatusId(DeliveryProductStatusId.PENDING)
-        ));
+        command.deliveryProducts()
+                .forEach(productId -> delivery.addProduct(new DeliveryProductDate(dateTime.now()),
+                        new DeliveryProductObservations(""), new ProductId(productId),
+                        new DeliveryProductStatusId(DeliveryProductStatusId.PENDING)));
 
         deliveryRepository.save(delivery);
     }
 
-    private void verifyOperatorBelongToManager(OperatorCode operatorCode, ManagerCode managerCode, MunicipalityCode municipalityCode) {
-        boolean belong = workspaceMicroservice.verifyOperatorBelongToManager(operatorCode, managerCode, municipalityCode);
+    private void verifyOperatorBelongToManager(OperatorCode operatorCode, ManagerCode managerCode,
+            MunicipalityCode municipalityCode) {
+        boolean belong = workspaceMicroservice.verifyOperatorBelongToManager(operatorCode, managerCode,
+                municipalityCode);
         if (!belong) {
             throw new OperatorDoesNotBelongToManager();
         }
@@ -94,8 +85,8 @@ public final class DeliveryCreator implements CommandUseCase<CreateDeliveryComma
     }
 
     private void verifyProductBelongToManager(ProductId productId, ManagerCode managerCode) {
-        List<ProductResponse> productResponseList = this.managerProductsFinder.
-                handle(new ManagerProductsFinderQuery(managerCode.value())).list();
+        List<ProductResponse> productResponseList = this.managerProductsFinder
+                .handle(new ManagerProductsFinderQuery(managerCode.value())).list();
         productResponseList.stream().filter(productResponse -> productResponse.id().equals(productId.value())).findAny()
                 .orElseThrow(ProductDoesNotBelongToManager::new);
     }

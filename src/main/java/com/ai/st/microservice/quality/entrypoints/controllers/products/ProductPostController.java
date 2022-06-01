@@ -12,6 +12,8 @@ import com.ai.st.microservice.quality.modules.products.application.create_produc
 import com.ai.st.microservice.quality.modules.products.application.ProductResponse;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.TracingKeyword;
 import io.swagger.annotations.*;
 
 import org.slf4j.Logger;
@@ -21,7 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api(value = "Manage products", tags = {"Products"})
+@Api(value = "Manage products", tags = { "Products" })
 @RestController
 public final class ProductPostController extends ApiController {
 
@@ -30,25 +32,27 @@ public final class ProductPostController extends ApiController {
     private final ProductCreator productCreator;
 
     public ProductPostController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                 OperatorBusiness operatorBusiness, ProductCreator productCreator) {
+            OperatorBusiness operatorBusiness, ProductCreator productCreator) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.productCreator = productCreator;
     }
 
     @PostMapping(value = "api/quality/v1/products", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Create product")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Product created", response = ProductResponse.class),
-            @ApiResponse(code = 500, message = "Error Server")})
+    @ApiResponses(value = { @ApiResponse(code = 201, message = "Product created", response = ProductResponse.class),
+            @ApiResponse(code = 500, message = "Error Server") })
     @ResponseBody
-    public ResponseEntity<?> createProduct(
-            @RequestBody CreateProductRequest request,
+    public ResponseEntity<?> createProduct(@RequestBody CreateProductRequest request,
             @RequestHeader("authorization") String headerAuthorization) {
 
         HttpStatus httpStatus;
         Object responseDto = null;
 
         try {
+
+            SCMTracing.setTransactionName("createProduct");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
+            SCMTracing.addCustomParameter(TracingKeyword.BODY_REQUEST, request.toString());
 
             InformationSession session = this.getInformationSession(headerAuthorization);
 
@@ -58,26 +62,25 @@ public final class ProductPostController extends ApiController {
             String description = request.getDescription();
             validateDescription(description);
 
-            productCreator.handle(
-                    new ProductCreatorCommand(
-                            name, description, request.isXTF(), session.entityCode()
-                    )
-            );
+            productCreator.handle(new ProductCreatorCommand(name, description, request.isXTF(), session.entityCode()));
 
             httpStatus = HttpStatus.CREATED;
 
         } catch (InputValidationException e) {
             log.error("Error ProductPostController@createProduct#Validation ---> " + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
-            responseDto = new BasicResponseDto(e.getMessage(), 3);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (DomainError e) {
             log.error("Error ProductPostController@createProduct#Domain ---> " + e.getMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+            responseDto = new BasicResponseDto(e.errorMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (Exception e) {
             log.error("Error ProductPostController@createProduct#General ---> " + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 1);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);
@@ -129,5 +132,11 @@ final class CreateProductRequest {
 
     public void setXTF(boolean XTF) {
         isXTF = XTF;
+    }
+
+    @Override
+    public String toString() {
+        return "CreateProductRequest{" + "name='" + name + '\'' + ", description='" + description + '\'' + ", isXTF="
+                + isXTF + '}';
     }
 }

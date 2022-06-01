@@ -12,7 +12,8 @@ public final class DeliveryProductStatusName {
     }
 
     private void ensureStatusName(String value) {
-        if (value == null) throw new DeliveryProductStatusNameInvalid();
+        if (value == null)
+            throw new DeliveryProductStatusNameInvalid();
     }
 
     public static DeliveryProductStatusName fromValue(String value) {

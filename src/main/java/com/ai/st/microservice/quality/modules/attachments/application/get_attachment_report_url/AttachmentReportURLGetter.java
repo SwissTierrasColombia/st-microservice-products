@@ -28,7 +28,9 @@ public final class AttachmentReportURLGetter implements QueryUseCase<AttachmentR
     private final DeliveryProductRepository deliveryProductRepository;
     private final DeliveryProductAttachmentRepository attachmentRepository;
 
-    public AttachmentReportURLGetter(DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository, DeliveryProductAttachmentRepository attachmentRepository) {
+    public AttachmentReportURLGetter(DeliveryRepository deliveryRepository,
+            DeliveryProductRepository deliveryProductRepository,
+            DeliveryProductAttachmentRepository attachmentRepository) {
         this.deliveryRepository = deliveryRepository;
         this.deliveryProductRepository = deliveryProductRepository;
         this.attachmentRepository = attachmentRepository;
@@ -42,13 +44,14 @@ public final class AttachmentReportURLGetter implements QueryUseCase<AttachmentR
         DeliveryProductAttachmentId attachmentId = DeliveryProductAttachmentId.fromValue(query.attachmentId());
         ManagerCode managerCode = ManagerCode.fromValue(query.managerCode());
 
-        DeliveryProductXTFAttachment attachment = verifyPermissions(deliveryId, deliveryProductId, attachmentId, managerCode);
+        DeliveryProductXTFAttachment attachment = verifyPermissions(deliveryId, deliveryProductId, attachmentId,
+                managerCode);
 
         return new StringResponse(attachment.reportRevisionUrl().value());
     }
 
     private DeliveryProductXTFAttachment verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId,
-                                                           DeliveryProductAttachmentId attachmentId, ManagerCode managerCode) {
+            DeliveryProductAttachmentId attachmentId, ManagerCode managerCode) {
 
         // verify delivery exists
         Delivery delivery = deliveryRepository.search(deliveryId);
@@ -74,7 +77,8 @@ public final class AttachmentReportURLGetter implements QueryUseCase<AttachmentR
 
         // verify type attachment
         if (!deliveryProductAttachment.isXTF()) {
-            throw new UnauthorizedToModifyDelivery("No se puede descargar el reporte de revisión porque el archivo no es un XTF.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede descargar el reporte de revisión porque el archivo no es un XTF.");
         }
 
         // verify status of xtf attachment
