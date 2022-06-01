@@ -14,6 +14,8 @@ import com.ai.st.microservice.quality.modules.feedbacks.application.get_feedback
 import com.ai.st.microservice.quality.modules.feedbacks.application.get_feedback_url.FeedbackURLGetterQuery;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.TracingKeyword;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -34,7 +36,7 @@ import java.io.FileInputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-@Api(value = "Manage Deliveries", tags = {"Deliveries"})
+@Api(value = "Manage Deliveries", tags = { "Deliveries" })
 @RestController
 public final class DeliveryProductFeedbackGetController extends ApiController {
 
@@ -44,8 +46,9 @@ public final class DeliveryProductFeedbackGetController extends ApiController {
     private final FeedbackFinder feedbackFinder;
     private final FeedbackURLGetter feedbackURLGetter;
 
-    public DeliveryProductFeedbackGetController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                                OperatorBusiness operatorBusiness, ServletContext servletContext, FeedbackFinder feedbackFinder, FeedbackURLGetter feedbackURLGetter) {
+    public DeliveryProductFeedbackGetController(AdministrationBusiness administrationBusiness,
+            ManagerBusiness managerBusiness, OperatorBusiness operatorBusiness, ServletContext servletContext,
+            FeedbackFinder feedbackFinder, FeedbackURLGetter feedbackURLGetter) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.servletContext = servletContext;
         this.feedbackFinder = feedbackFinder;
@@ -56,18 +59,18 @@ public final class DeliveryProductFeedbackGetController extends ApiController {
     @ApiOperation(value = "Get feedbacks")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Feedback got", response = FeedbackResponse.class, responseContainer = "List"),
-            @ApiResponse(code = 500, message = "Error Server", response = String.class)})
+            @ApiResponse(code = 500, message = "Error Server", response = String.class) })
     @ResponseBody
-    public ResponseEntity<?> findFeedbacks(
-            @PathVariable Long deliveryId,
-            @PathVariable Long deliveryProductId,
+    public ResponseEntity<?> findFeedbacks(@PathVariable Long deliveryId, @PathVariable Long deliveryProductId,
             @RequestHeader("authorization") String headerAuthorization) {
-
 
         HttpStatus httpStatus;
         Object responseDto;
 
         try {
+
+            SCMTracing.setTransactionName("findFeedbacks");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
 
             InformationSession session = this.getInformationSession(headerAuthorization);
 
@@ -75,24 +78,26 @@ public final class DeliveryProductFeedbackGetController extends ApiController {
             validateDeliveryProductId(deliveryProductId);
 
             responseDto = feedbackFinder.handle(
-                    new FeedbackFinderQuery(
-                            deliveryId, deliveryProductId, session.role(), session.entityCode()
-                    )).list();
+                    new FeedbackFinderQuery(deliveryId, deliveryProductId, session.role(), session.entityCode()))
+                    .list();
 
             httpStatus = HttpStatus.OK;
 
         } catch (InputValidationException e) {
             log.error("Error DeliveryProductFeedbackGetController@findFeedbacks#Validation ---> " + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
-            responseDto = new BasicResponseDto(e.getMessage(), 3);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (DomainError e) {
             log.error("Error DeliveryProductFeedbackGetController@findFeedbacks#Domain ---> " + e.getMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+            responseDto = new BasicResponseDto(e.errorMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (Exception e) {
             log.error("Error DeliveryProductFeedbackGetController@findFeedbacks#General ---> " + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 1);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);
@@ -100,14 +105,11 @@ public final class DeliveryProductFeedbackGetController extends ApiController {
 
     @GetMapping(value = "api/quality/v1/deliveries/{deliveryId}/products/{deliveryProductId}/feedbacks/{feedbackId}/download")
     @ApiOperation(value = "Download file")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "File downloaded"),
-            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class)})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "File downloaded"),
+            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class) })
     @ResponseBody
-    public ResponseEntity<?> downloadFeedback(@PathVariable Long deliveryId,
-                                              @PathVariable Long deliveryProductId,
-                                              @PathVariable Long feedbackId,
-                                              @RequestHeader("authorization") String headerAuthorization) {
+    public ResponseEntity<?> downloadFeedback(@PathVariable Long deliveryId, @PathVariable Long deliveryProductId,
+            @PathVariable Long feedbackId, @RequestHeader("authorization") String headerAuthorization) {
 
         MediaType mediaType;
         File file;
@@ -115,16 +117,17 @@ public final class DeliveryProductFeedbackGetController extends ApiController {
 
         try {
 
+            SCMTracing.setTransactionName("downloadFeedback");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
+
             InformationSession session = this.getInformationSession(headerAuthorization);
 
             validateDeliveryId(deliveryId);
             validateDeliveryProductId(deliveryProductId);
             validateFeedbackId(feedbackId);
 
-            String pathFile = feedbackURLGetter.handle(
-                    new FeedbackURLGetterQuery(
-                            deliveryId, deliveryProductId, feedbackId, session.role(), session.entityCode()
-                    )).value();
+            String pathFile = feedbackURLGetter.handle(new FeedbackURLGetterQuery(deliveryId, deliveryProductId,
+                    feedbackId, session.role(), session.entityCode())).value();
 
             Path path = Paths.get(pathFile);
             String fileName = path.getFileName().toString();
@@ -141,14 +144,17 @@ public final class DeliveryProductFeedbackGetController extends ApiController {
             resource = new InputStreamResource(new FileInputStream(file));
 
         } catch (InputValidationException e) {
+            SCMTracing.sendError(e.getMessage());
             log.error("Error DeliveryProductFeedbackGetController@downloadFeedback#Validation ---> " + e.getMessage());
-            return new ResponseEntity<>(new BasicResponseDto(e.getMessage(), 3), HttpStatus.UNPROCESSABLE_ENTITY);
+            return new ResponseEntity<>(new BasicResponseDto(e.getMessage()), HttpStatus.UNPROCESSABLE_ENTITY);
         } catch (DomainError e) {
+            SCMTracing.sendError(e.getMessage());
             log.error("Error DeliveryProductFeedbackGetController@downloadFeedback#Domain ---> " + e.getMessage());
-            return new ResponseEntity<>(new BasicResponseDto(e.errorMessage(), 2), HttpStatus.UNPROCESSABLE_ENTITY);
+            return new ResponseEntity<>(new BasicResponseDto(e.errorMessage()), HttpStatus.UNPROCESSABLE_ENTITY);
         } catch (Exception e) {
+            SCMTracing.sendError(e.getMessage());
             log.error("Error DeliveryProductFeedbackGetController@downloadFeedback#General ---> " + e.getMessage());
-            return new ResponseEntity<>(new BasicResponseDto(e.getMessage(), 1), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new BasicResponseDto(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return this.responseFile(file, mediaType, resource);

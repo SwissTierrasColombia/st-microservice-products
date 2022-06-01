@@ -17,12 +17,14 @@ import com.ai.st.microservice.quality.modules.shared.domain.OperatorCode;
 import com.ai.st.microservice.quality.modules.shared.domain.Service;
 
 @Service
-public final class DeliveryProductSearcher implements QueryUseCase<DeliveryProductSearcherQuery, DeliveryProductResponse> {
+public final class DeliveryProductSearcher
+        implements QueryUseCase<DeliveryProductSearcherQuery, DeliveryProductResponse> {
 
     private final DeliveryRepository deliveryRepository;
     private final DeliveryProductRepository deliveryProductRepository;
 
-    public DeliveryProductSearcher(DeliveryProductRepository deliveryProductRepository, DeliveryRepository deliveryRepository) {
+    public DeliveryProductSearcher(DeliveryProductRepository deliveryProductRepository,
+            DeliveryRepository deliveryRepository) {
         this.deliveryProductRepository = deliveryProductRepository;
         this.deliveryRepository = deliveryRepository;
     }
@@ -63,7 +65,8 @@ public final class DeliveryProductSearcher implements QueryUseCase<DeliveryProdu
         }
         if (role.equals(Roles.MANAGER)) {
             // verify status of the delivery
-            if (!delivery.deliveryBelongToManager(ManagerCode.fromValue(entityCode)) || !delivery.isAvailableToManager()) {
+            if (!delivery.deliveryBelongToManager(ManagerCode.fromValue(entityCode))
+                    || !delivery.isAvailableToManager()) {
                 throw new UnauthorizedToSearchDelivery();
             }
         }

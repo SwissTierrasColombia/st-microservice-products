@@ -8,5 +8,3 @@ public final class RemovingAttachmentToProductFailed extends DomainError {
         super("removing_attachment_to_product_failed", errorMessage);
     }
 }
-
-

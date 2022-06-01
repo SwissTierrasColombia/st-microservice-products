@@ -9,7 +9,8 @@ public final class AttachmentReportURLGetterQuery implements Query {
     private final Long attachmentId;
     private final Long managerCode;
 
-    public AttachmentReportURLGetterQuery(Long deliveryId, Long deliveryProductId, Long attachmentId, Long managerCode) {
+    public AttachmentReportURLGetterQuery(Long deliveryId, Long deliveryProductId, Long attachmentId,
+            Long managerCode) {
         this.deliveryId = deliveryId;
         this.deliveryProductId = deliveryProductId;
         this.attachmentId = attachmentId;

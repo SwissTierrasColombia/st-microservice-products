@@ -13,8 +13,8 @@ public abstract class DeliveryProductAttachment extends AggregateRoot {
     private final DeliveryProductAttachmentDate deliveryProductAttachmentDate;
 
     public DeliveryProductAttachment(DeliveryProductAttachmentId id, DeliveryProductAttachmentUUID uuid,
-                                     DeliveryProductAttachmentObservations observations,
-                                     DeliveryProductId deliveryProductId, DeliveryProductAttachmentDate deliveryProductAttachmentDate) {
+            DeliveryProductAttachmentObservations observations, DeliveryProductId deliveryProductId,
+            DeliveryProductAttachmentDate deliveryProductAttachmentDate) {
         this.deliveryProductAttachmentId = id;
         this.uuid = uuid;
         this.observations = observations;

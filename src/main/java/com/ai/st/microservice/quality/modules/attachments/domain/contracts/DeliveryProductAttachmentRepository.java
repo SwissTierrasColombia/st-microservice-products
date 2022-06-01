@@ -24,6 +24,7 @@ public interface DeliveryProductAttachmentRepository {
 
     void remove(DeliveryProductAttachmentId id);
 
-    void updateReportRevisionXTF(DeliveryProductAttachmentUUID uuid, XTFReportRevisionUrl reportRevisionUrl, XTFReportObservations observations);
+    void updateReportRevisionXTF(DeliveryProductAttachmentUUID uuid, XTFReportRevisionUrl reportRevisionUrl,
+            XTFReportObservations observations);
 
 }

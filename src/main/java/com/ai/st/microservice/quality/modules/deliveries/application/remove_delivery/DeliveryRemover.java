@@ -24,10 +24,11 @@ public final class DeliveryRemover implements CommandUseCase<DeliveryRemoverComm
     private final DeliveryProductRemover deliveryProductRemover;
 
     public DeliveryRemover(DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository,
-                           DeliveryProductAttachmentRepository attachmentRepository, StoreFile storeFile) {
+            DeliveryProductAttachmentRepository attachmentRepository, StoreFile storeFile) {
         this.deliveryRepository = deliveryRepository;
         this.deliveryProductRepository = deliveryProductRepository;
-        this.deliveryProductRemover = new DeliveryProductRemover(deliveryRepository, deliveryProductRepository, attachmentRepository, storeFile);
+        this.deliveryProductRemover = new DeliveryProductRemover(deliveryRepository, deliveryProductRepository,
+                attachmentRepository, storeFile);
     }
 
     @Override
@@ -58,22 +59,21 @@ public final class DeliveryRemover implements CommandUseCase<DeliveryRemoverComm
 
         // verify status of the delivery
         if (!delivery.isDraft()) {
-            throw new UnauthorizedToModifyDelivery("No se puede eliminar la entrega, porque el estado de la entrega no lo permite.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede eliminar la entrega, porque el estado de la entrega no lo permite.");
         }
 
     }
 
     private void removeProductsFromDelivery(DeliveryId deliveryId, OperatorCode operatorCode) {
-        deliveryProductRepository.findByDeliveryId(deliveryId).forEach(deliveryProduct ->
-                removeProductFromDelivery(deliveryId, deliveryProduct, operatorCode));
+        deliveryProductRepository.findByDeliveryId(deliveryId)
+                .forEach(deliveryProduct -> removeProductFromDelivery(deliveryId, deliveryProduct, operatorCode));
     }
 
-    private void removeProductFromDelivery(DeliveryId deliveryId, DeliveryProduct deliveryProduct, OperatorCode operatorCode) {
-        deliveryProductRemover.handle(new DeliveryProductRemoverCommand(
-                deliveryId.value(),
-                deliveryProduct.deliveryProductId().value(),
-                operatorCode.value()
-        ));
+    private void removeProductFromDelivery(DeliveryId deliveryId, DeliveryProduct deliveryProduct,
+            OperatorCode operatorCode) {
+        deliveryProductRemover.handle(new DeliveryProductRemoverCommand(deliveryId.value(),
+                deliveryProduct.deliveryProductId().value(), operatorCode.value()));
     }
 
 }

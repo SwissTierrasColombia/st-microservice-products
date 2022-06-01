@@ -12,8 +12,8 @@ import java.util.List;
 public interface TaskMicroservice {
 
     void createQualityRulesTask(DeliveryId deliveryId, DeliveryProductId deliveryProductId,
-                                DeliveryProductXTFAttachment attachment, DepartmentMunicipality departmentMunicipality,
-                                List<UserCode> users);
+            DeliveryProductXTFAttachment attachment, DepartmentMunicipality departmentMunicipality,
+            List<UserCode> users);
 
     TaskXTFQualityControl findQualityProcessTask(DeliveryProductXTFAttachment attachment);
 

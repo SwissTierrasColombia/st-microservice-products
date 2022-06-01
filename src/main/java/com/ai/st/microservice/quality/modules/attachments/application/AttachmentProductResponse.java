@@ -10,7 +10,9 @@ import java.util.Date;
 
 public final class AttachmentProductResponse implements Response {
 
-    private enum Types {XTF, FTP, DOCUMENT}
+    private enum Types {
+        XTF, FTP, DOCUMENT
+    }
 
     private final Long attachmentId;
     private final Types type;
@@ -19,7 +21,8 @@ public final class AttachmentProductResponse implements Response {
     private final String observations;
     private final Long deliveryProductId;
 
-    public AttachmentProductResponse(Long attachmentId, Types type, AttachmentType data, Date attachmentDate, String observations, Long deliveryProductId) {
+    public AttachmentProductResponse(Long attachmentId, Types type, AttachmentType data, Date attachmentDate,
+            String observations, Long deliveryProductId) {
         this.attachmentId = attachmentId;
         this.type = type;
         this.data = data;
@@ -29,18 +32,15 @@ public final class AttachmentProductResponse implements Response {
     }
 
     public static AttachmentProductResponse fromAggregate(DeliveryProductXTFAttachment attachment) {
-        XTF xtf = new XTF(
-                attachment.valid().value(),
-                attachment.status().value().name(),
-                attachment.version().value(),
+        XTF xtf = new XTF(attachment.valid().value(), attachment.status().value().name(), attachment.version().value(),
                 attachment.hasReportRevisionURL(),
-                attachment.hasReportRevisionURL() ? attachment.reportObservations().value() : null
-        );
+                attachment.hasReportRevisionURL() ? attachment.reportObservations().value() : null);
         return fromAggregate(attachment, Types.XTF, xtf);
     }
 
     public static AttachmentProductResponse fromAggregate(DeliveryProductFTPAttachment attachment) {
-        FTP ftp = new FTP(attachment.domain().value(), attachment.port().value(), attachment.username().value(), attachment.password().value());
+        FTP ftp = new FTP(attachment.domain().value(), attachment.port().value(), attachment.username().value(),
+                attachment.password().value());
         return fromAggregate(attachment, Types.FTP, ftp);
     }
 
@@ -48,15 +48,11 @@ public final class AttachmentProductResponse implements Response {
         return fromAggregate(attachment, Types.DOCUMENT, null);
     }
 
-    private static AttachmentProductResponse fromAggregate(DeliveryProductAttachment attachment, Types type, AttachmentType data) {
-        return new AttachmentProductResponse(
-                attachment.deliveryProductAttachmentId().value(),
-                type,
-                data,
-                attachment.deliveryProductAttachmentDate().value(),
-                attachment.observations().value(),
-                attachment.deliveryProductId().value()
-        );
+    private static AttachmentProductResponse fromAggregate(DeliveryProductAttachment attachment, Types type,
+            AttachmentType data) {
+        return new AttachmentProductResponse(attachment.deliveryProductAttachmentId().value(), type, data,
+                attachment.deliveryProductAttachmentDate().value(), attachment.observations().value(),
+                attachment.deliveryProductId().value());
     }
 
     public Long attachmentId() {
@@ -95,7 +91,8 @@ public final class AttachmentProductResponse implements Response {
         private final boolean hasReportRevision;
         private final String reportObservations;
 
-        public XTF(Boolean isValid, String status, String version, boolean hasReportRevision, String reportObservations) {
+        public XTF(Boolean isValid, String status, String version, boolean hasReportRevision,
+                String reportObservations) {
             this.isValid = isValid;
             this.status = status;
             this.version = version;

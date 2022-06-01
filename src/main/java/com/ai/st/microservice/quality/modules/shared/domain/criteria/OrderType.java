@@ -2,9 +2,7 @@ package com.ai.st.microservice.quality.modules.shared.domain.criteria;
 
 public enum OrderType {
 
-    ASC("asc"),
-    DESC("desc"),
-    NONE("none");
+    ASC("asc"), DESC("desc"), NONE("none");
 
     private final String type;
 

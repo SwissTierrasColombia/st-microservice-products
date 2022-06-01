@@ -20,8 +20,7 @@ public final class DeliveryProductStatusId {
     }
 
     private void ensureStatus(Long value) {
-        if (!value.equals(DeliveryProductStatusId.PENDING)
-                && !value.equals(DeliveryProductStatusId.ACCEPTED)
+        if (!value.equals(DeliveryProductStatusId.PENDING) && !value.equals(DeliveryProductStatusId.ACCEPTED)
                 && !value.equals(DeliveryProductStatusId.REJECTED))
             throw new DeliveryProductStatusInvalid();
     }

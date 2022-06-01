@@ -22,10 +22,12 @@ public final class DeliveryToManagerSender implements CommandUseCase<DeliveryToM
     private final DeliveryRepository deliveryRepository;
     private final IntegrityDeliveryChecker integrityDeliveryChecker;
 
-    public DeliveryToManagerSender(DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository,
-                                   ProductRepository productRepository, DeliveryProductAttachmentRepository attachmentRepository) {
+    public DeliveryToManagerSender(DeliveryRepository deliveryRepository,
+            DeliveryProductRepository deliveryProductRepository, ProductRepository productRepository,
+            DeliveryProductAttachmentRepository attachmentRepository) {
         this.deliveryRepository = deliveryRepository;
-        this.integrityDeliveryChecker = new IntegrityDeliveryChecker(deliveryProductRepository, attachmentRepository, productRepository);
+        this.integrityDeliveryChecker = new IntegrityDeliveryChecker(deliveryProductRepository, attachmentRepository,
+                productRepository);
     }
 
     @Override
@@ -54,11 +56,11 @@ public final class DeliveryToManagerSender implements CommandUseCase<DeliveryToM
 
         // verify status of the delivery
         if (!delivery.isDraft()) {
-            throw new UnauthorizedToModifyDelivery("No se puede enviar la entrega, porque el estado de la misma no lo permite.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede enviar la entrega, porque el estado de la misma no lo permite.");
         }
 
         integrityDeliveryChecker.handle(new IntegrityDeliveryCheckerCommand(deliveryId.value()));
     }
-
 
 }

@@ -19,5 +19,5 @@ public final class DeliveryStatusCreatorCommand implements Command {
     public String name() {
         return name;
     }
-    
+
 }

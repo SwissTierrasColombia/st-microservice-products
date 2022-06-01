@@ -14,7 +14,8 @@ public final class UserCode {
     }
 
     private void ensureUser(Long value) {
-        if (value == null || value <= 0) throw new UserInvalid();
+        if (value == null || value <= 0)
+            throw new UserInvalid();
     }
 
     public Long value() {
@@ -23,8 +24,10 @@ public final class UserCode {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         UserCode userCode = (UserCode) o;
         return Objects.equals(value, userCode.value);
     }

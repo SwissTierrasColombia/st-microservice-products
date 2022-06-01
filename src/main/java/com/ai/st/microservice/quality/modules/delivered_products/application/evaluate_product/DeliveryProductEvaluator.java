@@ -31,8 +31,9 @@ public final class DeliveryProductEvaluator implements CommandUseCase<DeliveryPr
     private final DeliveryProductAttachmentRepository attachmentRepository;
     private final TaskMicroservice taskMicroservice;
 
-    public DeliveryProductEvaluator(DeliveryRepository deliveryRepository, DeliveryProductRepository deliveryProductRepository,
-                                    DeliveryProductAttachmentRepository attachmentRepository, TaskMicroservice taskMicroservice) {
+    public DeliveryProductEvaluator(DeliveryRepository deliveryRepository,
+            DeliveryProductRepository deliveryProductRepository,
+            DeliveryProductAttachmentRepository attachmentRepository, TaskMicroservice taskMicroservice) {
         this.deliveryRepository = deliveryRepository;
         this.deliveryProductRepository = deliveryProductRepository;
         this.attachmentRepository = attachmentRepository;
@@ -51,7 +52,8 @@ public final class DeliveryProductEvaluator implements CommandUseCase<DeliveryPr
         deliveryProductRepository.changeStatus(deliveryProductId, mappingStatus(command.state()));
     }
 
-    private void verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId, ManagerCode managerCode) {
+    private void verifyPermissions(DeliveryId deliveryId, DeliveryProductId deliveryProductId,
+            ManagerCode managerCode) {
 
         // verify delivery exists
         Delivery delivery = deliveryRepository.search(deliveryId);
@@ -72,12 +74,14 @@ public final class DeliveryProductEvaluator implements CommandUseCase<DeliveryPr
 
         // verify status of the delivery
         if (!delivery.isInReview()) {
-            throw new UnauthorizedToModifyDelivery("No se puede aceptar o rechazar el producto, porque el estado de la entrega no lo permite.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede aceptar o rechazar el producto, porque el estado de la entrega no lo permite.");
         }
 
         // verify status of the product
         if (!deliveryProduct.isPending()) {
-            throw new UnauthorizedToModifyDelivery("No se puede aceptar o rechazar el producto, porque el estado del producto no lo permite.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede aceptar o rechazar el producto, porque el estado del producto no lo permite.");
         }
 
         verifyIfThereAreAnyTaskActive(deliveryProduct);
@@ -92,13 +96,16 @@ public final class DeliveryProductEvaluator implements CommandUseCase<DeliveryPr
 
     private void verifyIfThereAreAnyTaskActive(DeliveryProduct deliveryProduct) {
 
-        List<DeliveryProductAttachment> xtfAttachments = attachmentRepository.findByDeliveryProductId(deliveryProduct.deliveryProductId())
-                .stream().filter(DeliveryProductAttachment::isXTF).collect(Collectors.toList());
+        List<DeliveryProductAttachment> xtfAttachments = attachmentRepository
+                .findByDeliveryProductId(deliveryProduct.deliveryProductId()).stream()
+                .filter(DeliveryProductAttachment::isXTF).collect(Collectors.toList());
 
         xtfAttachments.forEach(xtfAttachment -> {
-            TaskXTFQualityControl taskXTFQualityControl = taskMicroservice.findQualityProcessTask((DeliveryProductXTFAttachment) xtfAttachment);
+            TaskXTFQualityControl taskXTFQualityControl = taskMicroservice
+                    .findQualityProcessTask((DeliveryProductXTFAttachment) xtfAttachment);
             if (taskXTFQualityControl != null) {
-                throw new UnauthorizedToModifyDelivery("No se puede aceptar o rechazar un producto si existe una tarea de calidad asociada a los archivos XTF.");
+                throw new UnauthorizedToModifyDelivery(
+                        "No se puede aceptar o rechazar un producto si existe una tarea de calidad asociada a los archivos XTF.");
             }
         });
 

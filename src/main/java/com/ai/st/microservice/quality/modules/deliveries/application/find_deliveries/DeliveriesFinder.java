@@ -37,14 +37,9 @@ public final class DeliveriesFinder implements QueryUseCase<DeliveriesFinderQuer
         if (query.states().size() > 0) {
             filters.add(filterByStatus(query.states(), query.role()));
         } else {
-            List<Long> defaultStatuses = Arrays.asList(
-                    DeliveryStatusId.DRAFT,
-                    DeliveryStatusId.DELIVERED,
-                    DeliveryStatusId.IN_REVIEW,
-                    DeliveryStatusId.IN_REMEDIATION,
-                    DeliveryStatusId.ACCEPTED,
-                    DeliveryStatusId.REJECTED
-            );
+            List<Long> defaultStatuses = Arrays.asList(DeliveryStatusId.DRAFT, DeliveryStatusId.DELIVERED,
+                    DeliveryStatusId.IN_REVIEW, DeliveryStatusId.IN_REMEDIATION, DeliveryStatusId.ACCEPTED,
+                    DeliveryStatusId.REJECTED);
             filters.add(filterByStatus(defaultStatuses, query.role()));
         }
 
@@ -68,12 +63,8 @@ public final class DeliveriesFinder implements QueryUseCase<DeliveriesFinderQuer
             filters.add(filterByManager(manager));
         }
 
-        Criteria criteria = new Criteria(
-                filters,
-                Order.fromValues(Optional.of("deliveryDate"), Optional.of("DESC")),
-                Optional.of(verifyPage(query.page())),
-                Optional.of(verifyLimit(query.limit()))
-        );
+        Criteria criteria = new Criteria(filters, Order.fromValues(Optional.of("deliveryDate"), Optional.of("DESC")),
+                Optional.of(verifyPage(query.page())), Optional.of(verifyLimit(query.limit())));
 
         PageableDomain<Delivery> pageableDomain = repository.matching(criteria);
 
@@ -89,22 +80,20 @@ public final class DeliveriesFinder implements QueryUseCase<DeliveriesFinderQuer
     }
 
     private Filter filterByRole(Roles role, Long entityCode) {
-        FilterField filterField = (role.equals(Roles.OPERATOR)) ? new FilterField("operator") :
-                new FilterField("manager");
+        FilterField filterField = (role.equals(Roles.OPERATOR)) ? new FilterField("operator")
+                : new FilterField("manager");
         return new Filter(filterField, FilterOperator.EQUAL, new FilterValue(entityCode.toString()));
     }
 
     private Filter filterByStatus(List<Long> statuses, Roles role) {
 
-        List<DeliveryStatusId> statusesAllowed = (role.equals(Roles.OPERATOR)) ?
-                Delivery.statusesAllowedToOperator() : Delivery.statusesAllowedToManager();
+        List<DeliveryStatusId> statusesAllowed = (role.equals(Roles.OPERATOR)) ? Delivery.statusesAllowedToOperator()
+                : Delivery.statusesAllowedToManager();
 
         List<Long> statusesApproved = filterStatuses(statuses, statusesAllowed);
 
-        return new Filter(
-                new FilterField("deliveryStatus"), FilterOperator.CONTAINS,
-                statusesApproved.stream().
-                        map(stateId -> new FilterValue(stateId.toString())).collect(Collectors.toList()));
+        return new Filter(new FilterField("deliveryStatus"), FilterOperator.CONTAINS, statusesApproved.stream()
+                .map(stateId -> new FilterValue(stateId.toString())).collect(Collectors.toList()));
     }
 
     private List<Long> filterStatuses(List<Long> statuses, List<DeliveryStatusId> allows) {
@@ -119,30 +108,22 @@ public final class DeliveriesFinder implements QueryUseCase<DeliveriesFinderQuer
     }
 
     private Filter filterByCode(String code) {
-        return new Filter(
-                new FilterField("code"),
-                FilterOperator.EQUAL,
+        return new Filter(new FilterField("code"), FilterOperator.EQUAL,
                 new FilterValue(DeliveryCode.fromValue(code).value()));
     }
 
     private Filter filterByMunicipality(String municipality) {
-        return new Filter(
-                new FilterField("municipality"),
-                FilterOperator.EQUAL,
+        return new Filter(new FilterField("municipality"), FilterOperator.EQUAL,
                 new FilterValue(MunicipalityCode.fromValue(municipality).value()));
     }
 
     private Filter filterByOperator(Long operator) {
-        return new Filter(
-                new FilterField("operator"),
-                FilterOperator.EQUAL,
+        return new Filter(new FilterField("operator"), FilterOperator.EQUAL,
                 new FilterValue(OperatorCode.fromValue(operator).value().toString()));
     }
 
     private Filter filterByManager(Long manager) {
-        return new Filter(
-                new FilterField("manager"),
-                FilterOperator.EQUAL,
+        return new Filter(new FilterField("manager"), FilterOperator.EQUAL,
                 new FilterValue(ManagerCode.fromValue(manager).value().toString()));
     }
 
@@ -154,17 +135,12 @@ public final class DeliveriesFinder implements QueryUseCase<DeliveriesFinderQuer
             throw new ErrorFromInfrastructure();
         }
 
-        List<DeliveryResponse> deliveriesResponse = pageableDomain.items()
-                .stream().map(DeliveryResponse::fromAggregate).collect(Collectors.toList());
+        List<DeliveryResponse> deliveriesResponse = pageableDomain.items().stream().map(DeliveryResponse::fromAggregate)
+                .collect(Collectors.toList());
 
-        return new PageableResponse<>(
-                deliveriesResponse,
-                pageableDomain.currentPage().get(),
-                pageableDomain.numberOfElements().get(),
-                pageableDomain.totalElements().get(),
-                pageableDomain.totalPages().get(),
-                pageableDomain.size().get()
-        );
+        return new PageableResponse<>(deliveriesResponse, pageableDomain.currentPage().get(),
+                pageableDomain.numberOfElements().get(), pageableDomain.totalElements().get(),
+                pageableDomain.totalPages().get(), pageableDomain.size().get());
     }
 
 }

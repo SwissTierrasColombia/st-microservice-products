@@ -19,8 +19,7 @@ public final class DeliveryProductStatusCreator implements CommandUseCase<Delive
     @Override
     public void handle(DeliveryProductStatusCreatorCommand command) {
         DeliveryProductStatus deliveryProductStatus = new DeliveryProductStatus(
-                DeliveryProductStatusId.fromValue(command.id()),
-                DeliveryProductStatusName.fromValue(command.name()));
+                DeliveryProductStatusId.fromValue(command.id()), DeliveryProductStatusName.fromValue(command.name()));
         repository.save(deliveryProductStatus);
     }
 

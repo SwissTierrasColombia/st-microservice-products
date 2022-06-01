@@ -14,7 +14,8 @@ public final class DeliveryProductAttachmentDate {
     }
 
     private void ensureDate(Date value) {
-        if (value == null) throw new AttachmentDateInvalid();
+        if (value == null)
+            throw new AttachmentDateInvalid();
     }
 
     public Date value() {

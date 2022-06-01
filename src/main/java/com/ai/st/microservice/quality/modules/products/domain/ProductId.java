@@ -14,7 +14,8 @@ public final class ProductId {
     }
 
     private void ensureProductId(Long value) {
-        if (value == null || value <= 0) throw new ProductIdInvalid();
+        if (value == null || value <= 0)
+            throw new ProductIdInvalid();
     }
 
     public Long value() {
@@ -27,8 +28,10 @@ public final class ProductId {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         ProductId productId = (ProductId) o;
         return Objects.equals(value, productId.value);
     }

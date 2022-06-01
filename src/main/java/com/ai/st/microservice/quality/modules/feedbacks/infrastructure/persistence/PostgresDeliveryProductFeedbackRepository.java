@@ -53,17 +53,13 @@ public final class PostgresDeliveryProductFeedbackRepository implements Delivery
         DeliveredProductEntity deliveredProductEntity = new DeliveredProductEntity();
         deliveredProductEntity.setId(deliveryProductId.value());
 
-        return repository.findByDeliveredProduct(deliveredProductEntity).stream().map(this::mapping).collect(Collectors.toList());
+        return repository.findByDeliveredProduct(deliveredProductEntity).stream().map(this::mapping)
+                .collect(Collectors.toList());
     }
 
     private Feedback mapping(DeliveredProductFeedbackEntity entity) {
-        return Feedback.fromPrimitives(
-                entity.getId(),
-                entity.getFeedback(),
-                entity.getAttachmentUrl(),
-                entity.getCreatedAt(),
-                entity.getDeliveredProduct().getId()
-        );
+        return Feedback.fromPrimitives(entity.getId(), entity.getFeedback(), entity.getAttachmentUrl(),
+                entity.getCreatedAt(), entity.getDeliveredProduct().getId());
     }
 
 }

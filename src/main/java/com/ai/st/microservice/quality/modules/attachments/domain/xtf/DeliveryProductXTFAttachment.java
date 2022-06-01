@@ -15,10 +15,9 @@ public final class DeliveryProductXTFAttachment extends DeliveryProductAttachmen
     private final XTFReportObservations reportObservations;
 
     public DeliveryProductXTFAttachment(DeliveryProductAttachmentId id, DeliveryProductAttachmentUUID uuid,
-                                        DeliveryProductAttachmentObservations observations,
-                                        DeliveryProductId deliveryProductId, DeliveryProductAttachmentDate deliveryProductAttachmentDate,
-                                        XTFValid valid, XTFUrl url, XTFVersion version, XTFStatus status, XTFReportRevisionUrl reportRevisionUrl,
-                                        XTFReportObservations reportObservations) {
+            DeliveryProductAttachmentObservations observations, DeliveryProductId deliveryProductId,
+            DeliveryProductAttachmentDate deliveryProductAttachmentDate, XTFValid valid, XTFUrl url, XTFVersion version,
+            XTFStatus status, XTFReportRevisionUrl reportRevisionUrl, XTFReportObservations reportObservations) {
         super(id, uuid, observations, deliveryProductId, deliveryProductAttachmentDate);
         this.isValid = valid;
         this.url = url;
@@ -28,28 +27,23 @@ public final class DeliveryProductXTFAttachment extends DeliveryProductAttachmen
         this.reportObservations = reportObservations;
     }
 
-    public static DeliveryProductXTFAttachment create(DeliveryProductAttachmentUUID uuid, DeliveryProductAttachmentObservations observations,
-                                                      DeliveryProductId deliveryProductId, DeliveryProductAttachmentDate deliveryProductAttachmentDate,
-                                                      XTFValid valid, XTFUrl url, XTFVersion version, XTFStatus status) {
-        return new DeliveryProductXTFAttachment(null, uuid, observations, deliveryProductId, deliveryProductAttachmentDate, valid, url,
-                version, status, null, null);
+    public static DeliveryProductXTFAttachment create(DeliveryProductAttachmentUUID uuid,
+            DeliveryProductAttachmentObservations observations, DeliveryProductId deliveryProductId,
+            DeliveryProductAttachmentDate deliveryProductAttachmentDate, XTFValid valid, XTFUrl url, XTFVersion version,
+            XTFStatus status) {
+        return new DeliveryProductXTFAttachment(null, uuid, observations, deliveryProductId,
+                deliveryProductAttachmentDate, valid, url, version, status, null, null);
     }
 
-    public static DeliveryProductXTFAttachment fromPrimitives(Long id, String uuid, String observations, Long deliveryProductId,
-                                                              Date date, Boolean isValid, String url, String reportUrl,
-                                                              String reportObservations, String version, String status) {
+    public static DeliveryProductXTFAttachment fromPrimitives(Long id, String uuid, String observations,
+            Long deliveryProductId, Date date, Boolean isValid, String url, String reportUrl, String reportObservations,
+            String version, String status) {
 
-        return new DeliveryProductXTFAttachment(
-                new DeliveryProductAttachmentId(id),
-                new DeliveryProductAttachmentUUID(uuid),
-                new DeliveryProductAttachmentObservations(observations),
-                new DeliveryProductId(deliveryProductId),
-                new DeliveryProductAttachmentDate(date),
-                new XTFValid(isValid),
-                new XTFUrl(url),
-                new XTFVersion(version),
-                new XTFStatus(XTFStatus.valueOf(status)),
-                new XTFReportRevisionUrl(reportUrl, true),
+        return new DeliveryProductXTFAttachment(new DeliveryProductAttachmentId(id),
+                new DeliveryProductAttachmentUUID(uuid), new DeliveryProductAttachmentObservations(observations),
+                new DeliveryProductId(deliveryProductId), new DeliveryProductAttachmentDate(date),
+                new XTFValid(isValid), new XTFUrl(url), new XTFVersion(version),
+                new XTFStatus(XTFStatus.valueOf(status)), new XTFReportRevisionUrl(reportUrl, true),
                 new XTFReportObservations(reportObservations));
     }
 
@@ -88,6 +82,5 @@ public final class DeliveryProductXTFAttachment extends DeliveryProductAttachmen
     public boolean hasReportRevisionURL() {
         return reportRevisionUrl.value() != null;
     }
-
 
 }

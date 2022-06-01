@@ -2,8 +2,12 @@ package com.ai.st.microservice.quality.modules.shared.infrastructure.store;
 
 import com.ai.st.microservice.quality.modules.shared.domain.contracts.StoreFile;
 import com.ai.st.microservice.quality.modules.shared.domain.exceptions.StoreFileError;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.microservices.HTTPWorkspaceMicroservice;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -13,6 +17,8 @@ import java.io.IOException;
 
 @Service
 public final class LocalStoreFile implements StoreFile {
+
+    private final Logger log = LoggerFactory.getLogger(LocalStoreFile.class);
 
     @Value("${st.temporalDirectory}")
     private String stTemporalDirectory;
@@ -36,6 +42,9 @@ public final class LocalStoreFile implements StoreFile {
             return pathFile;
 
         } catch (IOException e) {
+            String messageError = String.format("Error guardando permanentemente el archivo: %s", e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
             throw new StoreFileError();
         }
 
@@ -55,6 +64,9 @@ public final class LocalStoreFile implements StoreFile {
             return temporalFile;
 
         } catch (IOException e) {
+            String messageError = String.format("Error guardando temporalmente el archivo: %s", e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
             throw new StoreFileError();
         }
     }
@@ -63,8 +75,10 @@ public final class LocalStoreFile implements StoreFile {
     public void deleteFile(String pathFile) {
         try {
             FileUtils.deleteQuietly(new File(pathFile));
-        } catch (Exception ignored) {
-
+        } catch (Exception e) {
+            String messageError = String.format("Error eliminando el archivo: %s", e.getMessage());
+            SCMTracing.sendError(messageError);
+            log.error(messageError);
         }
     }
 

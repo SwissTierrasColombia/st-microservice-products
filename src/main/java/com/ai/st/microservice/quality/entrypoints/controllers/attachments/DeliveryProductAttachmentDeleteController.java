@@ -11,6 +11,8 @@ import com.ai.st.microservice.quality.modules.attachments.application.remove_att
 import com.ai.st.microservice.quality.modules.attachments.application.remove_attachment_from_product.AttachmentProductRemoverCommand;
 import com.ai.st.microservice.quality.modules.shared.domain.DomainError;
 
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.TracingKeyword;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -22,7 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Api(value = "Manage Deliveries", tags = {"Deliveries"})
+@Api(value = "Manage Deliveries", tags = { "Deliveries" })
 @RestController
 public final class DeliveryProductAttachmentDeleteController extends ApiController {
 
@@ -30,22 +32,20 @@ public final class DeliveryProductAttachmentDeleteController extends ApiControll
 
     private final AttachmentProductRemover attachmentProductRemover;
 
-    public DeliveryProductAttachmentDeleteController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                                     OperatorBusiness operatorBusiness, AttachmentProductRemover attachmentProductRemover) {
+    public DeliveryProductAttachmentDeleteController(AdministrationBusiness administrationBusiness,
+            ManagerBusiness managerBusiness, OperatorBusiness operatorBusiness,
+            AttachmentProductRemover attachmentProductRemover) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.attachmentProductRemover = attachmentProductRemover;
     }
 
     @DeleteMapping(value = "api/quality/v1/deliveries/{deliveryId}/products/{deliveryProductId}/attachments/{attachmentId}")
     @ApiOperation(value = "Remove attachment from delivery product")
-    @ApiResponses(value = {
-            @ApiResponse(code = 204, message = "Attachment removed"),
-            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class)})
+    @ApiResponses(value = { @ApiResponse(code = 204, message = "Attachment removed"),
+            @ApiResponse(code = 500, message = "Error Server", response = BasicResponseDto.class) })
     @ResponseBody
-    public ResponseEntity<?> removeAttachmentFromProduct(
-            @PathVariable Long deliveryId,
-            @PathVariable Long deliveryProductId,
-            @PathVariable Long attachmentId,
+    public ResponseEntity<?> removeAttachmentFromProduct(@PathVariable Long deliveryId,
+            @PathVariable Long deliveryProductId, @PathVariable Long attachmentId,
             @RequestHeader("authorization") String headerAuthorization) {
 
         HttpStatus httpStatus;
@@ -53,30 +53,38 @@ public final class DeliveryProductAttachmentDeleteController extends ApiControll
 
         try {
 
+            SCMTracing.setTransactionName("removeAttachmentFromProduct");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
+
             InformationSession session = this.getInformationSession(headerAuthorization);
 
             validateDeliveryId(deliveryId);
             validateDeliveryProductId(deliveryProductId);
             validateAttachmentId(attachmentId);
 
-            attachmentProductRemover.handle(
-                    new AttachmentProductRemoverCommand(
-                            deliveryId, deliveryProductId, attachmentId, session.entityCode()));
+            attachmentProductRemover.handle(new AttachmentProductRemoverCommand(deliveryId, deliveryProductId,
+                    attachmentId, session.entityCode()));
 
             httpStatus = HttpStatus.NO_CONTENT;
 
         } catch (InputValidationException e) {
-            log.error("Error DeliveryProductAttachmentDeleteController@removeAttachmentFromProduct#Validation ---> " + e.getMessage());
+            log.error("Error DeliveryProductAttachmentDeleteController@removeAttachmentFromProduct#Validation ---> "
+                    + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
-            responseDto = new BasicResponseDto(e.getMessage(), 3);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (DomainError e) {
-            log.error("Error DeliveryProductAttachmentDeleteController@removeAttachmentFromProduct#Domain ---> " + e.getMessage());
+            log.error("Error DeliveryProductAttachmentDeleteController@removeAttachmentFromProduct#Domain ---> "
+                    + e.getMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+            responseDto = new BasicResponseDto(e.errorMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (Exception e) {
-            log.error("Error DeliveryProductAttachmentDeleteController@removeAttachmentFromProduct#General ---> " + e.getMessage());
+            log.error("Error DeliveryProductAttachmentDeleteController@removeAttachmentFromProduct#General ---> "
+                    + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 1);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);

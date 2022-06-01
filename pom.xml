@@ -13,12 +13,12 @@
 
     <groupId>com.ai.st.microservice.quality</groupId>
     <artifactId>st-microservice-quality</artifactId>
-    <version>1.0.0</version>
+    <version>1.2.0</version>
     <name>st-microservice-quality</name>
     <description>Products BPM</description>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
         <spring-cloud.version>Hoxton.RC2</spring-cloud.version>
     </properties>
 
@@ -93,7 +93,21 @@
         <dependency>
             <groupId>com.ai.st.microservice.common</groupId>
             <artifactId>st-common</artifactId>
-            <version>1.1.2</version>
+            <version>1.1.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.newrelic.agent.java</groupId>
+            <artifactId>newrelic-api</artifactId>
+            <version>7.5.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.newrelic.agent.java</groupId>
+            <artifactId>newrelic-agent</artifactId>
+            <version>7.5.0</version>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>
@@ -122,6 +136,35 @@
                 <configuration>
                     <source>9</source>
                     <target>9</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+                <version>2.18.0</version>
+                <configuration>
+                    <lineEnding>LF</lineEnding>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>8.5.4</version>
+                <configuration>
+                    <user>postgres</user>
+                    <password>123456</password>
+                    <url>jdbc:postgresql://localhost:54321/sistema-transicion</url>
+                    <schemas>
+                        <schema>quality</schema>
+                    </schemas>
                 </configuration>
             </plugin>
         </plugins>

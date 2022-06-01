@@ -15,8 +15,7 @@ public final class ReportAggregatorCommand implements Command {
     private final String extensionFile;
 
     public ReportAggregatorCommand(Long deliveryId, Long deliveryProductId, Long attachmentId, Long managerCode,
-                                   Long userCode, boolean overwrite, String observations,
-                                   byte[] bytesFile, String extensionFile) {
+            Long userCode, boolean overwrite, String observations, byte[] bytesFile, String extensionFile) {
         this.deliveryId = deliveryId;
         this.deliveryProductId = deliveryProductId;
         this.attachmentId = attachmentId;

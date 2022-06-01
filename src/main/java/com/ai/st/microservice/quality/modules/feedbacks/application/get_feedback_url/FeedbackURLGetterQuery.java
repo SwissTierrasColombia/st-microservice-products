@@ -11,7 +11,8 @@ public final class FeedbackURLGetterQuery implements Query {
     private final Roles role;
     private final Long entityCode;
 
-    public FeedbackURLGetterQuery(Long deliveryId, Long deliveryProductId, Long feedbackId, Roles role, Long entityCode) {
+    public FeedbackURLGetterQuery(Long deliveryId, Long deliveryProductId, Long feedbackId, Roles role,
+            Long entityCode) {
         this.deliveryId = deliveryId;
         this.deliveryProductId = deliveryProductId;
         this.feedbackId = feedbackId;

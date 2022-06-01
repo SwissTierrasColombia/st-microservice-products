@@ -19,8 +19,8 @@ public final class DeliveriesFinderQuery implements Query {
     private final Roles role;
     private final Long entityCode;
 
-    public DeliveriesFinderQuery(int page, int limit, List<Long> states, String code,
-                                 String municipality, Long operator, Long manager, Roles role, Long entityCode) {
+    public DeliveriesFinderQuery(int page, int limit, List<Long> states, String code, String municipality,
+            Long operator, Long manager, Roles role, Long entityCode) {
         this.page = page;
         this.limit = limit;
         this.code = code;

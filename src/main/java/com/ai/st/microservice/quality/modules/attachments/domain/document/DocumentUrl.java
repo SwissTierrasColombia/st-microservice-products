@@ -12,7 +12,8 @@ public final class DocumentUrl {
     }
 
     private void ensureUrl(String value) {
-        if (value == null || value.isEmpty()) throw new DocumentUrlInvalid();
+        if (value == null || value.isEmpty())
+            throw new DocumentUrlInvalid();
     }
 
     public String value() {

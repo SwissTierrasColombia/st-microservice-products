@@ -46,7 +46,8 @@ public final class ReviewStarter implements CommandUseCase<ReviewStarterCommand>
 
         // verify status of the delivery
         if (!delivery.isDelivered()) {
-            throw new UnauthorizedToModifyDelivery("No se puede iniciar la revisión, porque el estado de la misma no lo permite.");
+            throw new UnauthorizedToModifyDelivery(
+                    "No se puede iniciar la revisión, porque el estado de la misma no lo permite.");
         }
     }
 

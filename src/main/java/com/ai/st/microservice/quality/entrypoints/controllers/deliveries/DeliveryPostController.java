@@ -11,6 +11,8 @@ import com.ai.st.microservice.quality.modules.deliveries.application.create_deli
 import com.ai.st.microservice.quality.modules.deliveries.application.create_delivery.DeliveryCreator;
 import com.ai.st.microservice.quality.modules.shared.domain.*;
 
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.SCMTracing;
+import com.ai.st.microservice.quality.modules.shared.infrastructure.tracing.TracingKeyword;
 import io.swagger.annotations.*;
 
 import org.slf4j.Logger;
@@ -22,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-@Api(value = "Manage Deliveries", tags = {"Deliveries"})
+@Api(value = "Manage Deliveries", tags = { "Deliveries" })
 @RestController
 public final class DeliveryPostController extends ApiController {
 
@@ -31,24 +33,27 @@ public final class DeliveryPostController extends ApiController {
     private final DeliveryCreator deliveryCreator;
 
     public DeliveryPostController(AdministrationBusiness administrationBusiness, ManagerBusiness managerBusiness,
-                                  OperatorBusiness operatorBusiness, DeliveryCreator deliveryCreator) {
+            OperatorBusiness operatorBusiness, DeliveryCreator deliveryCreator) {
         super(administrationBusiness, managerBusiness, operatorBusiness);
         this.deliveryCreator = deliveryCreator;
     }
 
     @PostMapping(value = "api/quality/v1/deliveries", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Create delivery")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Delivery created"),
-            @ApiResponse(code = 500, message = "Error Server", response = String.class)})
+    @ApiResponses(value = { @ApiResponse(code = 201, message = "Delivery created"),
+            @ApiResponse(code = 500, message = "Error Server", response = String.class) })
     @ResponseBody
     public ResponseEntity<?> createDelivery(@RequestBody CreateDeliveryRequest request,
-                                            @RequestHeader("authorization") String headerAuthorization) {
+            @RequestHeader("authorization") String headerAuthorization) {
 
         HttpStatus httpStatus;
         Object responseDto = null;
 
         try {
+
+            SCMTracing.setTransactionName("createDelivery");
+            SCMTracing.addCustomParameter(TracingKeyword.AUTHORIZATION_HEADER, headerAuthorization);
+            SCMTracing.addCustomParameter(TracingKeyword.BODY_REQUEST, request.toString());
 
             InformationSession session = this.getInformationSession(headerAuthorization);
 
@@ -64,29 +69,26 @@ public final class DeliveryPostController extends ApiController {
             List<Long> products = request.getDeliveredProducts();
             validateProducts(request.getDeliveredProducts());
 
-            deliveryCreator.handle(
-                    new CreateDeliveryCommand(
-                            municipalityCode,
-                            managerCode,
-                            session.entityCode(),
-                            session.userCode(),
-                            observations,
-                            products));
+            deliveryCreator.handle(new CreateDeliveryCommand(municipalityCode, managerCode, session.entityCode(),
+                    session.userCode(), observations, products));
 
             httpStatus = HttpStatus.CREATED;
 
         } catch (InputValidationException e) {
             log.error("Error DeliveryPostController@createDelivery#Validation ---> " + e.getMessage());
             httpStatus = HttpStatus.BAD_REQUEST;
-            responseDto = new BasicResponseDto(e.getMessage(), 1);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (DomainError e) {
             log.error("Error DeliveryPostController@createDelivery#Domain ---> " + e.errorMessage());
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            responseDto = new BasicResponseDto(e.errorMessage(), 2);
+            responseDto = new BasicResponseDto(e.errorMessage());
+            SCMTracing.sendError(e.getMessage());
         } catch (Exception e) {
             log.error("Error DeliveryPostController@createDelivery#General ---> " + e.getMessage());
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            responseDto = new BasicResponseDto(e.getMessage(), 3);
+            responseDto = new BasicResponseDto(e.getMessage());
+            SCMTracing.sendError(e.getMessage());
         }
 
         return new ResponseEntity<>(responseDto, httpStatus);
@@ -169,5 +171,12 @@ final class CreateDeliveryRequest {
 
     public void setDeliveredProducts(List<Long> deliveredProducts) {
         this.deliveredProducts = deliveredProducts;
+    }
+
+    @Override
+    public String toString() {
+        return "CreateDeliveryRequest{" + "municipalityCode='" + municipalityCode + '\'' + ", observations='"
+                + observations + '\'' + ", managerCode=" + managerCode + ", deliveredProducts=" + deliveredProducts
+                + '}';
     }
 }

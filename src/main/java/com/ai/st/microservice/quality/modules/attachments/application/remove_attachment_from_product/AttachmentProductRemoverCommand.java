@@ -9,7 +9,8 @@ public final class AttachmentProductRemoverCommand implements Command {
     private final Long attachmentId;
     private final Long operatorCode;
 
-    public AttachmentProductRemoverCommand(Long deliveryId, Long deliveryProductId, Long attachmentId, Long operatorId) {
+    public AttachmentProductRemoverCommand(Long deliveryId, Long deliveryProductId, Long attachmentId,
+            Long operatorId) {
         this.deliveryId = deliveryId;
         this.deliveryProductId = deliveryProductId;
         this.attachmentId = attachmentId;

@@ -9,7 +9,8 @@ public final class ManagerName extends StringValueObject {
     }
 
     private static void ensureName(String value) {
-        if (value == null || value.isEmpty()) throw new ManagerNameInvalid();
+        if (value == null || value.isEmpty())
+            throw new ManagerNameInvalid();
     }
 
     public static ManagerName fromValue(String value) {
